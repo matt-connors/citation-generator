@@ -1,0 +1,53 @@
+---
+import type { ImageMetadata } from "astro";
+import { getImage } from "astro:assets";
+import defaultImage from "../../../public/images/default.jpg";
+
+interface Props {
+    src: string | ImageMetadata;
+    alt: string;
+}
+
+const { src, alt } = Astro.props;
+
+/**
+ * Import an image from the public folder and return the image object.
+ * @param sourceUrl The URL of the image to import.
+ */
+async function importImage(sourceUrl: string | ImageMetadata) {
+    try {
+        // import the image
+        const image = await import(`/public/images/${sourceUrl}`);
+        // ensure the image exists
+        if (image) {
+            return image.default;
+        }
+        // throw an error if the image doesn't exist
+        throw new Error("Image not found.");
+    }
+    catch (error) {
+        // Return a default image if the image doesn't exist (there was an error importing it)
+        console.warn(`WARNING: failed to import image (not found): ${src}`);
+        return defaultImage;
+    }
+}
+
+const importedImage = await importImage(src);
+const image = await getImage({
+    src: importedImage,
+    format: "webp",
+    widths: [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000],
+});
+
+---
+
+<picture>
+    <img
+        srcset={image.srcSet.attribute}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        width={importedImage.width}
+        height={importedImage.height}
+    />
+</picture>

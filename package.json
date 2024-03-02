@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
-    "preview": "npm run build && wrangler pages dev ./dist"
+    "preview": "npm run build && wrangler pages dev ./dist --compatibility-flags=\"nodejs_compat\""
   },
   "author": "",
   "license": "ISC",

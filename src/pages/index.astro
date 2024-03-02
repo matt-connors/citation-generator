@@ -1,8 +1,6 @@
 ---
-import { Image } from "astro:assets";
-
 import BaseHead from "../components/astro/BaseHead.astro";
-import image from "../../public/images/istockphoto-615422436-612x612.jpg";
+import Img from "../components/astro/img.astro";
 ---
 
 <!doctype html>
@@ -12,10 +10,6 @@ import image from "../../public/images/istockphoto-615422436-612x612.jpg";
     </head>
     <body>
         <h1>Hello World</h1>
-        <Image
-            src={image}
-            alt="A description of my image."
-            widths={[240, 540, 720, image.width]}
-        />
+        <Img src="istockphoto-615422436-612x612.jpg" alt="A description of my image." />
     </body>
 </html>

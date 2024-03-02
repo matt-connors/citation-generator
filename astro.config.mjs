@@ -28,7 +28,8 @@ export default defineConfig({
         // },
         // Use cloudflare image service for image optimization
         // https://developers.cloudflare.com/images/manage-images/create-variants/
-        imageService: 'cloudflare',
+        // ** can't be enabled without a domain -- wont work on pages.dev endpoint provided by cloudflare **
+        // imageService: 'cloudflare',
     }),
     integrations: [
         // Compresses images and minifies HTML, CSS, and JS
