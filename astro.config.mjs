@@ -18,6 +18,7 @@ import react from '@astrojs/react';
 // https://astro.build/config
 export default defineConfig({
     site: "https://citation-generator-5bt.pages.dev/",
+    base: "/",
     output: "server",
     adapter: cloudflare({
         mode: "directory",

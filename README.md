@@ -11,7 +11,7 @@ This project is hosted on Cloudflare Pages and uses Cloudflare Functions for api
 To preview just the static site using Astro, you can run the following command: \
 `npm run dev`
 
-To preview the entire project locally, prior to deployment, as if it were on Cloudflare, you can run the following command: \
+To preview the entire project locally prior to deployment, as if it were on Cloudflare, you can run the following command: \
 `npm run preview`
 
 > Running the preview command will statically generate the site and use wrangler to start a local server. Note that making changes to the site will require you to stop the server and run the preview command again.

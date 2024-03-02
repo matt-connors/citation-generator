@@ -9,6 +9,7 @@ interface Props {
 }
 
 const { src, alt } = Astro.props;
+const baseURL = import.meta.url.replace('file://', '').split('/').slice(0, -4).join('/');
 
 /**
  * Import an image from the public folder and return the image object.
@@ -17,7 +18,7 @@ const { src, alt } = Astro.props;
 async function importImage(sourceUrl: string | ImageMetadata) {
     try {
         // import the image
-        const image = await import(`../../../public/images/${sourceUrl}`);
+        const image = await import(`${baseURL}/public/images/${sourceUrl}`);
         // ensure the image exists
         if (image) {
             return image.default;
