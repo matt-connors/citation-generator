@@ -9,7 +9,11 @@ interface Props {
 }
 
 const { src, alt } = Astro.props;
-const baseURL = import.meta.url.replace('file://', '').split('/').slice(0, -4).join('/');
+const baseURL = import.meta.url
+    .replace("file://", "")
+    .split("/")
+    .slice(0, -4)
+    .join("/");
 
 /**
  * Import an image from the public folder and return the image object.
@@ -17,16 +21,22 @@ const baseURL = import.meta.url.replace('file://', '').split('/').slice(0, -4).j
  */
 async function importImage(sourceUrl: string | ImageMetadata) {
     try {
+        console.log("sourceUrl: \t", sourceUrl);
+        console.log("baseURL: \t", baseURL);
+        console.log("meta url: \t", import.meta.url);
+        console.log("root", import.meta.env.ROOT_URL);
+        console.log("full path: \t", `${baseURL}/public/images/${sourceUrl}`);
+        console.log("ENV", import.meta.env);
+        
         // import the image
-        const image = await import(`${baseURL}/public/images/${sourceUrl}`);
+        const image = await import(`http://127.0.0.1:8788/images/${sourceUrl}`);
         // ensure the image exists
         if (image) {
             return image.default;
         }
         // throw an error if the image doesn't exist
         throw new Error("Image not found.");
-    }
-    catch (error) {
+    } catch (error) {
         // Return a default image if the image doesn't exist (there was an error importing it)
         console.warn(`WARNING: failed to import image (not found): ${src}`);
         return defaultImage;
@@ -39,16 +49,13 @@ const image = await getImage({
     format: "webp",
     widths: [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000],
 });
-
 ---
 
-<picture>
-    <img
-        srcset={image.srcSet.attribute}
-        alt={alt}
-        loading="lazy"
-        decoding="async"
-        width={importedImage.width}
-        height={importedImage.height}
-    />
-</picture>
+<img
+    srcset={image.srcSet.attribute}
+    alt={alt}
+    loading="lazy"
+    decoding="async"
+    width={importedImage.width}
+    height={importedImage.height}
+/>

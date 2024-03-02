@@ -8,7 +8,7 @@ dist/
 .wrangler/
 
 # Astro generated file
-functions/*.js
+functions/*path*.js
 
 # dependencies
 node_modules/
