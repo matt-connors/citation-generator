@@ -17,7 +17,7 @@ const { src, alt } = Astro.props;
 async function importImage(sourceUrl: string | ImageMetadata) {
     try {
         // import the image
-        const image = await import(`/public/images/${sourceUrl}`);
+        const image = await import(`../../../public/images/${sourceUrl}`);
         // ensure the image exists
         if (image) {
             return image.default;

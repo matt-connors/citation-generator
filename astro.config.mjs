@@ -9,6 +9,12 @@ import react from '@astrojs/react';
  * See https://docs.astro.build/en/guides/integrations-guide/cloudflare/
  */
 
+/**
+ * Consider implemeting i18n generation
+ * https://github.com/yassinedoghri/astro-i18next#readme
+ * https://docs.astro.build/en/guides/integrations-guide/sitemap/
+ */
+
 // https://astro.build/config
 export default defineConfig({
     site: "https://citation-generator-5bt.pages.dev/",
