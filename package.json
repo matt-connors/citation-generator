@@ -7,12 +7,15 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "npm run build && wrangler pages dev ./dist"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@astrojs/cloudflare": "^9.0.2",
     "astro": "^4.4.8"
+  },
+  "devDependencies": {
+    "wrangler": "^3.30.1"
   }
 }
