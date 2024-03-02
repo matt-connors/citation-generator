@@ -1,5 +1,8 @@
 import { defineConfig } from 'astro/config';
 import cloudflare from "@astrojs/cloudflare";
+import sitemap from '@astrojs/sitemap';
+import compress from "astro-compress";
+import react from '@astrojs/react';
 
 /**
  * Astro Config file for Cloudflare
@@ -8,14 +11,13 @@ import cloudflare from "@astrojs/cloudflare";
 
 // https://astro.build/config
 export default defineConfig({
+    site: "https://citation-generator-5bt.pages.dev/",
     output: "server",
     adapter: cloudflare({
         mode: "directory",
         routes: {
             strategy: "include",
-            include: [
-                "/api/*"
-            ]
+            include: ["/api/*"]
         },
         // runtime: {
         //     mode: "local",
@@ -26,6 +28,14 @@ export default defineConfig({
         // },
         // Use cloudflare image service for image optimization
         // https://developers.cloudflare.com/images/manage-images/create-variants/
-        // imageService: 'cloudflare',
-    })
+        imageService: 'cloudflare',
+    }),
+    integrations: [
+        // Compresses images and minifies HTML, CSS, and JS
+        compress(),
+        // Generates a sitemap file
+        sitemap(),
+        // React integration
+        react()
+    ]
 });

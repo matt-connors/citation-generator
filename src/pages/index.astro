@@ -1,5 +1,21 @@
+---
+import { Image } from "astro:assets";
+
+import BaseHead from "../components/astro/BaseHead.astro";
+import image from "../../public/images/istockphoto-615422436-612x612.jpg";
+---
+
+<!doctype html>
 <html>
+    <head>
+        <BaseHead title="" description="" />
+    </head>
     <body>
         <h1>Hello World</h1>
+        <Image
+            src={image}
+            alt="A description of my image."
+            widths={[240, 540, 720, image.width]}
+        />
     </body>
 </html>

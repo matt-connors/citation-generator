@@ -4,9 +4,11 @@ dist/
 # generated types
 .astro/
 
-# build directory
-dist/
-functions/[[path]].js
+# Wrangler
+.wrangler/
+
+# Astro generated file
+functions/*.js
 
 # dependencies
 node_modules/
