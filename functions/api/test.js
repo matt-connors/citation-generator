@@ -7,5 +7,5 @@ export function onRequest(context) {
             "content-type": "application/json"
         }
     };
-    return new Response(JSON.stringify(data), options);
+    return new Response(JSON.stringify(context), options);
 }

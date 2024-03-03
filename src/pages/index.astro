@@ -1,15 +1,12 @@
 ---
-import BaseHead from "../components/astro/BaseHead.astro";
 import Img from "../components/astro/img.astro";
+import Layout from "../layouts/page.astro";
 ---
 
-<!doctype html>
-<html>
-    <head>
-        <BaseHead title="" description="" />
-    </head>
-    <body>
-        <h1>Hello World</h1>
-        <Img src="istockphoto-615422436-612x612.jpg" alt="A description of my image." />
-    </body>
-</html>
+<Layout title="" description="">
+    <h1 class="heading-1">Hello World</h1>
+    <Img
+        src="istockphoto-615422436-612x612.jpg"
+        alt="A description of my image."
+    />
+</Layout>
