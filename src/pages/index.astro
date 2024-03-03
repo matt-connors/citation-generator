@@ -1,12 +1,37 @@
 ---
-import Img from "../components/astro/img.astro";
 import Layout from "../layouts/page.astro";
+import CitationSearch from "../components/react/CitationSearch";
 ---
 
 <Layout title="" description="">
-    <h1 class="heading-1">Hello World</h1>
-    <Img
-        src="istockphoto-615422436-612x612.jpg"
-        alt="A description of my image."
-    />
+    <section id="tool">
+        <div id="text-container">
+            <h1 class="heading-1">MLA Format <br />Citation Generator</h1>
+            <!-- <p class="subtitle">
+                Accurate APA, MLA, Chicago, and Harvard citations, verified by
+                experts, trusted by millions
+            </p> -->
+        </div>
+        <CitationSearch client:only />
+    </section>
 </Layout>
+
+<style>
+    #tool {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    #text-container {
+        text-align: center;
+        margin: 4rem 0;
+    }
+    /* #text-container .heading-1 {
+        margin-bottom: 1rem;
+    } */
+    #text-container .subtitle {
+        max-width: 44ch;
+        color: var(--color-text-light);
+    }
+</style>
