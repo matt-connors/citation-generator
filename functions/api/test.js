@@ -1,4 +1,4 @@
-export function onRequest(context) {
+export function onRequest(...args) {
     const data = {
         message: "Hello from Cloudflare Worker!"
     };
@@ -7,5 +7,5 @@ export function onRequest(context) {
             "content-type": "application/json"
         }
     };
-    return new Response(JSON.stringify(context), options);
+    return new Response(JSON.stringify({args}), options);
 }

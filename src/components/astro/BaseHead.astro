@@ -1,5 +1,5 @@
 ---
-import '../../styles/global.css';
+import "../../styles/global.css";
 
 interface Props {
     title: string;
@@ -11,12 +11,7 @@ interface Props {
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 // Get the metadata from the Astro props
-const {
-    title,
-    description,
-    image = '/images/banner.png'
-} = Astro.props;
-
+const { title, description, image = "/images/banner.png" } = Astro.props;
 ---
 
 <!-- Global Metadata -->
@@ -25,7 +20,13 @@ const {
 <link rel="icon" type="image/png" href="/favicon.png" />
 
 <!-- Font preloads -->
-<link rel="preload" href="/fonts/Manrope-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin />
+<link
+    rel="preload"
+    href="/fonts/Manrope-VariableFont_wght.ttf"
+    as="font"
+    type="font/ttf"
+    crossorigin
+/>
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
@@ -48,3 +49,10 @@ const {
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image, Astro.url)} />
+
+<!-- Cloudflare Web Analytics -->
+<script
+    defer
+    src="https://static.cloudflareinsights.com/beacon.min.js"
+    data-cf-beacon='{"token": "be4d6ced89604b3ba9e8c5137b6bc781"}'></script>
+<!-- End Cloudflare Web Analytics -->
