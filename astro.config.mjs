@@ -3,6 +3,7 @@ import cloudflare from "@astrojs/cloudflare";
 import sitemap from '@astrojs/sitemap';
 import compress from "astro-compress";
 import react from '@astrojs/react';
+import mdx from '@astrojs/mdx';
 
 /**
  * Astro Config file for Cloudflare
@@ -17,21 +18,21 @@ import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
-    site: "https://citation-generator-5bt.pages.dev/",
+    site: "https://citation-generator-5bt.pages.dev",
     output: "server",
     adapter: cloudflare({
         mode: "directory",
         routes: {
-            strategy: "include",
-            include: ["/api/*"]
+            strategy: "exclude",
+            include: ["/api/*", "/guides/*"],
         },
-        // runtime: {
-        //     mode: "local",
-        //     type: "pages",
-        //     bindings: {
-        //         // Bindings for environment variables, KV, D1, R2, Durable Objects, etc.
-        //     }
-        // },
+        runtime: {
+            mode: "local",
+            type: "pages",
+            bindings: {
+                // Bindings for environment variables, KV, D1, R2, Durable Objects, etc.
+            }
+        },
         // Use cloudflare image service for image optimization
         // https://developers.cloudflare.com/images/manage-images/create-variants/
         // ** can't be enabled without a domain -- wont work on pages.dev endpoint provided by cloudflare **
@@ -43,6 +44,8 @@ export default defineConfig({
         // Generates a sitemap file
         sitemap(),
         // React integration
-        react()
+        react(),
+        // MDX integration
+        mdx(),
     ]
 });

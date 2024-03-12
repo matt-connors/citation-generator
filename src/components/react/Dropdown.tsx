@@ -101,8 +101,8 @@ export default function Dropdown({ options, defaultOption, className, onChange }
                 </div>
                 <ul>
                     {matchingOptions
-                    // sort alphabetically, with the selected option at the top
-                    .sort((a, b) => a.label === selectedOption.label ? -1 : b.label === selectedOption.label ? 1 : a.label.localeCompare(b.label))
+                    // sort alphabetically
+                    .sort((a, b) => a.label.localeCompare(b.label))
                     .map((option, index) => (
                         <li key={index}>
                             <button

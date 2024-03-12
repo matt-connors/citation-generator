@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import clsx from "clsx";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import Dropdown from "./Dropdown";
 import styles from "../../styles/citation-search.module.css";
 
@@ -52,7 +53,7 @@ const CitationSearch = () => {
     ];
 
     return (
-        <Tabs selectedIndex={tabIndex} onSelect={setTabIndex}>
+        <Tabs selectedIndex={tabIndex} onSelect={setTabIndex} className={styles.citationSearch}>
             {/* Tab list */}
             <TabList className={styles.searchTablist} role="tablist">
                 {tabPanels.map((panel, index) => (
@@ -60,7 +61,7 @@ const CitationSearch = () => {
                 ))}
             </TabList>
             {/* Form containing search inputs and citation options */}
-            <form className={styles.searchBox}>
+            <form className={styles.searchBox} action="/citations">
                 {/* Dropdown for selecting citation style */}
                 <Dropdown
                     options={citationStyles}
@@ -78,6 +79,10 @@ const CitationSearch = () => {
                     <span>Cite</span>
                 </button>
             </form>
+            <a href="/citations" className={styles.smallButton}>
+                <span>Cite Manually</span>
+                <ChevronRightIcon className={styles.icon} />
+            </a>
         </Tabs>
     );
 }

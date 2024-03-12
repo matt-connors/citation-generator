@@ -12,63 +12,71 @@ function createResponse(body) {
 }
 
 /**
- * Extracts dates from a string which are prefixed by a specific word
+ * Extracts dates from a string
  */
-// function getDateMatches(prefixes, text) {
-//     // The regex to matches any date in the format, such as
-//     //     01/01/2023, 1/1/2023, 01-01-2023, 1-1-2023, 01:01:2023, 1:1:2023, January 1, 2023, Jan 1, 2023, 1 January 2023, 1 Jan 2023, 2017 Oct 4
-//     const dateRegex = /\b(\d{1,2}|[a-zA-Z]{3,9})\s*[:,\s-]\s*(\d{1,2}|[a-zA-Z]{3,9})\s*[:,\s-]\s*(\d{4})|(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\/(19|20)?\d{2}$/g;
-//     // const dateRegex = /^(?:(?:(0[1-9]|1[0-2])|(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?) )?\s?(?:\d{1,2}(?:st|nd|rd|th)?)?(?:\s*,)?\s*)?\d{4}$/g;
-//     const matches = [];
+function extractDates(text) {
+    const regexPatterns = [
+        // YYYY-MM-DD (e.g., 2024-03-10)
+        /\d{4}-\d{2}-\d{2}/,
+        // MM/DD/YYYY (e.g., 03/10/2024)
+        /\d{2}\/\d{2}\/\d{4}/,
+        // DD/MM/YYYY (e.g., 10/03/2024) - for countries with DD/MM format
+        /\d{2}\/\d{2}\/\d{4}/,
+        // Month name DD, YYYY (e.g., March 10, 2024)
+        /\w+\s\d{1,2},\s\d{4}/,
+        // Month abbreviation (3 letters) DD, YYYY (e.g., Mar 10, 2024)
+        /\b[A-Z]{3}\s\d{1,2},\s\d{4}/,
+        // Ordinal dates (e.g., 1st of March 2024, 2nd April, 2023)
+        /\d{1,2}(?:st|nd|rd|th)\s+(of)?\s+\w+\s+\d{4}/,
+        // Two-digit year format (e.g., 10/03/23) - Use with caution due to ambiguity
+        /\d{2}\/\d{2}\/\d{2}/,
+        // Day, Month, Year (e.g., 10 March 2024)
+        /\d{1,2}\s\w+\s\d{4}/,
+    ];
 
-//     let match;
-//     while ((match = dateRegex.exec(text)) !== null) {
+    const extractedDates = [];
+    for (const pattern of regexPatterns) {
+        let match;
+        while ((match = pattern.exec(text)) !== null) {
+            extractedDates.push(match[0]);
+            text = text.slice(match.index + match[0].length); // Update remaining text
+        }
+    }
 
-//         console.log('increment')
+    return extractedDates;
+}
 
-//         const matchIndex = match.index;
-//         const prefixBefore = text.slice(0, matchIndex).trim();
-
-//         for (const prefix of prefixes) {
-//             if (prefixBefore.toLowerCase().endsWith(prefix)) {
-//                 const date = new Date(match[0]);
-//                 matches.push({
-//                     context: {
-//                         prefix,
-//                         matchedText: match[0]
-//                     },
-//                     date: getDateParts(date)
-//                 });
-//             }
-//         }
-//     }
-
-//     return matches;
-// }
-
+/**
+ * Extracts dates from a string based on prefixes
+ */
 function getDateMatches(prefixes, text) {
     const foundDates = [];
     const textLower = text.toLowerCase(); // Convert to lowercase for case-insensitive matching
+    const prefixEnds = [" on", " at", ": "];
 
     for (const prefix of prefixes) {
-        const prefixLower = prefix.toLowerCase();
-        const startIndex = textLower.indexOf(prefixLower);
+        for (const prefixEnd of prefixEnds) {
+            const prefixLower = prefix.toLowerCase() + prefixEnd;
+            const startIndex = textLower.indexOf(prefixLower);
 
-        if (startIndex !== -1) {
-            // Extract date string after prefix, removing leading/trailing white spaces
-            const dateString = text.substring(startIndex + prefixLower.length).trim();
+            if (startIndex !== -1) {
+                // Extract date string after prefix, removing leading/trailing white spaces
+                const dateStringText = text.substring(startIndex + prefixLower.length).trim();
+                const dates = extractDates(dateStringText);
 
-            // Use moment.js to parse the date string and handle various formats
-            const parsedDate = moment(dateString); // Use strict parsing
-
-            if (parsedDate.isValid()) {
-                foundDates.push({
-                    context: {
-                        prefix: prefix,
-                        matchedText: dateString
-                    },
-                    date: getDateParts(parsedDate)
-                });
+                for (const dateString of dates) {
+                    // Use moment.js to parse the date string and handle various formats
+                    const parsedDate = moment(dateString);
+                    if (parsedDate.isValid()) {
+                        foundDates.push({
+                            context: {
+                                prefix: prefix,
+                                matchedText: dateString
+                            },
+                            date: getDateParts(parsedDate)
+                        });
+                    }
+                }
             }
         }
     }
@@ -120,9 +128,11 @@ class JSDOM {
     async extractDates(prefixes) {
         return new Promise(resolve => {
             const matches = [];
+            // look for datetime attribute
             this._rewriter.on("body", {
                 element(element) {
                     element.onEndTag(() => {
+                        clearTimeout(timeout);
                         resolve(matches);
                     })
                 },
@@ -134,7 +144,11 @@ class JSDOM {
                         )
                     }
                 }
-            })
+            });
+            // ensure we eventually resolve the promise
+            const timeout = setTimeout(() => {
+                resolve(matches);
+            }, 1000);
         })
             .catch(e => {
                 console.error(e);
@@ -211,8 +225,8 @@ async function extractData(response) {
 
     // Define the operations to be performed
     const operations = {
-        titleText: dom.querySelectorText('title'),
-        dates: dom.extractDates(['edited on', 'last modified', 'last modified on', 'created on', 'updated on', 'published:', 'date written:', 'published online', 'updated', 'published'])
+        // titleText: dom.querySelectorText('title'),
+        dates: dom.extractDates(['edited', 'last modified', 'created', 'updated', 'published', 'date written', 'online'])
     }
 
     // Perform the operations and get the transformed data
@@ -256,7 +270,7 @@ export async function onRequest(context) {
     // Return the response
     return createResponse({
         dates: extractedData.dates,
-        title: extractedData.titleText,
+        // title: extractedData.titleText,
         url: params.url,
         etc: "...",
     });

@@ -15,6 +15,10 @@
     /* font-size: 18px; */
 }
 
+.searchBox > div:first-child {
+    max-width: 170px;
+}
+
 .searchBox input {
     border: none;
     outline: none;
@@ -75,6 +79,25 @@
     color: var(--color-text-light);
 }
 
+.smallButton {
+    font-size: 15px;
+    font-weight: 440;
+    color: var(--color-text-light);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    line-height: 1;
+    margin: 16px 0;
+    padding: 5px 8px;
+    border-radius: 8px;
+    align-self: flex-end;
+    /* align-self: center; */
+}
+
+.smallButton:hover {
+    background: var(--color-background-2);
+    cursor: pointer;
+}
 .citeBtn {
     border-radius: 35px;
     padding: 0 25px;
@@ -102,6 +125,17 @@
     background: linear-gradient(90deg, transparent 85%, var(--color-background-1) 100%);
     pointer-events: none;
     z-index: 1;
+}
+
+.citationSearch {
+    display: flex;
+    flex-direction: column;
+}
+
+.icon {
+    width: 14px;
+    stroke-width: 2.1px;
+    transform: translateY(-1px);
 }
 
 /**
@@ -137,4 +171,41 @@
     background: var(--color-background-2);
     border-radius: 20px;
     color: var(--color-text-dark);
+}
+
+@media (max-width: 750px) {
+    .searchBox > div:first-child {
+        max-width: none;
+    }
+    .searchBox {
+        grid-template-columns: 1fr;
+        width: 100%;
+        border-radius: 25px;
+        --searchbox-inline-spacing: 1.25rem;
+    }
+    .citationSearch {
+        width: 100%;
+    }
+    .label:first-child {
+        border-radius: calc(25px - 5px);
+    }
+    .label + .label::before {
+        display: none;
+    }
+    .label + .label {
+        padding-left: calc(var(--searchbox-inline-spacing) - 5px);
+    }
+    .citeBtn {
+        /* width: calc(100% - 5px); */
+        margin: 0;
+        width: 100%;
+        border-radius: calc(25px - 5px);
+        height: 50px;
+        text-align: center;
+        justify-content: center;
+    }
+    .smallButton {
+        margin: 16px auto;
+        padding: 8px 10px;
+    }
 }
