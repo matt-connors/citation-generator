@@ -67,7 +67,7 @@ body {
 @supports (-webkit-touch-callout: none) {
     /* CSS specific to iOS devices */
     body {
-        font-weight: 410;
+        font-weight: 395;
         letter-spacing: none;
     }
 }
