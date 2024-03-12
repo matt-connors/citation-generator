@@ -60,6 +60,16 @@ body {
     letter-spacing: .015rem;
     background-color: var(--color-background-1);
     color: var(--color-text-dark);
+    /* font-smooth: always; */
+}
+
+/* https://stackoverflow.com/questions/30102792/css-media-query-to-target-only-ios-devices */
+@supports (-webkit-touch-callout: none) {
+    /* CSS specific to iOS devices */
+    body {
+        font-weight: 410;
+        letter-spacing: none;
+    }
 }
 
 a {
