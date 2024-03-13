@@ -1,6 +1,15 @@
 import moment from 'moment';
 
 /**
+ * Test sites
+ * https%3A%2F%2Fwww.epa.gov%2Ffacts-and-figures-about-materials-waste-and-recycling%2Fplastics-material-specific-data
+ * https://www.theguardian.com/society/2018/aug/29/teens-desert-social-media
+ * 
+ * Contains no quality dates
+ * https://interestingengineering.com/european-union-wants-all-smartphones-to-have-the-same-charging-port
+ */
+
+/**
  * Stringifies the body and creates a JSON response
  */
 function createResponse(body) {
@@ -49,37 +58,54 @@ function extractDates(text) {
 /**
  * Extracts dates from a string based on prefixes
  */
-function getDateMatches(prefixes, text) {
+function extractMatchingDates(text, prefix, prefixEnd) {
     const foundDates = [];
-    const textLower = text.toLowerCase(); // Convert to lowercase for case-insensitive matching
-    const prefixEnds = [" on", " at", ": "];
+    const prefixLower = prefix.toLowerCase() + prefixEnd;
+    const startIndex = text.indexOf(prefixLower);
 
-    for (const prefix of prefixes) {
-        for (const prefixEnd of prefixEnds) {
-            const prefixLower = prefix.toLowerCase() + prefixEnd;
-            const startIndex = textLower.indexOf(prefixLower);
+    if (startIndex !== -1) {
+        // Extract date string after prefix, removing leading/trailing white spaces
+        const dateStringText = text.substring(startIndex + prefixLower.length).trim();
+        const dates = extractDates(dateStringText);
 
-            if (startIndex !== -1) {
-                // Extract date string after prefix, removing leading/trailing white spaces
-                const dateStringText = text.substring(startIndex + prefixLower.length).trim();
-                const dates = extractDates(dateStringText);
-
-                for (const dateString of dates) {
-                    // Use moment.js to parse the date string and handle various formats
-                    const parsedDate = moment(dateString);
-                    if (parsedDate.isValid()) {
-                        foundDates.push({
-                            context: {
-                                prefix: prefix,
-                                matchedText: dateString
-                            },
-                            date: getDateParts(parsedDate)
-                        });
-                    }
-                }
+        for (const dateString of dates) {
+            // Use moment.js to parse the date string and handle various formats
+            const parsedDate = moment(dateString);
+            if (parsedDate.isValid()) {
+                foundDates.push({
+                    context: {
+                        prefix: prefix,
+                        matchedText: dateString
+                    },
+                    date: getDateParts(parsedDate)
+                });
             }
         }
     }
+    return foundDates;
+}
+
+/**
+ * Extracts dates from a string based on prefixes
+ */
+function getDateMatches(prefixes, text) {
+    const foundDates = [];
+    const textLower = text.toLowerCase(); // Convert to lowercase for case-insensitive matching
+    const prefixEnds = [" on", " at", ": ", " "];
+
+    // Extract dates based on prefixes
+    for (const prefix of prefixes) {
+        for (const prefixEnd of prefixEnds) {
+            foundDates.push(
+                ...extractMatchingDates(textLower, prefix, prefixEnd)
+            );
+        }
+    }
+
+    // Extract all other dates without a prefix
+    foundDates.push(
+        ...extractMatchingDates(textLower, "", "")
+    );
 
     return foundDates;
 }
@@ -133,7 +159,17 @@ class JSDOM {
                 element(element) {
                     element.onEndTag(() => {
                         clearTimeout(timeout);
-                        resolve(matches);
+                        resolve(
+                            matches
+                                // filter out repeated dates
+                                .filter((date, index, self) =>
+                                    index === self.findIndex((d) =>
+                                        d.date.day === date.date.day &&
+                                        d.date.month === date.date.month &&
+                                        d.date.year === date.date.year
+                                    )
+                                )
+                        );
                     })
                 },
                 text(text) {
@@ -225,7 +261,7 @@ async function extractData(response) {
 
     // Define the operations to be performed
     const operations = {
-        // titleText: dom.querySelectorText('title'),
+        titleText: dom.querySelectorText('title'),
         dates: dom.extractDates(['edited', 'last modified', 'created', 'updated', 'published', 'date written', 'online'])
     }
 
@@ -270,9 +306,12 @@ export async function onRequest(context) {
     // Return the response
     return createResponse({
         dates: extractedData.dates,
-        // title: extractedData.titleText,
+        title: extractedData.titleText,
         url: params.url,
         etc: "...",
     });
+
+    // Note that the extracted dates array will start with dates its most confident about, then include the rest
+    // Starting with dates preceeded by a keyword, then the first date found on the page, then the rest
 
 }
