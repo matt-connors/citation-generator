@@ -8,6 +8,7 @@
         ],
         "types": [
             "@cloudflare/workers-types"
-        ]
+        ],
+        "outDir": "../dist"
     }
 }

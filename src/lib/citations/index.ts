@@ -11,13 +11,19 @@ function getUrlParams() {
     return params;
 }
 
+let { host, protocol } = window.location;
+
+// change the host to the local server running backend if the host is localhost:3000
+if (host === 'localhost:4321') {
+    host = 'localhost:8788';
+}
+
 /**
  * Fetch the citation data from the server.
  */
 async function fetchCitationData() {
     const params = getUrlParams();
-    console.log('fetching ...');
-    const response = await fetch(`http://127.0.0.1:8788/api/test?url=${encodeURIComponent(params.website)}`, {
+    const response = await fetch(`${protocol}//${host}/api/test?url=${encodeURIComponent(params.website)}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

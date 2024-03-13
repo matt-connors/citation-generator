@@ -75,7 +75,10 @@ import { Bars3Icon } from '@heroicons/react/24/outline'
             padding: 2rem calc(1.5rem - 10px);
             background-color: var(--color-background-1);
             border-top: 1px solid var(--color-border);
-            width: 100%;
+            /* width: 100%; */
+            left: 0;
+            right: 0;
+            box-sizing: border-box;
             z-index: 9999;
             box-shadow: rgba(0,0,0,0.04) 0 24px 48px -4px, rgba(0,0,0,0.02) 0 12px 24px -4px, rgba(0,0,0,0.02) 0 8px 16px -4px, rgba(0,0,0,0.02) 0 4px 8px -2px, rgb(0 0 0 / 64%) 0 0 1px 0, rgba(0,0,0,0.02) 0 48px 96px -4px;
         }
@@ -93,6 +96,7 @@ import { Bars3Icon } from '@heroicons/react/24/outline'
             width: 100%;
             background-color: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             z-index: 0;
         }
     }
@@ -149,7 +153,6 @@ import { Bars3Icon } from '@heroicons/react/24/outline'
 
 <script>
     const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-    const menuContent = document.getElementById('menu-content');
     const header = document.querySelector('header');
     const obscure = document.getElementById('obscure');
 
