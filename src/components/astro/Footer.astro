@@ -99,14 +99,16 @@ import Logo from '../../../public/images/logo.svg';
     footer figure {
         grid-area: figure;
     }
-    @media (max-width: 1500px) {
+    @media (max-width: 1500px) and (min-width: 1000px) {
         footer {
             grid-template-columns: 1fr 1fr;
             grid-template-areas:
                 'figure figure'
                 'nav-a nav-b';
             justify-content: center;
+            gap: min(calc(15vw + 2rem), 8rem) 3rem;
         }
+        
     }
     @media (max-width: 1000px) {
         footer {
@@ -115,6 +117,7 @@ import Logo from '../../../public/images/logo.svg';
                 'figure'
                 'nav-a'
                 'nav-b';
+                justify-content: center;
         }
     }
     @media (max-width: 500px) {
