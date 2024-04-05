@@ -27,6 +27,9 @@
     "react-dom": "^18.2.0",
     "react-tabs": "^6.0.2"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.6.1"
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240222.0",
     "typescript": "^5.3.3",
