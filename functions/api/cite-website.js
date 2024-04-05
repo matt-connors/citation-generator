@@ -2,8 +2,6 @@
 Receives a URL, fetches website data, extracts important information (cheerio), return a JSON object
 
 */
-
-import fetch from 'node-fetch';
 import cheerio from 'cheerio';
 import moment from 'moment';
 
