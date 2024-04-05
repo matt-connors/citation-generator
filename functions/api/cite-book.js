@@ -9,3 +9,7 @@ export function onRequest(...args) {
     };
     return new Response(JSON.stringify({args}), options);
 }
+
+/*cite-book
+Integrates with Google Books API to return a JSON Object
+*/

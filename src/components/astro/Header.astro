@@ -1,12 +1,123 @@
 ---
+import { BookOpenIcon } from '@heroicons/react/24/outline'
+import Logo from '../../../public/images/logo.svg';
+const site = Astro.site;
 
+import { Bars3Icon } from '@heroicons/react/24/outline'
 ---
 
-<header></header>
+<!--
+    Remove "Home" and make it "Citation Generator"
+    Exisiting links to "Citation Generator" will be changed to "My Citations"
+    We will only reference the Home as the "Citation Generator"
+ -->
+
+<header>
+    <div class="logo">
+        <a href={`${site}`} aria-label="MLA Generator">
+            <!-- <p>MLA Generator</p> -->
+            <img src={Logo.src} alt="MLA Generator" title="MLA Generator" />
+        </a>
+    </div>
+    <ul id="menu-content">
+        <li><a href={`${site}`}>Home</a></li>
+        <li><a href={`${site}citations`}>Citation Generator</a></li>
+        <li><span>Citation Guides</span></li>
+        <ul>
+            <li><a href={`${site}guides/apa`}>Citation Basics</a></li>
+            <li><a href={`${site}guides/apa`}>Citation Examples</a></li>
+            <li><a href={`${site}guides/apa`}>MLA Format Guide</a></li>
+            <li><a href={`${site}guides/apa`}>APA Format Guide</a></li>
+            <li><a href={`${site}guides/apa`}>Chicago Format Guide</a></li>
+            <li><a href={`${site}guides/apa`}>Harvard Format Guide</a></li>
+            <li><a href={`${site}guides/apa`}>Turabian Format Guide</a></li>
+        </ul>
+    </ul>
+    <div id="obscure"></div>
+    <button id="mobile-menu-toggle">
+        <div class="menu-bar"></div>
+        <div class="menu-bar"></div>
+        <div class="menu-bar"></div>
+    </button>
+    <a class="button-primary">
+        <BookOpenIcon className="button-icon" />
+        <span>Create Citation</span>
+    </a>
+</header>
 
 <style>
-    header {
+    .menu-bar {
+        width: 26px;
+        height: 1px;
+        background-color: var(--color-text-dark);
+        border-radius: 2px;
+    }
+    .menu-bar:nth-child(2) {
+        width: 17px;
+        align-self: end;
+    }
+    #mobile-menu-toggle {
         display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 18px;
+        cursor: pointer;
+        padding: 5px;
+        box-sizing: content-box;
+
+        display: none;
+    }
+    #obscure {
+        display: none;
+    }
+    @media (max-width: 1050px) {
+        #menu-content {
+            display: none;
+            position: absolute;
+            flex-direction: column;
+            text-align: left;
+            align-items: flex-start;
+            top: 100%;
+            padding: 2rem calc(1.5rem - 10px);
+            background-color: var(--color-background-1);
+            border-top: 1px solid var(--color-border);
+            /* width: 100%; */
+            left: 0;
+            right: 0;
+            box-sizing: border-box;
+            z-index: 9999;
+            box-shadow: rgba(0,0,0,0.04) 0 24px 48px -4px, rgba(0,0,0,0.02) 0 12px 24px -4px, rgba(0,0,0,0.02) 0 8px 16px -4px, rgba(0,0,0,0.02) 0 4px 8px -2px, rgb(0 0 0 / 64%) 0 0 1px 0, rgba(0,0,0,0.02) 0 48px 96px -4px;
+        }
+        #mobile-menu-toggle {
+            display: flex;
+        }
+        header[open] #menu-content {
+            display: flex;
+        }
+        header[open] #obscure {
+            display: flex;
+            position: absolute;
+            top: 100%;
+            height: calc(100vh - 100%);
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 0;
+        }
+    }
+    @media (max-width: 650px) {
+        header {
+            grid-template-columns: 1fr auto !important;
+        }
+        header .button-primary {
+            display: none;
+        }
+    }
+    header {
+        display: grid;
+        align-items: center;
+        grid-template-columns: 1fr auto auto;
         height: 70px;
         position: sticky;
         top: 0;
@@ -20,5 +131,42 @@
         z-index: 999;
         background-color: var(--color-background-1);
         padding: 0 var(--page-inline-padding);
+        padding: 0 1.5rem;
+        gap: 30px;
+    }
+    header ul {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    header li a,
+    header li span {
+        padding: 10px;
+        cursor: pointer;
+    }
+    header ul ul {
+        display: none;
+    }
+    .logo {
+        display: flex;
+        height: 28px;
+    }
+    .logo img {
+        height: 100%;
+        image-rendering: -webkit-optimize-contrast;
     }
 </style>
+
+<script>
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const header = document.querySelector('header');
+    const obscure = document.getElementById('obscure');
+
+    mobileMenuToggle!.addEventListener('click', () => {
+        header!.toggleAttribute('open');
+    });
+
+    obscure!.addEventListener('click', (e) => {
+        header!.removeAttribute('open');
+    });
+</script>

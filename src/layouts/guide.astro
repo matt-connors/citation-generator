@@ -1,0 +1,216 @@
+---
+import Layout from "../layouts/page.astro";
+const { frontmatter, headings } = Astro.props;
+---
+
+<Layout title={frontmatter.title}>
+    <article>
+        <nav id="guide-nav">
+            <p class="heading-3">Guide</p>
+            <ul>
+                {
+                    headings
+                        .filter((heading) => heading.level === 2)
+                        .map((heading) => {
+                            const headingId = heading.text
+                                .toLowerCase()
+                                .replace(/ /g, "-");
+                            return (
+                                <li>
+                                    <a href={`#${headingId}`}>{heading.text}</a>
+                                </li>
+                            );
+                        })
+                }
+            </ul>
+        </nav>
+        <div id="guide-content">
+            <h1>{frontmatter.title}</h1>
+            <!-- <p>Written by {frontmatter.author}</p> -->
+            <p class="date">
+                Published on
+                <time datetime={frontmatter.pubDate.toISOString()}>{new Date(frontmatter.pubDate).toLocaleDateString()}</time>
+            </p>
+            <slot />
+        </div>
+    </article>
+</Layout>
+
+<style is:global>
+    .date {
+        font-size: 15px;
+        font-weight: 440;
+        color: var(--color-text-light);
+    }
+    article {
+        max-width: 1450px;
+        margin: auto;
+        padding: 4.5rem 2rem 3rem;
+        box-sizing: border-box;
+
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: clamp(5rem, 11vh, 6rem) clamp(3rem, 6vw, 6rem);
+
+        color: var(--color-text-medium);
+        line-height: 1.5;
+    }
+    #guide-content h1 {
+        font-size: 2.2rem;
+        max-width: 34ch;
+    }
+    #guide-content h2 {
+        font-size: 1.8rem;
+    }
+    #guide-content h3 {
+        font-size: 1.35rem;
+    }
+    #guide-content h1,
+    #guide-content h2,
+    #guide-content h3 {
+        color: var(--color-text-dark);
+        line-height: 1.2;
+        /* font-weight: 410; */
+    }
+    #guide-content * + h2,
+    #guide-content * + h3 {
+        margin-top: 1.1rem;
+    }
+    #guide-content ul li + li {
+        margin-top: 0.5rem;
+    }
+    #guide-content ul {
+        padding-left: 1.5rem;
+        list-style: circle;
+    }
+    #guide-content table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 14px;
+        overflow: hidden;
+        margin: 0.5rem 0;
+
+        --border-radius: 8px;
+    }
+    #guide-content th:first-child {
+        border-bottom-left-radius: var(--border-radius);
+        border-top-left-radius: var(--border-radius);
+    }
+    #guide-content th:last-child {
+        border-bottom-right-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+    }
+    #guide-content th,
+    #guide-content td {
+        padding: 0.8rem 1rem;
+        line-height: 1;
+    }
+    #guide-content td {
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
+    }
+    #guide-content td {
+        border-bottom: 1px solid var(--color-border);
+        vertical-align: top;
+        line-height: 1.4;
+    }
+    #guide-content tr:last-child td {
+        border-bottom: none;
+    }
+    #guide-content strong {
+        font-weight: 510;
+    }
+    #guide-content th {
+        background-color: var(--color-background-2);
+        font-weight: 510;
+        /* font-size: 15px; */
+        /* font-weight: 440; */
+        color: var(--color-text-light);
+        text-align: left;
+    }
+    #guide-content a {
+        color: var(--color-text-dark);
+        text-decoration: underline;
+    }
+    #guide-nav {
+        position: sticky;
+        top: 6rem;
+        height: min-content;
+        overflow: hidden;
+        color: var(--color-text-dark);
+    }
+    #guide-nav ul {
+        border-left: 1px solid var(--color-border);
+        line-height: 1.3;
+    }
+    #guide-nav a {
+        padding: 6px 22px;
+        display: block;
+        color: var(--color-text-light);
+        /* max-width: 21ch; */
+    }
+    #guide-nav a.active {
+        color: var(--color-text-dark);
+        /* background-color: var(--color-background-2);
+        border-radius: 8px;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0; */
+        /* font-weight: 420; */
+    }
+    #guide-nav a:hover {
+        color: var(--color-text-dark);
+        background-color: var(--color-background-2);
+        border-radius: 8px;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    #guide-nav .heading-3 {
+        margin-bottom: 1rem;
+    }
+    #guide-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+</style>
+
+<script>
+    // Add smooth scrolling to all links
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            document.querySelector(this.getAttribute("href")).scrollIntoView({
+                behavior: "smooth",
+            });
+        });
+    });
+    // auto highlight the current section in the guide
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            const id = entry.target.getAttribute("id");
+            const matchingAnchor = document.querySelector(
+                `nav a[href="#${id}"]`,
+            );
+            if (matchingAnchor === null) {
+                return;
+            }
+            if (entry.intersectionRatio > 0) {
+                matchingAnchor.classList.add("active");
+                // unactive the other anchors
+                document.querySelectorAll("nav a").forEach((anchor) => {
+                    if (anchor !== matchingAnchor) {
+                        anchor.classList.remove("active");
+                    }
+                });
+            } else {
+                matchingAnchor.classList.remove("active");
+            }
+        });
+    });
+
+    // Track all sections that have an `id` applied
+    document.querySelectorAll("h2[id]").forEach((section) => {
+        observer.observe(section);
+    });
+</script>

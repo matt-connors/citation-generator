@@ -1,0 +1,48 @@
+---
+import { CollectionEntry, getCollection } from "astro:content";
+import GuideLayout from "../../layouts/guide.astro";
+import Heading from "../../components/astro/Heading.astro";
+
+export async function getStaticPaths() {
+    const entries = await getCollection("guides");
+    return entries.map(entry => ({
+        params: {
+            slug: entry.slug,
+        },
+        props: entry,
+    }));
+}
+
+export const prerender = true;
+
+type Props = CollectionEntry<"guide">;
+
+const { slug } = Astro.params;
+
+const entry = await getCollection("guides", slug);
+
+// If the entry is undefined, redirect to 404
+if (entry === undefined) {
+    return Astro.redirect("/404");
+}
+
+// Render the markdown content
+const { Content, components } = await entry[0].render();
+
+// Extract headings from markdown
+function extractHeadings(md) {
+    const headings = md.match(/^(#+) (.+)$/gm);
+    return headings.map(heading => {
+        const level = heading.match(/#/g).length;
+        const text = heading.replace(/#/g, "").trim();
+        return { level, text };
+    });
+}
+
+const headings = extractHeadings(entry[0].body);
+
+---
+
+<GuideLayout frontmatter={entry[0].data} headings={headings}>
+    <Content components={{...components, h2: Heading }} />
+</GuideLayout>
