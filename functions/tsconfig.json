@@ -2,11 +2,14 @@
     "compilerOptions": {
         "target": "esnext",
         "module": "esnext",
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
         "lib": [
             "esnext"
         ],
         "types": [
             "@cloudflare/workers-types"
-        ]
+        ],
+        "outDir": "../dist"
     }
 }

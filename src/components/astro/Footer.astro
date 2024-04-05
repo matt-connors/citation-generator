@@ -1,7 +1,129 @@
 ---
-
+const site = Astro.site;
+import Logo from '../../../public/images/logo.svg';
 ---
 
 <footer>
-    
+    <figure>
+        <a href={`${site}`} aria-label="MLA Generator">
+            <img src={Logo.src} alt="MLA Generator" />
+        </a>
+        <figcaption>
+            MLA Generator is a free tool that creates citations, references, and
+            bibliographies for your academic papers.
+        </figcaption>
+    </figure>
+    <nav>
+        <p class="heading-3">MLA Generator</p>
+        <ul>
+            <li><a href={`${site}`}>Home</a></li>
+            <li><a href={`${site}citations`}>Citation Generator</a></li>
+            <li><a href={`${site}privacy`}>Privacy</a></li>
+            <li><a href={`${site}terms`}>Terms</a></li>
+        </ul>
+    </nav>
+    <nav>
+        <p class="heading-3">Guides</p>
+        <div class="grouping">
+            <ul>
+                <li><a href={`${site}guides/apa`}>Citing a Book</a></li>
+                <li><a href={`${site}guides/mla`}>Citing a Journal Article</a></li>
+                <li><a href={`${site}guides/chicago`}>Citing a Youtube Video</a></li>
+                <li><a href={`${site}guides/harvard`}>In-Text Citations</a></li>
+            </ul>
+            <ul>
+                <li><a href={`${site}guides/apa`}>APA Format</a></li>
+                <li><a href={`${site}guides/mla`}>MLA Format</a></li>
+                <li><a href={`${site}guides/chicago`}>Chicago Format</a></li>
+                <li><a href={`${site}guides/harvard`}>Harvard Format</a></li>
+            </ul>
+        </div>
+    </nav>
 </footer>
+
+<style>
+    footer {
+        display: grid;
+        grid-template-columns: 1fr repeat(2, auto);
+        padding: min(calc(15vw + 2rem), 8rem) var(--page-inline-padding);
+        /* max-width: 1450px; */
+        margin: 0 auto;
+        box-sizing: border-box;
+        grid-template-areas: 'figure nav-a nav-b';
+    }
+    footer,
+    .grouping {
+        gap: max(min(5vw, 0.05 * 1920px), 3rem);
+    }
+    footer figcaption {
+        color: var(--color-text-light);
+        /* font-size: 15px;
+        font-weight: 440; */
+        max-width: 38ch;
+        /* line-height: 1.4; */
+        padding: 5px 0;
+    }
+    footer figure,
+    footer nav {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    footer .heading-3,
+    footer img {
+        height: 32px !important;
+    }
+    footer img {
+        text-align: left;
+        width: min-content;
+        image-rendering: -webkit-optimize-contrast;
+    }
+    footer nav a {
+        display: block;
+        padding: 5px 0;
+        color: var(--color-text-light);
+    }
+    footer nav a:hover {
+        text-decoration: underline;
+        /* color: var(--color-text-dark); */
+    }
+    .grouping {
+        display: flex;
+    }
+    footer nav:first-child {
+        grid-area: nav-a;
+    }
+    footer nav:last-child {
+        grid-area: nav-b;
+    }
+    footer figure {
+        grid-area: figure;
+    }
+    @media (max-width: 1500px) and (min-width: 1000px) {
+        footer {
+            grid-template-columns: 1fr 1fr;
+            grid-template-areas:
+                'figure figure'
+                'nav-a nav-b';
+            justify-content: center;
+            gap: min(calc(15vw + 2rem), 8rem) 3rem;
+        }
+        
+    }
+    @media (max-width: 1000px) {
+        footer {
+            grid-template-columns: 1fr;
+            grid-template-areas:
+                'figure'
+                'nav-a'
+                'nav-b';
+                justify-content: center;
+        }
+    }
+    @media (max-width: 500px) {
+        .grouping {
+            flex-direction: column;
+            gap: 0;
+        }
+    }
+</style>

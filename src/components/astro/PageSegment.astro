@@ -1,0 +1,45 @@
+---
+import clsx from "clsx";
+const { title, background, id } = Astro.props;
+---
+
+<section class={`segment ${clsx(background && "colored")}`} id={id}>
+    <div class="segment-content">
+        <h2 class="heading-2">{title}</h2>
+        <slot />
+    </div>
+</section>
+<style>
+    .segment {
+        padding: min(calc(15vw + 2rem), 7rem) 0 min(calc(15vw + 2rem), 9rem);
+        
+
+        display: flex;
+        justify-content: center;
+    }
+    .segment.colored {
+        background-color: var(--color-background-2);
+        margin-top: 6rem;
+    }
+    .segment-content {
+        /* margin-top: 5rem; */
+        /* background-color: var(--color-background-2); */
+        /* margin: 4rem var(--page-inline-padding); */
+        /* margin: 4rem auto; */
+        /* border-radius: 35px; */
+        /* padding: 1.5rem; */
+        /* display: none; */
+        /* max-width: 912px;
+box-sizing: border-box; */
+        text-align: center;
+        /* max-width: 1450px; */
+        width: 100%;
+        /* margin: 7rem auto; */
+    }
+    .segment .heading-2 {
+        color: var(--color-text-light);
+        margin-bottom: 1rem;
+        max-width: 15ch;
+        margin: 0 auto 3rem;
+    }
+</style>

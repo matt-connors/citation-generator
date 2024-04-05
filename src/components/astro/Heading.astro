@@ -1,0 +1,30 @@
+---
+const { id } = Astro.props;
+import { LinkIcon } from '@heroicons/react/24/outline';
+---
+
+<h2 id={id}>
+    <a href={`#${id}`}>
+        <LinkIcon className="icon"/>
+    </a>
+    <slot />
+</h2>
+
+<style>
+    h2 {
+        position: relative;
+        /* display: flex;
+        align-items: center; */
+    }
+    .icon {
+        width: 20px;
+        margin-right: 8px;
+        position: absolute;
+        left: -28px;
+        top: 0;
+        bottom: 0;
+        transform: translateY(-50%);
+
+        display: none;
+    }
+</style>

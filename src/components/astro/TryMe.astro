@@ -1,0 +1,51 @@
+---
+const site = Astro.site;
+---
+
+<div id="try-me">
+    <h3 id="try-me-title">Citation Generator</h3>
+    <p>
+        You can easily create accurate citations in APA or MLA style using our
+        Citation Generators.
+    </p>
+    <div id="try-me-buttons">
+        <a href={`${site}citations`}>APA Citation Generator</a>
+        <a href={`${site}citations`}>MLA Citation Generator</a>
+    </div>
+</div>
+
+<style>
+    #try-me {
+        background-color: var(--color-background-brand);
+        padding: 2rem 2rem;
+        border-radius: 14px;
+        margin: 1rem 0;
+        color: var(--color-text-dark);
+        text-align: center;
+    }
+    #try-me-title {
+        font-size: 1.5rem;
+        /* font-weight: 600; */
+        margin-bottom: 1rem;
+    }
+    #try-me p {
+        max-width: 38ch;
+        margin: 0 auto;
+    }
+    #try-me-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    #try-me a {
+        text-decoration: none;
+        padding: 15px 20px;
+        background-color: var(--color-brand);
+        border-radius: 10px;
+        line-height: 1;
+    }
+    #try-me a:hover {
+        background-color: var(--color-brand-vibrant);
+    }
+</style>

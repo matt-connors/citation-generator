@@ -3,16 +3,20 @@
 
     border: 1px solid var(--color-border);
     border-radius: 50px;
-    padding: 15px var(--searchbox-inline-spacing) 11px;
+    padding: 5px;
     display: grid;
-    grid-template-columns: auto min(50vw, 600px) 3.5rem;
+    grid-template-columns: auto min(50vw, 600px) auto;
     align-items: center;
-    gap: var(--searchbox-inline-spacing);
+    gap: calc(var(--searchbox-inline-spacing) - 15px);
     position: relative;
     line-height: 1;
 
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.06);
     /* font-size: 18px; */
+}
+
+.searchBox > div:first-child {
+    max-width: 170px;
 }
 
 .searchBox input {
@@ -23,46 +27,88 @@
     box-sizing: border-box;
     height: 25px;
     width: 100%;
-    padding: 0;
+    padding: 4px 0 0;
 }
 
 .searchBox input::placeholder {
     color: var(--color-text-light);
 }
 
-.searchBox label {
+.label:first-child {
+    padding-left: calc(var(--searchbox-inline-spacing) - 5px);
+    padding-right: 15px;
+    
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.labelContent {
     display: flex;
     flex-direction: column;
     justify-content: center;
     width: 100%;
-    gap: 2px;
+    /* gap: 2px; */
 }
 
-.searchBox label span {
+.label {
+    /* padding: 5px 0 1px; */
+    padding: 8px 0;
+}
+
+.label + .label {
+    padding-left: var(--searchbox-inline-spacing);
+    position: relative;
+}
+
+.label + .label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 70%;
+    background-color: var(--color-border);
+}
+
+.inputLabel {
     font-size: 15px;
     font-weight: 440;
     color: var(--color-text-light);
 }
 
-.searchBox label + label {
-    border-left: 1px solid var(--color-border);
-    padding-left: var(--searchbox-inline-spacing);
+.smallButton {
+    font-size: 15px;
+    font-weight: 440;
+    color: var(--color-text-light);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    line-height: 1;
+    margin: 16px 0;
+    padding: 5px 8px;
+    border-radius: 8px;
+    align-self: flex-end;
+    /* align-self: center; */
 }
 
-.searchBox button {
-    --spacing: 10px;
-    position: absolute;
-    right: var(--spacing);
-    top: var(--spacing);
-    bottom: var(--spacing);
+.smallButton:hover {
+    background: var(--color-background-2);
+    cursor: pointer;
+}
+.citeBtn {
     border-radius: 35px;
     padding: 0 25px;
     display: flex;
     align-items: center;
     font-weight: 440;
+    height: calc(100% - 4px * 2);
+    margin: 4px;
 }
 
-.searchBox button span {
+.citeBtn span {
     transform: translateY(.5px);
 }
 
@@ -79,6 +125,17 @@
     background: linear-gradient(90deg, transparent 85%, var(--color-background-1) 100%);
     pointer-events: none;
     z-index: 1;
+}
+
+.citationSearch {
+    display: flex;
+    flex-direction: column;
+}
+
+.icon {
+    width: 14px;
+    stroke-width: 2.1px;
+    transform: translateY(-1px);
 }
 
 /**
@@ -116,12 +173,39 @@
     color: var(--color-text-dark);
 }
 
-/**
- * Dropdown
- */
-
-.temp {
-    height: 25px;
-    display: flex;
-    align-items: center;
+@media (max-width: 750px) {
+    .searchBox > div:first-child {
+        max-width: none;
+    }
+    .searchBox {
+        grid-template-columns: 1fr;
+        width: 100%;
+        border-radius: 25px;
+        --searchbox-inline-spacing: 1.25rem;
+    }
+    .citationSearch {
+        width: 100%;
+    }
+    .label:first-child {
+        border-radius: calc(25px - 5px);
+    }
+    .label + .label::before {
+        display: none;
+    }
+    .label + .label {
+        padding-left: calc(var(--searchbox-inline-spacing) - 5px);
+    }
+    .citeBtn {
+        /* width: calc(100% - 5px); */
+        margin: 0;
+        width: 100%;
+        border-radius: calc(25px - 5px);
+        height: 50px;
+        text-align: center;
+        justify-content: center;
+    }
+    .smallButton {
+        margin: 16px auto;
+        padding: 8px 10px;
+    }
 }
