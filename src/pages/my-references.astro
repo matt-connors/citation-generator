@@ -1,17 +1,14 @@
 ---
 import Layout from "../layouts/page.astro";
+import References from "../components/react/References";
+
 
 const title = "";
-const description =
-    "";
+const description = "";
 ---
 
 <Layout title={title} description={description}>
-
+    <References client:load />
 </Layout>
 
-<style>
-
-</style>
-
-<script src="../lib/citations/index.ts"></script>
+<style></style>

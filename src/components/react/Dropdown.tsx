@@ -6,7 +6,7 @@ import { ChevronDownIcon, CheckIcon } from '@heroicons/react/24/outline';
 import styles from '../../styles/dropdown.module.css';
 import parentStyles from '../../styles/citation-search.module.css';
 
-interface Option {
+export interface Option {
     label: string;
     value: string;
 }

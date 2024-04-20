@@ -1,0 +1,256 @@
+.icon {
+    width: 20px;
+    height: 20px;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.container {
+    margin: 10vh var(--page-inline-padding) 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.referencesContainer {
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.06);
+    border-radius: 35px;
+    padding: 2rem;
+    width: 100%;
+}
+
+.citation {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 5px 14px;
+    align-items: baseline;
+    /* user-select: none; */
+    padding: calc(var(--padding-block) / 2) calc(var(--padding-block) / 2 + 4px);
+    border-radius: 12px;
+}
+
+/* .citation:hover {
+    background: var(--color-background-3);
+} */
+
+.citationSourceWrapper {
+    margin-left: 48px;
+    max-width: 800px;
+}
+
+.citationSource {
+    font: 400 16px/32px 'Times New Roman', Times, serif;
+    text-indent: -48px;
+    width: 100%;
+    tab-size: 4;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    letter-spacing: 0;
+    background: #ffffff00;
+    color: #000;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    font-feature-settings: normal;
+    font-variation-settings: normal;
+}
+
+.citation span::selection,
+.citationSource::selection,
+.citationSource *::selection {
+    background-color: transparent;
+}
+
+.citationSourceContainer,
+.referenceTitle {
+    --padding-block: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-background-2);
+    padding: calc(var(--padding-block) / 2 + 3px) calc(var(--padding-block) + 8px);
+    border-radius: 1.5rem;
+}
+
+.citationSourceContainer{
+    padding-block: calc(var(--padding-block) + 8px);
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    /* gap: var(--padding-block); */
+    margin-top: 10px;
+}
+
+.referenceTitle .citation:hover {
+    /* border-radius: 30px;
+    padding-right: 14px; */
+    background: transparent;
+    cursor: pointer;
+}
+
+.referenceTitle {
+    line-height: 1;
+}
+
+.referenceTitleButtons {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.referenceTitle .button {
+    display: flex;
+    align-items: center;
+    font-size: 17px;
+    list-style: 1;
+    font-weight: 440;
+    color: var(--color-text-light);
+}
+
+.referenceTitle .button span {
+    transform: translateY(2px)
+}
+
+.referenceTitle .citation {
+    align-items: center;
+    /* font-size: 15px; */
+    font-weight: 440;
+    color: var(--color-text-light);
+}
+
+.dropdown {
+    margin: 5px 0 2rem;
+    display: inline-flex;
+    color: var(--color-text-light);
+}
+
+.dropdown>button>span {
+    display: none;
+}
+
+.dropdown svg {
+    stroke: var(--color-text-light);
+}
+
+.dropdown:hover {
+    background: transparent !important;
+}
+
+.checkbox {
+    border: 1px solid var(--color-border-2);
+    width: 17px;
+    height: 17px;
+    display: inline-flex;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: var(--color-background-2);
+    cursor: pointer;
+}
+
+.citationSourceContainer .checkbox {
+    transform: translateY(4px);
+}
+
+.checkboxElement {
+    display: none;
+}
+
+.checkboxElement:checked+.checkbox {
+    /* border-color: var(--color-text-dark); */
+}
+
+.checkboxElement:checked+.checkbox::before {
+    display: flex;
+    content: '';
+    width: 11px;
+    height: 11px;
+    background: var(--color-border-2);
+    position: absolute;
+    border-radius: 3px;
+}
+
+.citationSourceItem {
+    display: flex;
+    align-items: center;
+    /* justify-content: space-between; */
+    width: 100%;
+    position: relative;
+}
+
+.citationSourceItem:hover .citationSourceButtons {
+    visibility: visible;
+}
+
+.citationSourceButtons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    visibility: hidden;
+
+    position: absolute;
+    right: 0;
+    /* background: var(--color-background-2); */
+    padding: 5px;
+    border-radius: 14px;
+    box-shadow: -6px 0 35px 10px var(--color-background-2);
+    height: 100%;
+
+    background: #f5f5f5ca;
+    backdrop-filter: blur(1px);
+}
+
+.citationSourceButtons .button {
+    padding: 10px;
+    /* background-color: red; */
+    border-radius: 8px;
+    font-size: 17px;
+    line-height: 1;
+    font-weight: 440;
+    color: var(--color-text-light);
+    white-space: nowrap;
+}
+
+.citationSourceButtons .button:hover {
+    /* background: var(--color-background-3); */
+    color: var(--color-text-dark);
+}
+
+.searchContainer {
+    display: flex;
+    gap: 5px;
+}
+
+.searchContainer.open .search {
+    visibility: visible;
+    width: 170px;
+}
+
+.searchContainer.open {
+    background: var(--color-background-3);
+    border-radius: 30px;
+    padding: 5px 10px;
+    transform: translateX(calc(var(--padding-block) + 8px - var(--padding-block) / 2 - 3px))
+}
+
+.search {
+    background-color: transparent;
+    font: inherit;
+    font-size: 17px;
+    line-height: 1;
+    font-weight: 440;
+    color: var(--color-text-light);
+    border: none;
+    outline: none;
+    padding: 2px;
+    transform: translateY(1px);
+    visibility: hidden;
+    width: 0;
+    transition: width 0.2s;
+}

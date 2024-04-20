@@ -22,6 +22,10 @@
     background-color: var(--color-background-2);
 }
 
+.dropdown.open .dropdownIcon {
+    transform: rotate(180deg);
+}
+
 .dropdownValue {
     height: 25px;
     display: grid;
@@ -138,6 +142,13 @@
     background-color: var(--color-background-2);
     height: auto !important;
     /* box-sizing: border-box; */
+
+    border: none;
+    outline: none;
+    font: inherit;
+    letter-spacing: inherit;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .dropdownOption.selected .dropdownCheck {

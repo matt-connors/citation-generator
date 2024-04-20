@@ -28,3 +28,5 @@ pnpm-debug.log*
 
 # Ignore my version of the api
 functions/api/
+
+wrangler.toml

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, forwardRef, type Ref } from "react";
 import clsx from "clsx";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
@@ -19,7 +19,7 @@ const SearchPanel = ({ label, placeholder, name }) => {
 }
 
 // Main CitationSearch component
-const CitationSearch = () => {
+const CitationSearch = forwardRef((props: { includeDropdown: Boolean }, ref: Ref<HTMLInputElement>) => {
     // State for managing active tab index
     const [tabIndex, setTabIndex] = useState(0);
 
@@ -54,37 +54,44 @@ const CitationSearch = () => {
 
     return (
         <Tabs selectedIndex={tabIndex} onSelect={setTabIndex} className={styles.citationSearch}>
+            
             {/* Tab list */}
             <TabList className={styles.searchTablist} role="tablist">
                 {tabPanels.map((panel, index) => (
                     <Tab key={index} className={getClassNames('searchPanelTab', index)} role="tab" aria-selected={tabIndex === index ? "true" : "false"}>{panel.label}</Tab>
                 ))}
             </TabList>
+
             {/* Form containing search inputs and citation options */}
-            <form className={styles.searchBox} action="/citations">
+            <form className={`${styles.searchBox} ${clsx(
+                props.includeDropdown && styles.withDropdown
+            )}`} action="/my-references">
+
                 {/* Dropdown for selecting citation style */}
-                <Dropdown
+                {props.includeDropdown ? <Dropdown
                     options={citationStyles}
                     defaultOption={citationStyles[0]}
                     className={styles.label}
-                />
+                /> : <input type="hidden" name="citationStyle" ref={ref} />}
+
                 {/* Render tab panels dynamically */}
                 {tabPanels.map((panel, index) => (
                     <TabPanel key={index} className={`${styles.label} ${getClassNames('searchPanel', index)}`} role="tabpanel" aria-labelledby={panel.name} hidden={tabIndex !== index}>
                         <SearchPanel {...panel} />
                     </TabPanel>
                 ))}
+
                 {/* Cite button */}
                 <button type="submit" className={`button-primary ${styles.citeBtn}`}>
                     <span>Cite</span>
                 </button>
             </form>
-            <a href="/citations" className={styles.smallButton}>
+            <a href="/my-references" className={styles.smallButton}>
                 <span>Cite Manually</span>
                 <ChevronRightIcon className={styles.icon} />
             </a>
         </Tabs>
     );
-}
+})
 
 export default CitationSearch;

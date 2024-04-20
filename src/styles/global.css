@@ -13,18 +13,6 @@
     font-display: swap;
 }
 
-@font-face {
-    font-family: 'Times New Roman';
-    font-style: normal;
-    src: url('./fonts/Times-Roman.otf') format('opentype');
-}
-
-@font-face {
-    font-family: 'Times New Roman';
-    font-style: italic;
-    src: url('./fonts/Times-Roman-Italic.otf') format('opentype');
-}
-
 :root {
     --color-background-1: #fff;
     --color-background-2: #f5f5f5;
@@ -36,6 +24,7 @@
     --color-brand-vibrant: #b1fc03;
     --color-background-brand: #E9FFCD;
     --color-border: #DBE0E7;
+    --color-border-2: #b2b7be;
 
     --page-inline-padding: 1.5rem;
     --page-inline-padding: 13.2vw;
@@ -105,6 +94,10 @@ h6 {
     font-weight: inherit;
 }
 
+input {
+    margin: 0;
+}
+
 button {
     font: inherit;
     color: inherit;
@@ -137,6 +130,9 @@ figure {
     margin: 0;
 }
 
+pre {
+    margin: 0;
+}
 
 /**
  * Common classes
