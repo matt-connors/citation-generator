@@ -1,7 +1,7 @@
 /* cite-website
 Receives a URL, fetches website data, extracts important information (cheerio), return a JSON object
-
 */
+
 import cheerio from 'cheerio';
 import moment from 'moment';
 
@@ -28,37 +28,31 @@ export function createResponse(body) {
  * Fetch a response from a URL
  */
 async function fetchResponse(url) {
-    // add the protocol if it's missing
+    // Add the protocol if it's missing
     if (!url.startsWith('http')) {
-        url = `https://${url}`;
+      url = `https://${url}`;
     }
-    // Ensure the URL is valid
-    if (isUrlInvalid(url)) {
-        return new Response('Invalid URL', {
-            status: 400
-        });
-    }
+  
+    // Convert the URL to an object
+    const parsedUrl = new URL(url);
+  
     // Fetch the response
     try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.16299',
-                'Accept': 'text/html',
-            }
-        });
-        const text = await response.text();
-        return new Response(text, {
-            status: response.status
-        });
+      const response = await fetch(parsedUrl.toString(), {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.16299',
+          'Accept': 'text/html',
+        },
+      });
+      const text = await response.text();
+      return new Response(text, { status: response.status });
     } catch (e) {
-        console.error(e);
-        return new Response('Failed to fetch the page', {
-            status: 500
-        });
+      console.error(e);
+      return new Response('Failed to fetch the page', { status: 500 });
     }
-}
-
+  }
+  
 /**
  * This function will be invoked on all requests no matter the request method.
  * https://developers.cloudflare.com/pages/functions/api-reference
@@ -90,34 +84,29 @@ export async function onRequest(context) {
     // Load HTML content into Cheerio
     const $ = cheerio.load(html);
 
-    // Extract all meta tags
+    // Extract specific metadata
     const metadata = {};
-    $('meta').each((index, element) => {
-        const name = $(element).attr('name');
-        const content = $(element).attr('content');
-        if (name && content) {
-            metadata[name] = content;
-        }
-    });
 
-    // Check for specific keywords in metadata FOR TESTING PURPOSES
-    const specificKeywords = ['date', 'published by'];
-    const keywordMatches = {};
-    for (const keyword of specificKeywords) {
-        keywordMatches[keyword] = Object.keys(metadata).filter(key => key.toLowerCase().includes(keyword));
-    }
+    // Example: Extracting title and description
+    metadata.title = $('title').text();
+    metadata.description = $('meta[name="description"]').attr('content');
 
-    // Parse date strings using Moment.js
-    for (const key in metadata) {
-        if (moment(metadata[key], moment.ISO_8601, true).isValid()) {
-            metadata[key] = moment(metadata[key]).toISOString();
-        }
+    // Example: Extracting author
+    metadata.author = $('meta[name="author"]').attr('content');
+
+    // Example: Extracting keywords
+    metadata.keywords = $('meta[name="keywords"]').attr('content');
+
+    // Example: Extracting published date
+    metadata.publishedDate = $('meta[property="article:published_time"]').attr('content');
+
+    // Parse date strings using Moment.js if applicable
+    if (metadata.publishedDate) {
+        metadata.publishedDate = moment(metadata.publishedDate).toISOString();
     }
 
     return createResponse({
         success: true,
-        metadata: metadata,
-        keywordMatches: keywordMatches //FOR TESTING PURPOSES
+        metadata: metadata
     });
 }
-

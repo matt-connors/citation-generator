@@ -27,4 +27,4 @@ pnpm-debug.log*
 .DS_Store
 
 # Ignore my version of the api
-functions/api/
+functions/api/wrangler.toml

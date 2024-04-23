@@ -22,11 +22,17 @@
     "astro-compress": "^2.2.11",
     "cheerio": "^1.0.0-rc.12",
     "clsx": "^2.1.0",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "esbuild": "^0.20.2",
     "moment": "^2.30.1",
+    "os": "^0.1.2",
+    "path": "^0.12.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-tabs": "^6.0.2",
-    "sharp": "^0.33.3"
+    "sharp": "^0.33.3",
+    "workerd": "^1.20240405.0"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.6.1"

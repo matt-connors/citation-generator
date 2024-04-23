@@ -1,26 +1,22 @@
-require('dotenv').config();
-
 /**
  * Stringifies the body and creates a JSON response
  */
-export function createResponse(body) {
-    return new Response(JSON.stringify(body), {
+export function createResponse(citationInfo) {
+    return new Response(JSON.stringify(citationInfo), {
         headers: {
             "content-type": "application/json"
         }
     });
 }
 
-const api_key = process.env.API_KEY;
-
 /**
  * Fetch book information from the Google Books API
  */
-async function fetchBookInfo(isbn) {
-    const apiUrl = `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${api_key}`;
+async function fetchBookInfo(apiKey, isbn) {
+    const apiUrl = `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${apiKey}`;
     const response = await fetch(apiUrl);
     if (!response.ok) {
-        throw new Error(`Failed to fetch book information from Google Books API: ${response.statusText}`);
+        throw new Error(`Failed to fetch book information: ${response.statusText}`);
     }
     return await response.json();
 }
@@ -29,13 +25,23 @@ async function fetchBookInfo(isbn) {
  * Generate citation for the book
  */
 function generateCitation(bookInfo) {
-    const volumeInfo = bookInfo.volumeInfo;
-    const authors = volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Unknown author';
-    const title = volumeInfo.title || 'Unknown title';
-    const publisher = volumeInfo.publisher || 'Unknown publisher';
-    const publishedDate = volumeInfo.publishedDate || 'Unknown date';
-    const citation = `${authors}. (${publishedDate}). ${title}. ${publisher}.`;
-    return citation;
+    const today = new Date();
+    return {
+        authors: bookInfo.volumeInfo.authors,
+        sourceTitle: bookInfo.volumeInfo.title,
+        publisher: bookInfo.volumeInfo.publisher,
+        publicationDate: [{
+            context: {},
+            date: {
+                year: bookInfo.volumeInfo.publishedDate
+            }
+        }],
+        accessDate: {
+            year: today.getFullYear(),
+            month: today.getMonth() + 1,
+            day: today.getDate()
+        }
+    }
 }
 
 /**
@@ -45,6 +51,7 @@ function generateCitation(bookInfo) {
 export async function onRequest(context) {
     const url = new URL(context.request.url);
     const isbn = url.searchParams.get('isbn');
+    const apiKey = context.env.API_KEY;
 
     // Ensure the request has an `isbn` query parameter
     if (!isbn) {
@@ -53,21 +60,38 @@ export async function onRequest(context) {
         });
     }
 
+    // Validate ISBN format (basic check for numeric characters and length)
+    const isValidISBN = /(?=(?:[0-9]+[-●]){3})[-●0-9X]{13}$/.test(isbn);
+    if (!isValidISBN) {
+        return createResponse({
+            error: "Invalid ISBN format"
+        });
+    }
+
     try {
         // Fetch book information from Google Books API
-        const bookInfo = await fetchBookInfo(isbn);
+        const bookInfo = await fetchBookInfo(apiKey, isbn);
+
+        // Check if bookInfo contains any items
+        if (!bookInfo.items || bookInfo.items.length === 0) {
+            return createResponse({
+                error: "Book not found"
+            });
+        }
 
         // Generate citation for the book
-        const citation = generateCitation(bookInfo.items[0]);
+        const citationInfo = generateCitation(bookInfo.items[0]);
 
         return createResponse({
-            success: true,
-            citation: citation
+            uuid: isbn,
+            citationType: "book",
+            citationInfo
         });
-    } catch (error) {
+
+    }
+    catch (error) {
         return createResponse({
             error: error.message || "Failed to fetch book information or generate citation"
         });
     }
 }
-
