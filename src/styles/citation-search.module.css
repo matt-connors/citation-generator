@@ -183,10 +183,10 @@
 
 @media (max-width: 750px) {
     .searchBox > div:first-child {
-        max-width: none;
+        max-width: none !important;
     }
     .searchBox {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
         width: 100%;
         border-radius: 25px;
         --searchbox-inline-spacing: 1.25rem;
