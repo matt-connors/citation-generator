@@ -25,5 +25,6 @@ To preview the entire project locally prior to deployment, as if it were on Clou
 - `/**` - Statically generated files using Astro.
 - `/api/**` - Routes to the /functions directory for serverless functions via Cloudflare Functions.
 
+### Speed Test Result
 ![speed test result](https://mlagenerator.com/images/speed-results.png)
 
