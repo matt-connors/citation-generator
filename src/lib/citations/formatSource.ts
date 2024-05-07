@@ -5,10 +5,18 @@ import BookCitation from './types/book';
 
 function getFormattedRichText(citation: Citation, format: string): RichText[] {
     switch (format) {
-        case 'mla':
-            return citation.toMlaFormat();
-        case 'apa':
-            return citation.toApaFormat();
+        case 'mla-9th-edition':
+            return citation.toMlaFormat(9);
+        case 'mla-8th-edition':
+            return citation.toMlaFormat(8);
+        case 'ama-10th-edition':
+            return citation.toAmaFormat(10);
+        case 'ama-11th-edition':
+            return citation.toAmaFormat(11);
+        case 'apa-6th-edition':
+            return citation.toApaFormat(6);
+        case 'apa-7th-edition':
+            return citation.toApaFormat(7);
         case 'chicago':
             return citation.toChicagoFormat();
         case 'harvard':
@@ -35,6 +43,7 @@ function getRichText(source: Source, format: string): RichText[] {
  * 
  */
 export default function formatSource(source: Source, format: string): string {
+    // const
     const richText = getRichText(source, format);
     return richText
         .map(({ text, italic }) => italic ? `<i>${text}</i>` : text)

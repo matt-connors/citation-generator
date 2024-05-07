@@ -10,15 +10,15 @@ export default class BookCitation implements Citation {
     public publisher: string;
     public publicationDate: PublicationDate[];
     public accessDate: Date;
-    public url: string;
+    public isbn: string;
 
-    constructor({ authors, sourceTitle, publisher, publicationDate, accessDate, url }) {
+    constructor({ authors, sourceTitle, publisher, publicationDate, accessDate, isbn }) {
         this.authors = authors;
         this.sourceTitle = sourceTitle;
         this.publisher = publisher;
         this.publicationDate = publicationDate;
         this.accessDate = accessDate;
-        this.url = url;
+        this.isbn = isbn;
     }
 
     /**
@@ -60,7 +60,7 @@ export default class BookCitation implements Citation {
         const authors = this.authors.join(", ");
         const bookTitle = this.sourceTitle || '';
         const publisher = this.publisher || '';
-        const publicationDate = this.publicationDate[0].date.year;
+        const publicationDate = this._safeltyFormatDate(this.publicationDate[0]);
 
         return this._trimResult([
             { text: `${authors}. ` },
@@ -78,17 +78,7 @@ export default class BookCitation implements Citation {
      * Author(s). (Year). Title of the page. Publisher. URL
      */
     public toApaFormat(): RichText[] {
-        
-        const authors = this.authors.join(", ");
-        const pageTitle = this.sourceTitle || '';
-        const publisher = this.publisher || '';
-        const url = this.url || '';
-
-        return [
-            { text: `${authors}. (${this.publicationDate[0].date.year}). ` },
-            { text: `${pageTitle}. ${publisher}. ${url}` }
-        ];
-
+        return this.toMlaFormat();
     }
 
     /**
@@ -96,19 +86,7 @@ export default class BookCitation implements Citation {
      * Author(s). "Title of the page," Publisher, Publication Date. URL.
      */
     public toChicagoFormat(): RichText[] {
-
-        const authors = this.authors.join(", ");
-        const pageTitle = this.sourceTitle || '';
-        const publisher = this.publisher || '';
-        const publicationDate = this._safeltyFormatDate(this.publicationDate[0]);
-        const url = this.url || '';
-
-        return [
-            { text: `${authors}. ` },
-            { text: `"${pageTitle}", ` },
-            { text: `${publisher}, ${publicationDate}. ${url}` }
-        ];
-
+        return this.toMlaFormat();
     }
 
     /**
@@ -116,18 +94,24 @@ export default class BookCitation implements Citation {
      * Author(s) Year, 'Title of the page', Publisher, Publication Date, URL.
      */
     public toHarvardFormat(): RichText[] {
+        return this.toMlaFormat();
+    }
+
+    /**
+     * Returns the citation in AMA format
+     * Author(s). Title of the page. Publisher; Publication Date. URL.
+     */
+    public toAmaFormat(): RichText[] {
 
         const authors = this.authors.join(", ");
         const pageTitle = this.sourceTitle || '';
         const publisher = this.publisher || '';
         const publicationDate = this._safeltyFormatDate(this.publicationDate[0]);
-        const url = this.url || '';
 
         return [
-            { text: `${authors} ${this.publicationDate[0].date.year}, ` },
-            { text: `'${pageTitle}', ${publisher}, ${publicationDate}, ${url}` }
+            { text: `${authors}. ` },
+            { text: `${pageTitle}. ${publisher}; ${publicationDate}` }
         ];
-
     }
 
 }

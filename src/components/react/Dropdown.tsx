@@ -9,21 +9,27 @@ import parentStyles from '../../styles/citation-search.module.css';
 export interface Option {
     label: string;
     value: string;
+    default?: boolean;
 }
 
 interface DropdownProps {
     options: Option[];
-    defaultOption: Option;
     className: string;
+    value?: Option;
     onChange?: (value: Option) => void;
 }
 
-export default function Dropdown({ options, defaultOption, className, onChange }: DropdownProps) {
+export default function Dropdown({ options, className, value, onChange }: DropdownProps) {
+
+    const defaultOption = value || options.find(option => option.default) || options[0];
 
     const [open, setOpen] = useState(false);
     const [matchingOptions, setMatchingOptions] = useState(options);
     const [selectedOption, setSelectedOption] = useState(defaultOption);
 
+    useEffect(() => {
+        setSelectedOption(defaultOption);
+    }, [defaultOption]);
 
     // Handle opening/closing dropdown
     const handleOpen = (event: any) => {

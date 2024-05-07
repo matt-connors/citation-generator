@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import Dropdown from "./Dropdown";
+import citationStyles from '../citationStyles';
 import styles from "../../styles/citation-search.module.css";
 
 // Component for each search input field
@@ -19,7 +20,7 @@ const SearchPanel = ({ label, placeholder, name }) => {
 }
 
 // Main CitationSearch component
-const CitationSearch = forwardRef((props: { includeDropdown: Boolean }, ref: Ref<HTMLInputElement>) => {
+const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeManualCite: Boolean }, ref: Ref<HTMLInputElement>) => {
     // State for managing active tab index
     const [tabIndex, setTabIndex] = useState(0);
 
@@ -32,29 +33,13 @@ const CitationSearch = forwardRef((props: { includeDropdown: Boolean }, ref: Ref
     // Array of search panels with their respective labels, placeholders, and names
     const tabPanels = [
         { label: "Website", placeholder: "Paste the website URL", name: "website" },
-        { label: "Book", placeholder: "Enter an ISBN or DOI", name: "book" },
-        { label: "Journal", placeholder: "Enter an ISBN or DOI", name: "journal" }
-    ];
-
-    const citationStyles = [
-        { label: "MLA 9th edition", value: "mla-9th-edition" },
-        { label: "MLA 8th edition", value: "mla-8th-edition" },
-        { label: "AMA 11th edition", value: "ama-11th-edition" },
-        { label: "AMA 10th edition", value: "ama-10th-edition" },
-        { label: "APA 7th edition", value: "apa-7th-edition" },
-        { label: "APA 6th edition", value: "apa-6th-edition" },
-        { label: "Chicago 17th edition", value: "chicago-17th-edition" },
-        { label: "Harvard", value: "harvard" },
-        { label: "Vancouver", value: "vancouver" },
-        { label: "IEEE", value: "ieee" },
-        { label: "American Chemical Society", value: "acs" },
-        { label: "American Sociological Association", value: "asa" },
-        { label: "Council of Science Editors", value: "cse" },
+        { label: "Book", placeholder: "Enter an ISBN", name: "book" },
+        { label: "Journal", placeholder: "Enter an ISBN", name: "journal" }
     ];
 
     return (
         <Tabs selectedIndex={tabIndex} onSelect={setTabIndex} className={styles.citationSearch}>
-            
+
             {/* Tab list */}
             <TabList className={styles.searchTablist} role="tablist">
                 {tabPanels.map((panel, index) => (
@@ -70,7 +55,6 @@ const CitationSearch = forwardRef((props: { includeDropdown: Boolean }, ref: Ref
                 {/* Dropdown for selecting citation style */}
                 {props.includeDropdown ? <Dropdown
                     options={citationStyles}
-                    defaultOption={citationStyles[0]}
                     className={styles.label}
                 /> : <input type="hidden" name="citationStyle" ref={ref} />}
 
@@ -86,10 +70,12 @@ const CitationSearch = forwardRef((props: { includeDropdown: Boolean }, ref: Ref
                     <span>Cite</span>
                 </button>
             </form>
-            <a href="/my-references" className={styles.smallButton}>
-                <span>Cite Manually</span>
-                <ChevronRightIcon className={styles.icon} />
-            </a>
+            {props.includeManualCite && (
+                <a href="/my-references" className={styles.smallButton}>
+                    <span>Cite Manually</span>
+                    <ChevronRightIcon className={styles.icon} />
+                </a>
+            )}
         </Tabs>
     );
 })

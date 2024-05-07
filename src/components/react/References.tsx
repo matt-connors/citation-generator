@@ -4,6 +4,8 @@ import formatSource from '../../lib/citations/formatSource';
 import CitationSearch from './CitationSearch';
 import type { Option } from './Dropdown';
 
+import citationStyles from '../citationStyles';
+
 import Dropdown from './Dropdown';
 
 import {
@@ -19,15 +21,20 @@ import {
 import React, { useState, useEffect, useRef } from 'react';
 
 export default function References() {
-
     const [sources, setSources] = useState<Source[]>([]);
     const [sourceCount, setSourceCount] = useState<number>(0);
     const [checkedCount, setCheckedCount] = useState<number>(sourceCount);
+    const [citationFormat, setCitationFormat] = useState<string>('mla-9th-edition');
 
+    const citationFormatRef = useRef<HTMLInputElement>(null);
     const selectAllRef = useRef<any>(null);
     // const citationSearchRef = useRef<any>(null);
 
     useEffect(() => {
+        // Get the citation style from the query parameter
+        setCitationFormat(
+            new URLSearchParams(window.location.search).get('citationStyle') || 'mla-9th-edition'
+        );
         /**
          * Get existing sources from local storage
          */
@@ -87,7 +94,7 @@ export default function References() {
                 return;
             }
             // Fetch the sources from the server
-            fetch('http://127.0.0.1:8788/api' + requestUrl)
+            fetch('https://mlagenerator.com/api' + requestUrl)
                 .then(response => response.json())
                 .then(validateResponse)
                 .then(getMergedSources)
@@ -107,35 +114,6 @@ export default function References() {
             console.error('Caught error:', error);
         }
     }, []);
-
-    const citationFormatRef = useRef<HTMLInputElement>(null);
-
-    const citationStyles = [
-        { label: "MLA 9th edition", value: "mla-9th-edition" },
-        { label: "MLA 8th edition", value: "mla-8th-edition" },
-        { label: "AMA 11th edition", value: "ama-11th-edition" },
-        { label: "AMA 10th edition", value: "ama-10th-edition" },
-        { label: "APA 7th edition", value: "apa-7th-edition" },
-        { label: "APA 6th edition", value: "apa-6th-edition" },
-        { label: "Chicago 17th edition", value: "chicago-17th-edition" },
-        { label: "Harvard", value: "harvard" },
-        { label: "Vancouver", value: "vancouver" },
-        { label: "IEEE", value: "ieee" },
-        { label: "American Chemical Society", value: "acs" },
-        { label: "American Sociological Association", value: "asa" },
-        { label: "Council of Science Editors", value: "cse" },
-    ];
-
-    const test = (e: React.MouseEvent<HTMLPreElement>) => {
-        // copy the text to the clipboard with all its formatting
-        const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(e.currentTarget);
-        selection!.removeAllRanges();
-        selection!.addRange(range);
-        document.execCommand('copy');
-    }
-
 
     const selectAllSources = (event: React.ChangeEvent<HTMLInputElement>) => {
         const checkboxes = document.querySelectorAll(`.${styles.citationSourceItem} input[type="checkbox"]`);
@@ -165,40 +143,90 @@ export default function References() {
         }
     }
 
-    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const search = event.target.value.toLowerCase();
-        const filteredSources = sources.filter((source: Source) => {
-            const formattedSource = formatSource(source, 'mla').toLowerCase();
-            return formattedSource.includes(search);
+    // const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const search = event.target.value.toLowerCase();
+    //     const filteredSources = sources.filter((source: Source) => {
+    //         const formattedSource = formatSource(source, 'mla').toLowerCase();
+    //         return formattedSource.includes(search);
+    //     });
+    //     setSources(filteredSources);
+    // }
+
+    // const handleSearchFocusWithin = (event: React.FocusEvent<HTMLInputElement>) => {
+    //     const target = event.currentTarget;
+    //     const searchBox = target.querySelector('input[type="text"]') as HTMLInputElement;
+    //     target.classList.add(styles.open);
+    //     searchBox.focus();
+    //     searchBox.addEventListener('focusout', () => {
+    //         target.classList.remove(styles.open);
+    //     });
+    // }
+
+    const handleDelete = (event: React.MouseEvent<HTMLButtonElement>) => {
+        const checkboxes = document.querySelectorAll(`.${styles.citationSourceItem} input[type="checkbox"]`);
+        checkboxes.forEach((checkbox: HTMLInputElement) => {
+            if (checkbox.checked) {
+                const index = sources.findIndex((source: Source) => source.uuid === checkbox.id);
+                sources.splice(index, 1);
+                setSourceCount(sources.length);
+                setCheckedCount(checkedCount - 1);
+            }
         });
-        setSources(filteredSources);
+        setSources(sources);
+        localStorage.setItem('sources', JSON.stringify(sources));
     }
 
-    const handleSearchFocusWithin = (event: React.FocusEvent<HTMLInputElement>) => {
-        const target = event.currentTarget;
-        const searchBox = target.querySelector('input[type="text"]') as HTMLInputElement;
-        target.classList.add(styles.open);
-        searchBox.focus();
-        searchBox.addEventListener('focusout', () => {
-            target.classList.remove(styles.open);
+    const copySelected = (event: React.MouseEvent<HTMLButtonElement>) => {
+        const checkboxes = document.querySelectorAll(`.${styles.citationSourceItem} input[type="checkbox"]`);
+        const copyArea = document.querySelector(`#${styles.copyArea}`) as HTMLDivElement;
+        // Clear the copy area
+        while (copyArea.firstChild) {
+            copyArea.removeChild(copyArea.firstChild);
+        }
+        // Add the selected sources to the copy area
+        Array.from(checkboxes).forEach((checkbox: HTMLInputElement, index: number) => {
+            if (checkbox.checked) {
+                let pre = document.createElement('pre');
+                pre.innerHTML = formatSource(sources[index], citationFormat);
+                pre.classList.add(styles.citationSource);
+                copyArea.appendChild(pre);
+            }
         });
+        // copy the text to the clipboard with all its formatting
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(copyArea);
+        selection!.removeAllRanges();
+        selection!.addRange(range);
+        document.execCommand('copy');
+    }
+
+    const copy = (event: React.MouseEvent<HTMLButtonElement>) => {
+        const parent = event.currentTarget.closest('li') as HTMLLIElement;
+        const pre = parent.querySelector('pre') as HTMLPreElement;
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        selection!.removeAllRanges();
+        selection!.addRange(range);
+        document.execCommand('copy');
     }
 
     const ReferenceTitleButtons = () => {
         return checkedCount > 0 ? (
             <div className={styles.referenceTitleButtons}>
-                <button className={styles.button}>
+                <button className={styles.button} onClick={copySelected}>
                     <ClipboardIcon className={styles.icon} />
                     <span>Copy selected</span>
                 </button>
-                <button className={styles.button}>
+                <button className={styles.button} onClick={handleDelete}>
                     <TrashIcon className={styles.icon} />
                     <span>Delete</span>
                 </button>
             </div>
         ) : (
             <div className={styles.referenceTitleButtons}>
-                <button className={styles.button}>
+                {/* <button className={styles.button}>
                     <ArrowPathRoundedSquareIcon className={styles.icon} />
                     <span>Sort</span>
                 </button>
@@ -211,68 +239,73 @@ export default function References() {
                         <MagnifyingGlassIcon className={styles.icon} />
                     </button>
                     <input type="text" placeholder="Search" className={styles.search} onChange={handleSearch} />
-                </div>
-                
+                </div>   */}
             </div>
         )
     }
 
-return (
-    <div className={styles.container}>
-        <CitationSearch includeDropdown={false} ref={citationFormatRef} />
-        <div className={styles.referencesContainer}>
-            <h2 className="heading-2">References</h2>
-            <Dropdown
-                options={citationStyles}
-                defaultOption={citationStyles[0]}
-                className={styles.dropdown}
-                onChange={(option: Option) => {
-                    if (citationFormatRef.current) {
-                        citationFormatRef.current.value = option.value;
-                    }
-                }}
-            />
-            <div className={styles.referenceTitle}>
-                <label className={styles.citation}>
-                    <input type="checkbox" className={styles.checkboxElement} onChange={selectAllSources} ref={selectAllRef} />
-                    <div className={styles.checkbox}></div>
-                    <span>{sourceCount} source{checkedCount == 1 || sourceCount == 1 ? '' : 's'} {checkedCount > 0 ? 'selected' : ''}</span>
-                </label>
-                <ReferenceTitleButtons />
-            </div>
-            <ul className={styles.citationSourceContainer}>
-                {sources.length > 0 && sources.map((source: Source, index: number) => (
-                    <li key={index} className={styles.citationSourceItem}>
-                        <label className={styles.citation}>
-                            <input type="checkbox" className={styles.checkboxElement} onChange={updateCheckedCount} />
-                            <div className={styles.checkbox}></div>
-                            <div className={styles.citationSourceWrapper}>
-                                <pre dangerouslySetInnerHTML={{ __html: formatSource(source, 'mla') }} className={styles.citationSource}></pre>
+    return (
+        <div className={styles.container}>
+            <CitationSearch includeDropdown={false} includeManualCite={false} ref={citationFormatRef} />
+            <div className={styles.referencesContainer}>
+                <h2 className="heading-2">References</h2>
+                <Dropdown
+                    options={citationStyles}
+                    value={citationStyles.find((option: Option) => option.value === citationFormat)}
+                    className={styles.dropdown}
+                    onChange={(option: Option) => {
+                        if (citationFormatRef.current) {
+                            citationFormatRef.current.value = option.value;
+                            setCitationFormat(option.value);
+                            // change the query parameter for format to the selected value
+                            const url = new URL(window.location.href);
+                            url.searchParams.set('citationStyle', option.value);
+                            window.history.pushState({}, '', url.toString());
+                        }
+                    }}
+                />
+                <div className={styles.referenceTitle}>
+                    <label className={styles.citation}>
+                        <input type="checkbox" className={styles.checkboxElement} onChange={selectAllSources} ref={selectAllRef} />
+                        <div className={styles.checkbox}></div>
+                        <span>{sourceCount} source{checkedCount == 1 || sourceCount == 1 ? '' : 's'} {checkedCount > 0 ? 'selected' : ''}</span>
+                    </label>
+                    <ReferenceTitleButtons />
+                </div>
+                <ul className={styles.citationSourceContainer}>
+                    {sources.length > 0 && sources.map((source: Source, index: number) => (
+                        <li key={index} className={styles.citationSourceItem}>
+                            <label className={styles.citation}>
+                                <input type="checkbox" className={styles.checkboxElement} onChange={updateCheckedCount} />
+                                <div className={styles.checkbox}></div>
+                                <div className={styles.citationSourceWrapper}>
+                                    <pre dangerouslySetInnerHTML={{ __html: formatSource(source, citationFormat) }} className={styles.citationSource}></pre>
+                                </div>
+                            </label>
+                            <div className={styles.citationSourceButtons}>
+                                {/* <button>Edit</button> */}
+                                <button className={styles.button} onClick={copy}>
+                                    <ClipboardIcon className={styles.icon} />
+                                    <span>Copy</span>
+                                </button>
+                                {/* <button className={styles.button}>
+                                    <PencilIcon className={styles.icon} />
+                                    <span>Edit</span>
+                                </button> */}
+                                {source.citationInfo.url && (
+                                    <a className={styles.button} href={source.citationInfo.url} target="_blank" rel="noreferrer">
+                                        <GlobeAltIcon className={styles.icon} />
+                                        <span>Visit Site</span>
+                                    </a>
+                                )}
                             </div>
-                        </label>
-                        <div className={styles.citationSourceButtons}>
-                            {/* <button>Edit</button> */}
-                            <button className={styles.button}>
-                                <ClipboardIcon className={styles.icon} />
-                                <span>Copy</span>
-                            </button>
-                            <button className={styles.button}>
-                                <PencilIcon className={styles.icon} />
-                                <span>Edit</span>
-                            </button>
-                            {source.citationInfo.url && (
-                                <a className={styles.button} href={source.citationInfo.url} target="_blank" rel="noreferrer">
-                                    <GlobeAltIcon className={styles.icon} />
-                                    <span>Visit Site</span>
-                                </a>
-                            )}
-                        </div>
-                    </li>
-                ))}
-            </ul>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+            <div id={styles.copyArea}></div>
         </div>
-    </div>
-)
+    )
 }
 
 

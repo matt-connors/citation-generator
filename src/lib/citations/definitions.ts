@@ -48,8 +48,9 @@ export interface RichText {
  * Represents a citation
  */
 export interface Citation {
-    toMlaFormat(): RichText[];
-    toApaFormat(): RichText[];
-    toChicagoFormat(): RichText[];
-    toHarvardFormat(): RichText[];
+    toMlaFormat(edition?: number): RichText[];
+    toApaFormat(edition?: number): RichText[];
+    toChicagoFormat(edition?: number): RichText[];
+    toHarvardFormat(edition?: number): RichText[];
+    toAmaFormat(edition?: number): RichText[];
 }

@@ -10,11 +10,11 @@
 }
 
 .container {
-    margin: 10vh var(--page-inline-padding) 0;
+    margin: 10vh var(--page-inline-padding);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2rem;
+    gap: 3.5rem;
 }
 
 .referencesContainer {
@@ -110,6 +110,10 @@
     list-style: 1;
     font-weight: 440;
     color: var(--color-text-light);
+}
+
+.referenceTitle .button:active {
+    color: var(--color-text-dark);
 }
 
 .referenceTitle .button span {
@@ -217,6 +221,10 @@
     white-space: nowrap;
 }
 
+.citationSourceButtons .button:active {
+    color: var(--color-text-light) !important;
+}
+
 .citationSourceButtons .button:hover {
     /* background: var(--color-background-3); */
     color: var(--color-text-dark);
@@ -253,4 +261,12 @@
     visibility: hidden;
     width: 0;
     transition: width 0.2s;
+}
+
+#copyArea {
+    position: absolute;
+    top: -1000px;
+    left: -1000px;
+    /* overflow: hidden; */
+    /* display: none; */
 }
