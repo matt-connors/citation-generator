@@ -6,7 +6,10 @@ import PageSegment from "../components/astro/PageSegment.astro";
 import advantages from "../content/index/advantages";
 import faqs from "../content/index/faqs";
 
-import { ArrowUpRightIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
+import {
+    ArrowUpRightIcon,
+    DocumentTextIcon,
+} from "@heroicons/react/24/outline";
 
 const title = "MLA Generator | Reliable Citations in MLA, APA, & Chicago";
 const description =
@@ -23,11 +26,11 @@ const description =
                 by students worldwide.
             </p>
         </div>
-        <CitationSearch client:load />
+        <CitationSearch includeDropdown includeManualCite client:load />
     </section>
-    <div class="ad-container">
+    <!-- <div class="ad-container">
         <div class="ad"></div>
-    </div>
+    </div> -->
     <PageSegment title="MLA Citation Generator Features" background>
         <div class="advantage-card-container">
             {
@@ -82,35 +85,38 @@ const description =
             <div id="guide-snippet-content">
                 <h2 class="heading-3">A quick guide to working with sources</h2>
                 <p>
-                    When you are writing a research paper, you will use information
-                    from a variety of sources. This includes books, websites, and
-                    journal articles. To avoid plagiarism, you must give credit to
-                    the authors of the sources you use. This is done by creating a
-                    works cited page at the end of your paper. The works cited page
-                    lists all of the sources you used in your paper and is formatted
-                    according to the citation style you are using, such as MLA, APA,
-                    Chicago, or Harvard.
+                    When you are writing a research paper, you will use
+                    information from a variety of sources. This includes books,
+                    websites, and journal articles. To avoid plagiarism, you
+                    must give credit to the authors of the sources you use. This
+                    is done by creating a works cited page at the end of your
+                    paper. The works cited page lists all of the sources you
+                    used in your paper and is formatted according to the
+                    citation style you are using, such as MLA, APA, Chicago, or
+                    Harvard.
                 </p>
                 <h3 class="heading-3">What is a works cited page?</h3>
                 <p>
-                    A works cited page is a list of all the sources you used in your
-                    paper. It is formatted according to the citation style you are
-                    using, such as MLA, APA, Chicago, or Harvard. The works cited
-                    page is located at the end of your paper and is arranged in
-                    alphabetical order by the author's last name. Each entry on the
-                    works cited page includes the author's name, the title of the
-                    source, the publication date, and other publication information.
+                    A works cited page is a list of all the sources you used in
+                    your paper. It is formatted according to the citation style
+                    you are using, such as MLA, APA, Chicago, or Harvard. The
+                    works cited page is located at the end of your paper and is
+                    arranged in alphabetical order by the author's last name.
+                    Each entry on the works cited page includes the author's
+                    name, the title of the source, the publication date, and
+                    other publication information.
                 </p>
                 <h3 class="heading-3">How to create a works cited page</h3>
                 <p>
                     To create a works cited page, you will need to gather
                     information about each source you used in your paper. This
                     includes the author's name, the title of the source, the
-                    publication date, and other publication information. Once you
-                    have this information, you can use our MLA citation generator to
-                    create a works cited page in the correct format. Our generator
-                    will format the works cited page according to the citation style
-                    you are using, such as MLA, APA, Chicago, or Harvard.
+                    publication date, and other publication information. Once
+                    you have this information, you can use our MLA citation
+                    generator to create a works cited page in the correct
+                    format. Our generator will format the works cited page
+                    according to the citation style you are using, such as MLA,
+                    APA, Chicago, or Harvard.
                 </p>
                 <p>Learn more about <a href="">working with sources</a>.</p>
                 <!-- <a href="/guides/research-and-works-cited/" class="button-primary">
@@ -128,12 +134,12 @@ const description =
                     return (
                         <details class="faq" open={open}>
                             <summary>{faq.question}</summary>
-                            <div set:html={faq.answer} class="faq-content"/>
+                            <div set:html={faq.answer} class="faq-content" />
                         </details>
                     );
                 })
             }
-            <a href="/citations" class="button-primary">
+            <a href="/my-references" class="button-primary">
                 <span>Citation Generator</span>
                 <ArrowUpRightIcon className="button-icon" />
             </a>
@@ -146,14 +152,14 @@ const description =
     #guide-snippet {
         /* max-width: 1450px; */
         margin: auto;
-        padding: min(calc(15vw + 2rem), 9rem) var(--page-inline-padding) min(5vw, 3rem);
+        padding: min(calc(15vw + 2rem), 9rem) var(--page-inline-padding)
+            min(5vw, 3rem);
         box-sizing: border-box;
-        
     }
     #guide-snippet-columns {
         display: grid;
         grid-template-columns: auto 1fr;
-        gap: 3rem clamp(3rem,6vw,6rem);
+        gap: 3rem clamp(3rem, 6vw, 6rem);
     }
     @media (max-width: 1100px) {
         #guide-snippet-columns {
@@ -169,7 +175,7 @@ const description =
             border-top: 1px solid var(--color-border);
             padding-top: min(3rem, 13vw);
         }
-        #guide-snippet-nav  ul {
+        #guide-snippet-nav ul {
             width: fit-content;
         }
     }
@@ -221,7 +227,7 @@ const description =
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
     }
-    #guide-snippet-nav  .heading-3 {  
+    #guide-snippet-nav .heading-3 {
         margin-bottom: 1rem;
     }
     #guide-snippet h3 {
@@ -291,7 +297,6 @@ const description =
     @media (max-width: 700px) {
         .faq summary {
             font-size: 1.2rem;
-        
         }
     }
     /* Tool */
@@ -404,7 +409,7 @@ text-decoration-thickness: 2px;
     @media (max-width: 1000px) {
         .ad-container {
             margin: 4rem 1.5rem 0;
-            width: auto
+            width: auto;
         }
         .ad {
             width: 100%;

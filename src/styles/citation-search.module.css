@@ -5,7 +5,7 @@
     border-radius: 50px;
     padding: 5px;
     display: grid;
-    grid-template-columns: auto min(50vw, 600px) auto;
+    grid-template-columns: min(50vw, 600px) auto;
     align-items: center;
     gap: calc(var(--searchbox-inline-spacing) - 15px);
     position: relative;
@@ -15,8 +15,16 @@
     /* font-size: 18px; */
 }
 
-.searchBox > div:first-child {
+.searchBox.withDropdown {
+    grid-template-columns: auto min(50vw, 600px) auto;
+}
+
+.searchBox.withDropdown > div:first-child {
     max-width: 170px;
+}
+
+.searchBox:not(.withDropdown) > div{
+    padding-left: var(--searchbox-inline-spacing);
 }
 
 .searchBox input {
@@ -57,12 +65,12 @@
     padding: 8px 0;
 }
 
-.label + .label {
+.searchBox.withDropdown .label + .label {
     padding-left: var(--searchbox-inline-spacing);
     position: relative;
 }
 
-.label + .label::before {
+.searchBox.withDropdown .label + .label::before {
     content: '';
     position: absolute;
     left: 0;

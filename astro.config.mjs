@@ -18,7 +18,8 @@ import mdx from '@astrojs/mdx';
 
 // https://astro.build/config
 export default defineConfig({
-    site: "https://citation-generator-5bt.pages.dev",
+    site: "https://mlagenerator.com",
+    // site: "http://localhost:4321",
     output: "server",
     adapter: cloudflare({
         mode: "directory",

@@ -1,5 +1,6 @@
 ---
-import { CollectionEntry, getCollection } from "astro:content";
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 import GuideLayout from "../../layouts/guide.astro";
 import Heading from "../../components/astro/Heading.astro";
 
@@ -15,11 +16,11 @@ export async function getStaticPaths() {
 
 export const prerender = true;
 
-type Props = CollectionEntry<"guide">;
+type Props = CollectionEntry<"guide">
 
 const { slug } = Astro.params;
-
-const entry = await getCollection("guides", slug);
+const entries = await getCollection("guides");
+const entry = entries.filter(entry => entry.slug === slug);
 
 // If the entry is undefined, redirect to 404
 if (entry === undefined) {
@@ -32,11 +33,14 @@ const { Content, components } = await entry[0].render();
 // Extract headings from markdown
 function extractHeadings(md) {
     const headings = md.match(/^(#+) (.+)$/gm);
-    return headings.map(heading => {
-        const level = heading.match(/#/g).length;
-        const text = heading.replace(/#/g, "").trim();
-        return { level, text };
-    });
+    if (headings) {
+        return headings.map(heading => {
+            const level = heading.match(/#/g).length;
+            const text = heading.replace(/#/g, "").trim();
+            return { level, text };
+        });
+    }
+    return [];
 }
 
 const headings = extractHeadings(entry[0].body);
