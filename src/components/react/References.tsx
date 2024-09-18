@@ -272,36 +272,38 @@ export default function References() {
                     </label>
                     <ReferenceTitleButtons />
                 </div>
-                <ul className={styles.citationSourceContainer}>
-                    {sources.length > 0 && sources.map((source: Source, index: number) => (
-                        <li key={index} className={styles.citationSourceItem}>
-                            <label className={styles.citation}>
-                                <input type="checkbox" className={styles.checkboxElement} onChange={updateCheckedCount} />
-                                <div className={styles.checkbox}></div>
-                                <div className={styles.citationSourceWrapper}>
-                                    <pre dangerouslySetInnerHTML={{ __html: formatSource(source, citationFormat) }} className={styles.citationSource}></pre>
-                                </div>
-                            </label>
-                            <div className={styles.citationSourceButtons}>
-                                {/* <button>Edit</button> */}
-                                <button className={styles.button} onClick={copy}>
-                                    <ClipboardIcon className={styles.icon} />
-                                    <span>Copy</span>
-                                </button>
-                                {/* <button className={styles.button}>
+                {sources.length > 0 && (
+                    <ul className={styles.citationSourceContainer}>
+                        {sources.map((source: Source, index: number) => (
+                            <li key={index} className={styles.citationSourceItem}>
+                                <label className={styles.citation}>
+                                    <input type="checkbox" className={styles.checkboxElement} onChange={updateCheckedCount} />
+                                    <div className={styles.checkbox}></div>
+                                    <div className={styles.citationSourceWrapper}>
+                                        <pre dangerouslySetInnerHTML={{ __html: formatSource(source, citationFormat) }} className={styles.citationSource}></pre>
+                                    </div>
+                                </label>
+                                <div className={styles.citationSourceButtons}>
+                                    {/* <button>Edit</button> */}
+                                    <button className={styles.button} onClick={copy}>
+                                        <ClipboardIcon className={styles.icon} />
+                                        <span>Copy</span>
+                                    </button>
+                                    {/* <button className={styles.button}>
                                     <PencilIcon className={styles.icon} />
                                     <span>Edit</span>
                                 </button> */}
-                                {source.citationInfo.url && (
-                                    <a className={styles.button} href={source.citationInfo.url} target="_blank" rel="noreferrer">
-                                        <GlobeAltIcon className={styles.icon} />
-                                        <span>Visit Site</span>
-                                    </a>
-                                )}
-                            </div>
-                        </li>
-                    ))}
-                </ul>
+                                    {source.citationInfo.url && (
+                                        <a className={styles.button} href={source.citationInfo.url} target="_blank" rel="noreferrer">
+                                            <GlobeAltIcon className={styles.icon} />
+                                            <span>Visit Site</span>
+                                        </a>
+                                    )}
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
             <div id={styles.copyArea}></div>
         </div>

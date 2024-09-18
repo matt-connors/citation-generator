@@ -23,6 +23,7 @@
     border-radius: 35px;
     padding: 2rem;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .citation {
@@ -84,6 +85,10 @@
     align-items: flex-start;
     /* gap: var(--padding-block); */
     margin-top: 10px;
+}
+
+.citationSourceContainer li {
+    width: 100%;
 }
 
 .referenceTitle .citation:hover {
@@ -270,3 +275,38 @@
     /* overflow: hidden; */
     /* display: none; */
 }
+
+.noSourcesText {
+    line-height: 1;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    color: var(--color-text-light);
+}
+
+@media (max-width: 650px) {
+    .referencesContainer {
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        /* border-top: 1px solid var(--color-border); */
+        /* padding-top: 2rem; */
+    }
+    .dropdown {
+        margin-bottom: 1.5rem;
+    }
+    .dropdown div {
+        padding-top: 0;
+    }
+    .referenceTitle,
+    .citationSourceContainer {
+        padding-inline: 12px;
+    }
+    .container {
+        margin-bottom: 0;
+        gap: 10vh;
+    }
+}
+

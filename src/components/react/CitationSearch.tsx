@@ -55,7 +55,7 @@ const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeMan
                 {/* Dropdown for selecting citation style */}
                 {props.includeDropdown ? <Dropdown
                     options={citationStyles}
-                    className={styles.label}
+                    className={clsx(styles.label, styles.dropdown)}
                 /> : <input type="hidden" name="citationStyle" ref={ref} />}
 
                 {/* Render tab panels dynamically */}

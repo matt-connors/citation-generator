@@ -182,14 +182,24 @@
 }
 
 @media (max-width: 750px) {
+    .dropdown > div {
+        width: calc(100% + 10px);
+        left: -6px;
+    }
     .searchBox > div:first-child {
         max-width: none !important;
     }
     .searchBox {
         grid-template-columns: 1fr !important;
-        width: 100%;
+        /* width: 100%; */
         border-radius: 25px;
         --searchbox-inline-spacing: 1.25rem;
+    }
+    .searchBox > .label {
+        padding: 15px 18px 8px !important;
+    }
+    .searchBox .searchPanel {
+        padding: 8px 18px 15px;
     }
     .citationSearch {
         width: 100%;
