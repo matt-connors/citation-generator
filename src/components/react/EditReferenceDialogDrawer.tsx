@@ -11,16 +11,18 @@ import {
 import { PencilIcon } from "@heroicons/react/24/outline"
 import { useMediaQuery } from '@react-hook/media-query'
 import { Button } from "./Button"
+import EditCitationForm from "./EditCitationForm"
+import type { Source } from '../../lib/citations/definitions';
 
-const Content = () => {
+const Content = ({ source }: { source: Source }) => {
     return (
-        <div className="mx-auto w-full max-w-sm">
-
+        <div className="mx-auto w-full w-full">
+            <EditCitationForm source={source} />
         </div>
     )
 }
 
-export default function EditReferenceDialogDrawer() {
+export default function EditReferenceDialogDrawer({ source }: { source: Source }) {
 
     const [open, setOpen] = React.useState(false);
     const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -31,9 +33,9 @@ export default function EditReferenceDialogDrawer() {
 
     const Header = () => {
         return (
-            <HeaderComponent>
+            <HeaderComponent className="mb-2">
                 <TitleComponent>Edit Citation</TitleComponent>
-                <DescriptionComponent>Modify a citation here. Click save when you're done.</DescriptionComponent>
+                {/* <DescriptionComponent>{source.uuid}</DescriptionComponent> */}
             </HeaderComponent>
         )
     }
@@ -53,9 +55,9 @@ export default function EditReferenceDialogDrawer() {
                 <DialogTrigger asChild>
                     <TriggerButton />
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="">
                     <Header />
-                    <Content />
+                    <Content source={source} />
                 </DialogContent>
             </Dialog>
         )
@@ -68,7 +70,9 @@ export default function EditReferenceDialogDrawer() {
             </DrawerTrigger>
             <DrawerContent>
                 <Header />
-                <Content />
+                <div className="p-4">
+                    <Content source={source} />
+                </div>
             </DrawerContent>
         </Drawer>
     )

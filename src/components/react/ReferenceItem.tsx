@@ -53,7 +53,7 @@ export default function ReferenceItem({ source, index, citationFormat, onCheckCh
                     <ClipboardIcon className={styles.icon} />
                     <span>Copy</span>
                 </button>
-                <EditReferenceDialogDrawer />
+                <EditReferenceDialogDrawer source={source} />
                 {source.citationInfo.url && (
                     <a 
                         className={styles.button} 
