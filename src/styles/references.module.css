@@ -10,11 +10,12 @@
 }
 
 .container {
-    margin: 10vh var(--page-inline-padding);
+    margin: 10vh var(--page-inline-padding) 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3.5rem;
+    /* gap: 3.5rem; */
+    gap: 10vh;
 }
 
 .referencesContainer {
@@ -171,6 +172,10 @@
     display: none;
 }
 
+.citation span {
+    transform: translateY(1px);
+}
+
 .checkboxElement:checked+.checkbox {
     /* border-color: var(--color-text-dark); */
 }
@@ -191,6 +196,7 @@
     /* justify-content: space-between; */
     width: 100%;
     position: relative;
+    overflow: hidden;
 }
 
 .citationSourceItem:hover .citationSourceButtons {
@@ -295,18 +301,20 @@
         /* padding-top: 2rem; */
     }
     .dropdown {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.7rem;
     }
     .dropdown div {
         padding-top: 0;
     }
     .referenceTitle,
     .citationSourceContainer {
-        padding-inline: 12px;
+        padding-inline: 10px;
     }
-    .container {
-        margin-bottom: 0;
-        gap: 10vh;
+    .citationSourceWrapper {
+        margin-left: 36px;
+    }
+    .citationSource {
+        text-indent: -36px; 
     }
 }
 

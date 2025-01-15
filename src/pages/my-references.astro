@@ -2,13 +2,22 @@
 import Layout from "../layouts/page.astro";
 import References from "../components/react/References";
 
-
-const title = "";
-const description = "";
+const title = "My References | Citation Generator";
+const description = "View and manage your saved citations and references. Easily copy, edit, and organize your bibliography in multiple citation styles.";
 ---
 
 <Layout title={title} description={description}>
-    <References client:load />
+    <main>
+        <h1 class="sr-only">My References</h1>
+        <References client:load />
+    </main>
 </Layout>
 
-<style></style>
+<style>
+    main {
+        width: 100%;
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: var(--spacing-6);
+    }
+</style>
