@@ -34,17 +34,42 @@ export interface CorporateAuthor {
 /**
  * Represents a source from the server
  */
-export interface Source {
-    uuid: URL | ISBN;
-    citationType: string;
-    citationInfo: {
-        authors: Author[];
-        sourceTitle: string;
-        publisher: string;
-        publicationDate: PublicationDate;
-        accessDate: Date;
-        url: URL;
-    };
+export type Source = BookSource | WebsiteSource;
+
+export type BookSource = {
+    uuid: ISBN;
+    citationType: "book";
+    citationInfo: BookCitation & AllCitations;
+}
+
+export type WebsiteSource = {
+    uuid: URL;
+    citationType: "website";
+    citationInfo: WebsiteCitation & AllCitations;
+}
+
+/**
+ * 
+ */
+interface WebsiteCitation {
+    url: URL;
+}
+
+interface BookCitation {
+    doi: string;
+    url?: URL;
+    medium?: string;
+    edition?: string;
+    volume?: string;
+}
+
+
+interface AllCitations {
+    authors: Author[];
+    sourceTitle: string;
+    publisher: string;
+    publicationDate: PublicationDate;
+    accessDate: Date;
 }
 
 /**

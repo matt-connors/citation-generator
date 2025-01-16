@@ -60,7 +60,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
      * @param author - The author to delete
      */
     const handleDelete = (author: Author) => {
-        setSources((prevSources) => {
+        setSources((prevSources: any) => {
             const updatedSources = prevSources.map((source) => {
                 if (source.uuid === source.uuid) {
                     return {
@@ -82,7 +82,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
         let newAuthorId = source.citationInfo.authors.length + 1;
 
         // Update the source to initialize a new contributor
-        setSources((prevSources: Source[]) => {
+        setSources((prevSources: any) => {
             const updatedSources = prevSources.map((source) => {
                 if (source.uuid === source.uuid) {
                     return {
@@ -101,7 +101,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
     }
 
     const handleEditAuthor = (authorId: number, field: string, value: string) => {
-        setSources((prevSources) => {
+        setSources((prevSources: any) => {
             const updatedSources = prevSources.map((source) => {
                 if (source.uuid === source.uuid) {
                     return {
@@ -316,6 +316,131 @@ export const WebsiteName = ({ value, onChange, isRequired, isRecommended }: Text
             </span>
             <Input
                 placeholder="Website Name"
+                type="text"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+            />
+        </label>
+    )
+}
+
+/**
+ * Edition component
+ * @param value - The value to display
+ * @param onChange - The function to call when the value changes
+ * @param isRequired - Whether the field is required
+ * @param isRecommended - Whether the field is recommended
+ */
+export const Edition = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+    return (
+        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+            <span className="flex flex-col leading-4 text-sm">
+                Edition
+                {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
+                {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
+            </span>
+            <Input
+                placeholder="e.g., 3"
+                type="text"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+            />
+        </label>
+    )
+}
+
+/**
+ * Volume number component
+ * @param value - The value to display
+ * @param onChange - The function to call when the value changes
+ * @param isRequired - Whether the field is required
+ * @param isRecommended - Whether the field is recommended
+ */
+export const VolumeNumber = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+    return (
+        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+            <span className="flex flex-col leading-4 text-sm">
+                Volume Number
+                {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
+                {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
+            </span>
+            <Input
+                placeholder="Volume number"
+                type="text"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+            />
+        </label>
+    )
+}
+
+/**
+ * Publsiher component
+ * @param value - The value to display
+ * @param onChange - The function to call when the value changes
+ * @param isRequired - Whether the field is required
+ * @param isRecommended - Whether the field is recommended
+ */
+export const Publsiher = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+    return (
+        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+            <span className="flex flex-col leading-4 text-sm">
+                Publisher
+                {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
+                {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
+            </span>
+            <Input
+                placeholder="Publisher"
+                type="text"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+            />
+        </label>
+    )
+}
+
+/**
+ * Medium component
+ * @param value - The value to display
+ * @param onChange - The function to call when the value changes
+ * @param isRequired - Whether the field is required
+ * @param isRecommended - Whether the field is recommended
+ */
+export const Medium = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+    return (
+        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+            <span className="flex flex-col leading-4 text-sm">
+                Medium
+                {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
+                {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
+            </span>
+            <Input
+                placeholder="Medium"
+                type="text"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+            />
+        </label>
+    )
+}
+
+/**
+ * DOI component
+ * @param value - The value to display
+ * @param onChange - The function to call when the value changes
+ * @param isRequired - Whether the field is required
+ * @param isRecommended - Whether the field is recommended
+ */
+export const DOI = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+    return (
+        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+            <span className="flex flex-col leading-4 text-sm">
+                DOI
+                {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
+                {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
+            </span>
+            <Input
+                placeholder="DOI"
                 type="text"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
