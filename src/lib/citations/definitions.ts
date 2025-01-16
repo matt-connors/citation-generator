@@ -94,9 +94,10 @@ export interface RichText {
  * Represents a citation
  */
 export interface Citation {
-    toMlaFormat(edition?: number): RichText[];
-    toApaFormat(edition?: number): RichText[];
-    toChicagoFormat(edition?: number): RichText[];
-    toHarvardFormat(edition?: number): RichText[];
-    toAmaFormat(edition?: number): RichText[];
+    formatCitation(version: CitationVersion): RichText[];
 }
+
+export type CitationVersion = {
+    style: 'mla' | 'apa' | 'chicago' | 'ama' | 'harvard' | 'ieee' | 'vancouver';
+    version: number;
+};

@@ -1,39 +1,67 @@
-import type { Source, RichText, Citation } from './definitions';
+import type { Source, RichText, Citation, CitationVersion } from './definitions';
 
 import WebsiteCitation from './types/website';
 import BookCitation from './types/book';
 
-function getFormattedRichText(citation: Citation, format: string): RichText[] {
+// Yeah, ik I should just update the dropdown to have the CitationVersion object as a value
+function stringToVersionStyle(format: string): CitationVersion {
     switch (format) {
+
         case 'mla-9th-edition':
-            return citation.toMlaFormat(9);
+            return { style: 'mla', version: 9 }
         case 'mla-8th-edition':
-            return citation.toMlaFormat(8);
-        case 'ama-10th-edition':
-            return citation.toAmaFormat(10);
-        case 'ama-11th-edition':
-            return citation.toAmaFormat(11);
-        case 'apa-6th-edition':
-            return citation.toApaFormat(6);
+            return { style: 'mla', version: 8 }
+        case 'mla-7th-edition':
+            return { style: 'mla', version: 7 }
+        case 'mla-6th-edition':
+            return { style: 'mla', version: 6 }
+
         case 'apa-7th-edition':
-            return citation.toApaFormat(7);
-        case 'chicago':
-            return citation.toChicagoFormat();
+            return { style: 'apa', version: 7 }
+        case 'apa-6th-edition':
+            return { style: 'apa', version: 6 }
+
+        case 'chicago-17th-edition':
+            return { style: 'chicago', version: 17 }
+        case 'chicago-16th-edition':
+            return { style: 'chicago', version: 17 }
+
+        case 'ama-11th-edition':
+            return { style: 'ama', version: 11 }
+        case 'ama-10th-edition':
+            return { style: 'ama', version: 10 }
+
         case 'harvard':
-            return citation.toHarvardFormat();
+            return { style: 'harvard', version: NaN }
+        case 'ieee':
+            return { style: 'ieee', version: NaN }
+        case 'vancouver':
+            return { style: 'vancouver', version: NaN }
+
         default:
             throw new Error('Invalid format');
     }
 }
 
 function getRichText(source: Source, format: string): RichText[] {
+
+    const { version, style } = stringToVersionStyle(format);
+
     switch (source.citationType) {
         case 'website':
             const websiteCitation = new WebsiteCitation(source.citationInfo);
-            return getFormattedRichText(websiteCitation, format);
+            return websiteCitation.formatCitation({
+                version,
+                style
+            });
+
         case 'book':
             const bookCitation = new BookCitation(source.citationInfo);
-            return getFormattedRichText(bookCitation, format);
+            return bookCitation.formatCitation({
+                version,
+                style
+            });
+
         default:
             throw new Error('Invalid citation type');
     }
