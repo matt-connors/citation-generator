@@ -1,7 +1,7 @@
 type URL = string;
 type ISBN = string;
 
-export type Author = (PersonAuthor | CorporateAuthor) & { id: number };
+export type Author = (PersonAuthor | CorporateAuthor) & { id: number }
 
 /**
  * Represents a date

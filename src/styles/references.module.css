@@ -6,7 +6,11 @@
 .button {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 7px;
+}
+
+.button > span {
+    line-height: 0;
 }
 
 .container {
@@ -206,7 +210,7 @@
 .citationSourceButtons {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 18px;
     visibility: hidden;
 
     position: absolute;

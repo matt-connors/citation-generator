@@ -1,11 +1,11 @@
-import type { Citation, Date, PublicationDate, RichText } from '../definitions';
+import type { Author, Citation, Date, PublicationDate, RichText } from '../definitions';
 
 /**
  * Create a website citation
  */
 export default class WebsiteCitation implements Citation {
 
-    public authors: string[];
+    public authors: Author[];
     public sourceTitle: string;
     public publisher: string;
     public publicationDate: PublicationDate[];
@@ -70,9 +70,16 @@ export default class WebsiteCitation implements Citation {
      */
     public toMlaFormat(): RichText[] {
         const authors = this.authors.map(author => {
-            const [firstName, lastName] = author.split(' ');
-            if (firstName && lastName) {
-                return `${this._capitalizeFirstLetter(lastName)}, ${this._capitalizeFirstLetter(firstName)}`;
+            if (author.type === "person") {
+                return [
+                    author.lastName,
+                    author.firstName
+                ]
+                .filter(Boolean)
+                .join(", ");
+            }
+            if (author.type === "organization" && author.name) {
+                return author.name;
             }
             return '';
         }).join(", and ");

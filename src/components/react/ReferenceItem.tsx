@@ -4,6 +4,7 @@ import type { Source } from '../../lib/citations/definitions';
 import formatSource from '../../lib/citations/formatSource';
 import EditReferenceDialogDrawer from './EditReferenceDialogDrawer';
 import styles from '../../styles/references.module.css';
+import { Clipboard, Globe } from 'lucide-react';
 
 interface ReferenceItemProps {
     source: Source;
@@ -51,7 +52,7 @@ export default function ReferenceItem({ source, index, citationFormat, onCheckCh
                     onClick={handleCopy}
                     aria-label="Copy citation"
                 >
-                    <ClipboardIcon className={styles.icon} />
+                    <Clipboard className={styles.icon} />
                     <span>Copy</span>
                 </button>
                 <EditReferenceDialogDrawer source={source} setSources={setSources} />
@@ -63,7 +64,7 @@ export default function ReferenceItem({ source, index, citationFormat, onCheckCh
                         rel="noreferrer"
                         aria-label="Visit source website"
                     >
-                        <GlobeAltIcon className={styles.icon} />
+                        <Globe className={styles.icon} />
                         <span>Visit Site</span>
                     </a>
                 )}

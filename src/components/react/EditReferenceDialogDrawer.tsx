@@ -15,16 +15,16 @@ import EditCitationForm from "./EditCitationForm"
 import type { Source } from '../../lib/citations/definitions';
 import { ScrollArea } from "./ScrollArea";
 import { Line } from "./EditCitationFormComponents"
-import { Check, RefreshCw } from "lucide-react"
+import { Check, Pencil, RefreshCw } from "lucide-react"
 
 const Content = ({ source, setSources }: { source: Source, setSources: (sources: Source[]) => void }) => {
     return (
-        <ScrollArea className="mx-auto w-full w-full max-h-[60vh] h-full p-8 pt-0">
+        <ScrollArea className="mx-auto w-full w-full max-h-[65vh] h-full p-8 pt-0 pb-0">
             <EditCitationForm source={source} setSources={setSources} />
             <Line className="my-8" />
-            <div className="flex gap-2 items-center pb-1 text-muted-foreground ">
-                <Check size={19} strokeWidth={1.8} />
-                <p className="text-sm">All changes are saved automatically.</p>
+            <div className="flex gap-2 items-center pb-8 text-muted-foreground ">
+                <RefreshCw size={16} strokeWidth={1.8} />
+                <p className="text-xs leading-none">All changes are saved automatically.</p>
             </div>
         </ScrollArea>
     )
@@ -33,7 +33,7 @@ const Content = ({ source, setSources }: { source: Source, setSources: (sources:
 export default function EditReferenceDialogDrawer({ source, setSources }: { source: Source, setSources: (sources: Source[]) => void }) {
 
     const [open, setOpen] = React.useState(false);
-    const isDesktop = useMediaQuery("(min-width: 768px)");
+    const isDesktop = useMediaQuery("(min-width: 900px)");
 
     const HeaderComponent = isDesktop ? DialogHeader : DrawerHeader;
     const TitleComponent = isDesktop ? DialogTitle : DrawerTitle;
@@ -51,7 +51,7 @@ export default function EditReferenceDialogDrawer({ source, setSources }: { sour
     const TriggerButton = () => {
         return (
             <button className="flex gap-[5px] items-center text-[var(--color-text-light)] hover:text-[var(--color-text-primary)]" onClick={() => setOpen(true)}>
-                <PencilIcon className="w-[20px] h-[20px]" />
+                <Pencil className="w-[20px] h-[20px]" />
                 <span>Edit</span>
             </button>
         )

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Input } from "./Input";
-import type { Author, Source } from "../../lib/citations/definitions";
+import type { Author, CorporateAuthor, PersonAuthor, Source } from "../../lib/citations/definitions";
 import { cn } from "./utils";
 import { Button } from "./Button";
 import { Building2, Calendar, ChevronDown, Trash2, UserRound } from "lucide-react";
@@ -53,6 +53,8 @@ export const Line = ({ className }: { className?: string }) => <div className={c
  */
 export const Contributors = ({ source, setSources }: { source: Source, setSources: React.Dispatch<React.SetStateAction<Source[]>> }) => {
 
+    const [lastOpenedAuthorId, setLastOpenedAuthorId] = useState<number | null>(null);
+
     /**
      * Delete an author from the source
      * @param author - The author to delete
@@ -76,6 +78,9 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
     }
 
     const handleAddContributor = (type: "person" | "organization") => {
+
+        let newAuthorId = source.citationInfo.authors.length + 1;
+
         // Update the source to initialize a new contributor
         setSources((prevSources: Source[]) => {
             const updatedSources = prevSources.map((source) => {
@@ -84,7 +89,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
                         ...source,
                         citationInfo: {
                             ...source.citationInfo,
-                            authors: [...source.citationInfo.authors, { type, id: prevSources.length + 1 } as Author]
+                            authors: [...source.citationInfo.authors, { type, id: newAuthorId } as Author]
                         }
                     }
                 }
@@ -92,6 +97,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
             });
             return updatedSources;
         });
+        setLastOpenedAuthorId(newAuthorId);
     }
 
     const handleEditAuthor = (authorId: number, field: string, value: string) => {
@@ -120,7 +126,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
         });
     }
 
-    const AuthorPreviewName = React.memo(({ author }: { author: Author }) => {
+    const AuthorPreviewName = (author: Author) => {
         if (author.type === "person") {
             return author.firstName || author.lastName
                 ? <span>{author.firstName} {author.lastName}</span>
@@ -129,7 +135,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
         else {
             return <span>{author.name}</span>
         }
-    });
+    }
 
     return (
         <div className="grid grid-cols-[130px_1fr] gap-4">
@@ -139,9 +145,9 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
             </span>
             <div className="flex flex-col gap-4">
                 {source.citationInfo.authors.map((author) => (
-                    <details className="border border-border rounded-md shadow-sm [&[open]_summary_[data-chevron]]:rotate-180">
+                    <details className="border border-border rounded-md shadow-sm [&[open]_summary_[data-chevron]]:rotate-180" open={author.id === lastOpenedAuthorId}>
                         <summary className="pl-3 cursor-pointer w-full h-9 flex justify-between items-center">
-                            <span className="leading-none">{AuthorPreviewName({ author })}</span>
+                            <span className="leading-none">{AuthorPreviewName(author)}</span>
                             <div className="flex gap-2 items-center">
                                 <ChevronDown size={16} strokeWidth={1.5} className="transform transition-transform duration-100" data-chevron />
                                 <Button variant="ghost" size="icon" className="p-0" onClick={() => handleDelete(author)}>
@@ -150,7 +156,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
                             </div>
                         </summary>
                         <Line />
-                        <div className="p-3 pb-4">
+                        <div className="p-4 pb-5 pt-3">
                             <Tabs defaultValue={author.type}>
                                 <TabsList className="mt-1 mb-4">
                                     <TabsTrigger value="person">Person</TabsTrigger>
@@ -165,7 +171,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
                                         <Input
                                             placeholder="Title"
                                             type="text"
-                                            value={author.title}
+                                            value={(author as PersonAuthor).title}
                                             onChange={(e) => handleEditAuthor(author.id, "title", e.target.value)}
                                         />
                                     </label>
@@ -177,7 +183,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
                                         <Input
                                             placeholder="Initials"
                                             type="text"
-                                            value={author.initials}
+                                            value={(author as PersonAuthor).initials}
                                             onChange={(e) => handleEditAuthor(author.id, "initials", e.target.value)}
                                         />
                                     </label>
@@ -190,7 +196,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
                                         <Input
                                             placeholder="First Name"
                                             type="text"
-                                            value={author.firstName}
+                                            value={(author as PersonAuthor).firstName}
                                             onChange={(e) => handleEditAuthor(author.id, "firstName", e.target.value)}
                                         />
                                     </label>
@@ -203,7 +209,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
                                         <Input
                                             placeholder="Last Name"
                                             type="text"
-                                            value={author.lastName}
+                                            value={(author as PersonAuthor).lastName}
                                             onChange={(e) => handleEditAuthor(author.id, "lastName", e.target.value)}
                                         />
                                     </label>
@@ -218,7 +224,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
                                         <Input
                                             placeholder="Name"
                                             type="text"
-                                            value={author.name}
+                                            value={(author as CorporateAuthor).name}
                                             onChange={(e) => handleEditAuthor(author.id, "name", e.target.value)}
                                         />
                                     </label>

@@ -7,6 +7,8 @@ import Dropdown from './Dropdown';
 import CitationSearch from './CitationSearch';
 import ReferenceItem from './ReferenceItem';
 import { useReferences } from '../../lib/references/useReferences';
+import { Clipboard, Trash, Trash2 } from 'lucide-react';
+import { cn } from './utils';
 
 export default function References() {
     const {
@@ -68,7 +70,7 @@ export default function References() {
                         data-copy-selected
                         aria-label="Copy selected references"
                     >
-                        <ClipboardIcon className={styles.icon} />
+                        <Clipboard className={cn(styles.icon, "transform translate-y-[1px]")} />
                         <span>Copy selected</span>
                     </button>
                     <button 
@@ -76,7 +78,7 @@ export default function References() {
                         onClick={handleDelete}
                         aria-label="Delete selected references"
                     >
-                        <TrashIcon className={styles.icon} />
+                        <Trash2 className={cn(styles.icon, "transform translate-y-[1px]")} />
                         <span>Delete</span>
                     </button>
                 </div>
