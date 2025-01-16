@@ -1,6 +1,8 @@
 type URL = string;
 type ISBN = string;
 
+export type Author = (PersonAuthor | CorporateAuthor) & { id: number };
+
 /**
  * Represents a date
  */
@@ -11,13 +13,32 @@ export interface Date {
 }
 
 /**
+ * Represents a person author
+ */
+export interface PersonAuthor {
+    type: "person";
+    title?: string;
+    initials?: string;
+    lastName?: string;
+    firstName?: string;
+}
+
+/**
+ * Represents a corporate author
+ */
+export interface CorporateAuthor {
+    type: "organization";
+    name: string;
+}
+
+/**
  * Represents a source from the server
  */
 export interface Source {
     uuid: URL | ISBN;
     citationType: string;
     citationInfo: {
-        authors: string[];
+        authors: Author[];
         sourceTitle: string;
         publisher: string;
         publicationDate: PublicationDate;

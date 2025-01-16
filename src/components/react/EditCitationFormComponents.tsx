@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Input } from "./Input";
-import type { Source } from "../../lib/citations/definitions";
+import type { Author, Source } from "../../lib/citations/definitions";
 import { cn } from "./utils";
 import { Button } from "./Button";
 import { Building2, Calendar, ChevronDown, Trash2, UserRound } from "lucide-react";
@@ -57,7 +57,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
      * Delete an author from the source
      * @param author - The author to delete
      */
-    const handleDelete = (author: string) => {
+    const handleDelete = (author: Author) => {
         setSources((prevSources) => {
             const updatedSources = prevSources.map((source) => {
                 if (source.uuid === source.uuid) {
@@ -84,7 +84,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
                         ...source,
                         citationInfo: {
                             ...source.citationInfo,
-                            authors: [...source.citationInfo.authors, ""]
+                            authors: [...source.citationInfo.authors, { type, id: prevSources.length + 1 } as Author]
                         }
                     }
                 }
@@ -94,8 +94,45 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
         });
     }
 
+    const handleEditAuthor = (authorId: number, field: string, value: string) => {
+        setSources((prevSources) => {
+            const updatedSources = prevSources.map((source) => {
+                if (source.uuid === source.uuid) {
+                    return {
+                        ...source,
+                        citationInfo: {
+                            ...source.citationInfo,
+                            authors: source.citationInfo.authors.map((author) => {
+                                if (author.id === authorId) {
+                                    return {
+                                        ...author,
+                                        [field]: value
+                                    }
+                                }
+                                return author;
+                            })
+                        }
+                    };
+                }
+                return source;
+            });
+            return updatedSources;
+        });
+    }
+
+    const AuthorPreviewName = React.memo(({ author }: { author: Author }) => {
+        if (author.type === "person") {
+            return author.firstName || author.lastName
+                ? <span>{author.firstName} {author.lastName}</span>
+                : <span>{author.initials}</span>
+        }
+        else {
+            return <span>{author.name}</span>
+        }
+    });
+
     return (
-        <div className="grid grid-cols-[130px_1fr] gap-3">
+        <div className="grid grid-cols-[130px_1fr] gap-4">
             <span className="flex flex-col leading-4 text-sm h-9 justify-center">
                 Contributors
                 <span className="text-xs text-muted-foreground">Recommended</span>
@@ -104,7 +141,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
                 {source.citationInfo.authors.map((author) => (
                     <details className="border border-border rounded-md shadow-sm [&[open]_summary_[data-chevron]]:rotate-180">
                         <summary className="pl-3 cursor-pointer w-full h-9 flex justify-between items-center">
-                            <span className="leading-none">{author}</span>
+                            <span className="leading-none">{AuthorPreviewName({ author })}</span>
                             <div className="flex gap-2 items-center">
                                 <ChevronDown size={16} strokeWidth={1.5} className="transform transition-transform duration-100" data-chevron />
                                 <Button variant="ghost" size="icon" className="p-0" onClick={() => handleDelete(author)}>
@@ -114,58 +151,83 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
                         </summary>
                         <Line />
                         <div className="p-3 pb-4">
-                            <Tabs defaultValue={"person"}>
+                            <Tabs defaultValue={author.type}>
                                 <TabsList className="mt-1 mb-4">
                                     <TabsTrigger value="person">Person</TabsTrigger>
                                     <TabsTrigger value="organization">Organization</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="person" className="flex flex-col gap-4">
                                     {/* Title */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-3">
+                                    <label className="grid grid-cols-[110px_1fr] items-center gap-4">
                                         <span className="flex flex-col leading-4 text-sm">
                                             Title
                                         </span>
-                                        <Input placeholder="Title" type="text" />
+                                        <Input
+                                            placeholder="Title"
+                                            type="text"
+                                            value={author.title}
+                                            onChange={(e) => handleEditAuthor(author.id, "title", e.target.value)}
+                                        />
                                     </label>
                                     {/* Initials */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-3">
+                                    <label className="grid grid-cols-[110px_1fr] items-center gap-4">
                                         <span className="flex flex-col leading-4 text-sm">
                                             Initials
                                         </span>
-                                        <Input placeholder="Initials" type="text" />
+                                        <Input
+                                            placeholder="Initials"
+                                            type="text"
+                                            value={author.initials}
+                                            onChange={(e) => handleEditAuthor(author.id, "initials", e.target.value)}
+                                        />
                                     </label>
                                     {/* First Name */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-3">
+                                    <label className="grid grid-cols-[110px_1fr] items-center gap-4">
                                         <span className="flex flex-col leading-4 text-sm">
                                             First Name
                                             <span className="text-xs text-muted-foreground">Recommended</span>
                                         </span>
-                                        <Input placeholder="First Name" type="text" />
+                                        <Input
+                                            placeholder="First Name"
+                                            type="text"
+                                            value={author.firstName}
+                                            onChange={(e) => handleEditAuthor(author.id, "firstName", e.target.value)}
+                                        />
                                     </label>
                                     {/* Last Name */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-3">
+                                    <label className="grid grid-cols-[110px_1fr] items-center gap-4">
                                         <span className="flex flex-col leading-4 text-sm">
                                             Last Name
                                             <span className="text-xs text-muted-foreground">Recommended</span>
                                         </span>
-                                        <Input placeholder="Last Name" type="text" />
+                                        <Input
+                                            placeholder="Last Name"
+                                            type="text"
+                                            value={author.lastName}
+                                            onChange={(e) => handleEditAuthor(author.id, "lastName", e.target.value)}
+                                        />
                                     </label>
                                 </TabsContent>
-                                <TabsContent value="organization" className="flex flex-col gap-3">
+                                <TabsContent value="organization" className="flex flex-col gap-4">
                                     {/* Name */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-3">
+                                    <label className="grid grid-cols-[110px_1fr] items-center gap-4">
                                         <span className="flex flex-col leading-4 text-sm">
                                             Name
                                             <span className="text-xs text-muted-foreground">Recommended</span>
                                         </span>
-                                        <Input placeholder="Name" type="text" />
+                                        <Input
+                                            placeholder="Name"
+                                            type="text"
+                                            value={author.name}
+                                            onChange={(e) => handleEditAuthor(author.id, "name", e.target.value)}
+                                        />
                                     </label>
                                 </TabsContent>
                             </Tabs>
                         </div>
                     </details>
                 ))}
-                <div className="flex gap-3 items-center">
+                <div className="flex gap-4 items-center">
                     <Button variant="secondary" className="gap-2" onClick={() => handleAddContributor("person")}>
                         <UserRound size={17} strokeWidth={1.5} />
                         <span className="leading-none">Add Person</span>
@@ -190,7 +252,7 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
  */
 export const Title = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
     return (
-        <label className="grid grid-cols-[130px_1fr] items-center gap-3">
+        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 Title
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
@@ -215,7 +277,7 @@ export const Title = ({ value, onChange, isRequired, isRecommended }: TextCompon
  */
 export const Name = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
     return (
-        <label className="grid grid-cols-[130px_1fr] items-center gap-3">
+        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 Name
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
@@ -240,7 +302,7 @@ export const Name = ({ value, onChange, isRequired, isRecommended }: TextCompone
  */
 export const WebsiteName = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
     return (
-        <label className="grid grid-cols-[130px_1fr] items-center gap-3">
+        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 Website Name
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
@@ -265,7 +327,7 @@ export const WebsiteName = ({ value, onChange, isRequired, isRecommended }: Text
  */
 export const URL = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
     return (
-        <label className="grid grid-cols-[130px_1fr] items-center gap-3">
+        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 URL
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
@@ -341,13 +403,13 @@ export const PublicationDate = ({ value, onChange, isRequired, isRecommended }: 
     };
 
     return (
-        <div className="grid grid-cols-[130px_1fr] items-center gap-3">
+        <div className="grid grid-cols-[130px_1fr] items-center gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 Publication Date
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
-            <div className="grid grid-cols-[1fr_1fr_1fr] items-center gap-3">
+            <div className="grid grid-cols-[1fr_1fr_1fr] items-center gap-4">
                 <Input
                     placeholder="Year"
                     type="text"
@@ -448,14 +510,14 @@ export const AccessDate = ({ value, onChange, isRequired, isRecommended }: DateC
     };
 
     return (
-        <div className="grid grid-cols-[130px_1fr] gap-3">
+        <div className="grid grid-cols-[130px_1fr] gap-4">
             <span className="flex flex-col leading-4 text-sm h-9 justify-center">
                 Access Date
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
             <div className="">
-                <div className="grid grid-cols-[1fr_1fr_1fr] items-center gap-3">
+                <div className="grid grid-cols-[1fr_1fr_1fr] items-center gap-4">
                     <Input
                         placeholder="Year"
                         type="text"

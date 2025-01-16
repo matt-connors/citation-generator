@@ -2,13 +2,15 @@
  * Extracts the author from the given string.
  */
 
+import { Author } from "../definitions";
+
 // <a rel="author" href="https://www.example.com/author/author-name">Author Name</a>
 // "author" included in class name
 // author in json+ld
 // check if the author's name is preceeded by a keyword and prioritize those matches
 
 // check if the remaining text is a name (less than 3 words, no numbers, no special characters
-export function getAuthorMatches(text: string): string[] {
+export function getAuthorMatches(text: string): Author[] {
 
     const matches = [];
     const prefixes = ["written by", "author", "by"];
@@ -27,7 +29,13 @@ export function getAuthorMatches(text: string): string[] {
     return matches
         .filter((author, index, self) =>
             matches.indexOf(author) === index
-        );
+        )
+        .map((author, index) => ({
+            type: "person",
+            firstName: author.split(' ')[0],
+            lastName: author.split(' ')[1],
+            id: index
+        }));
 }
 
 /**

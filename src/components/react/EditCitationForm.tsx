@@ -41,7 +41,7 @@ export default function EditCitationForm({ source, setSources }: { source: Sourc
 
     return (
 
-        <div className="flex flex-col gap-4 w-full pt-6">
+        <div className="flex flex-col gap-4 w-full pt-8">
 
             {/* Title */}
             <Title
@@ -55,14 +55,14 @@ export default function EditCitationForm({ source, setSources }: { source: Sourc
                 value={localCitationInfo.publisher}
                 onChange={(value) => handleInputChange('publisher', value)}
             />
-            <Line className="my-2" />
+            <Line className="my-4" />
 
             {/* Contributors */}
             <Contributors
                 source={source}
                 setSources={setSources}
             />
-            <Line className="my-2" />
+            <Line className="my-4" />
 
             {/* Publication Date */}
             <PublicationDate
@@ -76,7 +76,7 @@ export default function EditCitationForm({ source, setSources }: { source: Sourc
                 value={localCitationInfo.accessDate}
                 onChange={(value) => handleInputChange('accessDate', value)}
             />
-            <Line className="my-2" />
+            <Line className="my-4" />
 
             {/* URL */}
             <URL
@@ -84,9 +84,6 @@ export default function EditCitationForm({ source, setSources }: { source: Sourc
                 onChange={(value) => handleInputChange('url', value)}
                 isRecommended={true}
             />
-            <Line className="my-2" />
-
-            <p className="text-sm text-muted-foreground text-xs">All changes are saved automatically.</p>
         </div>
     )
 }
