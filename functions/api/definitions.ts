@@ -6,7 +6,7 @@ export type Author = (PersonAuthor | CorporateAuthor);
 /**
  * Represents a date
  */
-export interface Date {
+export interface PublicationDate {
     year: number;
     month: number;
     day: number;
