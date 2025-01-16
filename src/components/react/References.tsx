@@ -14,6 +14,7 @@ export default function References() {
         sourceCount,
         checkedCount,
         citationFormat,
+        setSources,
         setCheckedCount,
         setCitationFormat,
         handleDelete,
@@ -126,6 +127,7 @@ export default function References() {
                             <ReferenceItem
                                 key={source.uuid}
                                 source={source}
+                                setSources={setSources}
                                 index={index}
                                 citationFormat={citationFormat}
                                 onCheckChange={handleCheckChange}

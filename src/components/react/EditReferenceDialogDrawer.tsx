@@ -13,16 +13,18 @@ import { useMediaQuery } from '@react-hook/media-query'
 import { Button } from "./Button"
 import EditCitationForm from "./EditCitationForm"
 import type { Source } from '../../lib/citations/definitions';
+import { ScrollArea } from "./ScrollArea";
+import { Line } from "./EditCitationFormComponents"
 
-const Content = ({ source }: { source: Source }) => {
+const Content = ({ source, setSources }: { source: Source, setSources: (sources: Source[]) => void }) => {
     return (
-        <div className="mx-auto w-full w-full">
-            <EditCitationForm source={source} />
-        </div>
+        <ScrollArea className="mx-auto w-full w-full max-h-[60vh] h-full p-6 pt-0">
+            <EditCitationForm source={source} setSources={setSources} />
+        </ScrollArea>
     )
 }
 
-export default function EditReferenceDialogDrawer({ source }: { source: Source }) {
+export default function EditReferenceDialogDrawer({ source, setSources }: { source: Source, setSources: (sources: Source[]) => void }) {
 
     const [open, setOpen] = React.useState(false);
     const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -33,9 +35,9 @@ export default function EditReferenceDialogDrawer({ source }: { source: Source }
 
     const Header = () => {
         return (
-            <HeaderComponent className="mb-2">
+            <HeaderComponent className="m-0 p-6 shadow-sm border-b border-border border-b-solid">
                 <TitleComponent>Edit Citation</TitleComponent>
-                {/* <DescriptionComponent>{source.uuid}</DescriptionComponent> */}
+                {/* <DescriptionComponent className="text-xs">{source.uuid}</DescriptionComponent> */}
             </HeaderComponent>
         )
     }
@@ -55,9 +57,9 @@ export default function EditReferenceDialogDrawer({ source }: { source: Source }
                 <DialogTrigger asChild>
                     <TriggerButton />
                 </DialogTrigger>
-                <DialogContent className="">
+                <DialogContent className="p-0">
                     <Header />
-                    <Content source={source} />
+                    <Content source={source} setSources={setSources} />
                 </DialogContent>
             </Dialog>
         )
@@ -70,9 +72,7 @@ export default function EditReferenceDialogDrawer({ source }: { source: Source }
             </DrawerTrigger>
             <DrawerContent>
                 <Header />
-                <div className="p-4">
-                    <Content source={source} />
-                </div>
+                <Content source={source} setSources={setSources} />
             </DrawerContent>
         </Drawer>
     )

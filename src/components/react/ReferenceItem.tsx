@@ -10,9 +10,10 @@ interface ReferenceItemProps {
     index: number;
     citationFormat: string;
     onCheckChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    setSources: (sources: Source[]) => void;
 }
 
-export default function ReferenceItem({ source, index, citationFormat, onCheckChange }: ReferenceItemProps) {
+export default function ReferenceItem({ source, index, citationFormat, onCheckChange, setSources }: ReferenceItemProps) {
     const handleCopy = (event: React.MouseEvent<HTMLButtonElement>) => {
         const target = event.currentTarget;
         const targetSpan = target.querySelector('span') as HTMLSpanElement;
@@ -53,7 +54,7 @@ export default function ReferenceItem({ source, index, citationFormat, onCheckCh
                     <ClipboardIcon className={styles.icon} />
                     <span>Copy</span>
                 </button>
-                <EditReferenceDialogDrawer source={source} />
+                <EditReferenceDialogDrawer source={source} setSources={setSources} />
                 {source.citationInfo.url && (
                     <a 
                         className={styles.button} 

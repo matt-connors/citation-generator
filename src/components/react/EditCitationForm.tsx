@@ -1,124 +1,92 @@
-import React, { useState } from "react";
-import { Input } from "./Input";
-import type { Source } from "../../lib/citations/definitions";
-import { Button } from "./Button";
-import { Building2, ChevronDown, UserRound } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./Tabs";
-import { cn } from "./utils";
+import React, { useState, useCallback } from "react";
+import type { Date, Source } from "../../lib/citations/definitions";
+import { Title, WebsiteName, Contributors, URL, Line, PublicationDate, AccessDate } from "./EditCitationFormComponents";
+import { useDebounce } from "../../hooks/useDebounce";
 
+/**
+ * Edit citation form component
+ * @param source - The source to edit
+ * @param setSources - The function to set the sources
+ */
+export default function EditCitationForm({ source, setSources }: { source: Source, setSources: React.Dispatch<React.SetStateAction<Source[]>> }) {
+    const [localCitationInfo, setLocalCitationInfo] = useState(source.citationInfo);
 
-const Contributors = ({ source }: { source: Source }) => {
-    const [tab, setTab] = useState("person");
+    // Debounce the update to parent state to avoid unnecessary re-renders
+    const debouncedSetSources = useDebounce((newCitationInfo: typeof source.citationInfo) => {
+        setSources(prevSources =>
+            prevSources.map(s =>
+                s.uuid === source.uuid
+                    ? { ...s, citationInfo: newCitationInfo }
+                    : s
+            )
+        );
+    }, 500);
+
+    const handleInputChange = useCallback((name: string, value: string | Date) => {
+        const newCitationInfo = {
+            ...localCitationInfo,
+            [name]: name === 'publicationDate' ? [{
+                context: { prefix: '', matchedText: '' },
+                date: value
+            }] : value
+        };
+        setLocalCitationInfo(newCitationInfo);
+        debouncedSetSources(newCitationInfo);
+    }, [localCitationInfo, debouncedSetSources]);
+
+    // Get the first publication date if it exists
+    const publicationDate = Array.isArray(localCitationInfo.publicationDate) && localCitationInfo.publicationDate.length > 0
+        ? localCitationInfo.publicationDate[0].date
+        : { year: 0, month: 0, day: 0 };
+
     return (
-        <div className="grid grid-cols-[120px_1fr] gap-3">
-            <span className="flex flex-col leading-4 text-sm h-9 justify-center">
-                Contributors
-                <span className="text-xs text-muted-foreground">Recommended</span>
-            </span>
-            <div className="flex flex-col gap-4">
-                {source.citationInfo.authors.map((author) => (
-                    <details className="border border-border rounded-md shadow-sm [&[open]_summary_svg]:rotate-180">
-                        <summary className="px-3 cursor-pointer w-full h-9 flex justify-between items-center">
-                            <span className="leading-none">{author}</span>
-                            <ChevronDown size={16} strokeWidth={1.5} className="transform transition-transform duration-100" />
-                        </summary>
-                        <Line />
-                        <div className="p-3 pb-4">
-                            <Tabs defaultValue="person" onValueChange={setTab} value={tab}>
-                                <TabsList className="mt-1 mb-4">
-                                    <TabsTrigger value="person">Person</TabsTrigger>
-                                    <TabsTrigger value="organization">Organization</TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="person" className="flex flex-col gap-4">
-                                    {/* Title */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-3">
-                                        <span className="flex flex-col leading-4 text-sm">
-                                            Title
-                                        </span>
-                                        <Input placeholder="Title" type="text" />
-                                    </label>
-                                    {/* Initials */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-3">
-                                        <span className="flex flex-col leading-4 text-sm">
-                                            Initials
-                                        </span>
-                                        <Input placeholder="Initials" type="text" />
-                                    </label>
-                                    {/* First Name */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-3">
-                                        <span className="flex flex-col leading-4 text-sm">
-                                            First Name
-                                            <span className="text-xs text-muted-foreground">Recommended</span>
-                                        </span>
-                                        <Input placeholder="First Name" type="text" />
-                                    </label>
-                                    {/* Last Name */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-3">
-                                        <span className="flex flex-col leading-4 text-sm">
-                                            Last Name
-                                            <span className="text-xs text-muted-foreground">Recommended</span>
-                                        </span>
-                                        <Input placeholder="Last Name" type="text" />
-                                    </label>
-                                </TabsContent>
-                                <TabsContent value="organization" className="flex flex-col gap-3">
-                                    {/* Name */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-3">
-                                        <span className="flex flex-col leading-4 text-sm">
-                                            Name
-                                            <span className="text-xs text-muted-foreground">Recommended</span>
-                                        </span>
-                                        <Input placeholder="Name" type="text" />
-                                    </label>
-                                </TabsContent>
-                            </Tabs>
-                        </div>
-                    </details>
-                ))}
-                <div className="flex gap-3 items-center">
-                    <Button variant="secondary" className="gap-2">
-                        <UserRound size={17} strokeWidth={1.5} />
-                        <span className="leading-none">Add Person</span>
-                    </Button>
-                    <Button variant="secondary" className="gap-2">
-                        <Building2 size={17} strokeWidth={1.5} />
-                        <span className="leading-none">Add Organization</span>
-                    </Button>
-                </div>
-            </div>
 
-        </div>
-    )
-}
+        <div className="flex flex-col gap-4 w-full pt-6">
 
-const Line = ({ className }: { className?: string }) => <div className={cn("h-[1px] w-full bg-border", className)} />
+            {/* Title */}
+            <Title
+                value={localCitationInfo.sourceTitle}
+                onChange={(value) => handleInputChange('sourceTitle', value)}
+                isRequired={true}
+            />
 
-export default function EditCitationForm({ source }: { source: Source }) {
-    return (
-        <div className="flex flex-col gap-4 w-full">
-            <label className="grid grid-cols-[120px_1fr] items-center gap-3">
-                <span className="flex flex-col leading-4 text-sm">
-                    Title
-                    <span className="text-xs text-muted-foreground">Required</span>
-                </span>
-                <Input placeholder="Title" type="text" value={source.citationInfo.sourceTitle} />
-            </label>
-            <label className="grid grid-cols-[120px_1fr] items-center gap-3">
-                <span className="flex flex-col leading-4 text-sm">
-                    Website name
-                </span>
-                <Input placeholder="Title" type="text" value={source.citationInfo.publisher} />
-            </label>
+            {/* Website Name */}
+            <WebsiteName
+                value={localCitationInfo.publisher}
+                onChange={(value) => handleInputChange('publisher', value)}
+            />
             <Line className="my-2" />
-            <Contributors source={source} />
+
+            {/* Contributors */}
+            <Contributors
+                source={source}
+                setSources={setSources}
+            />
             <Line className="my-2" />
-            <label className="grid grid-cols-[120px_1fr] items-center gap-3">
-                <span className="flex flex-col leading-4 text-sm">
-                    URL
-                    <span className="text-xs text-muted-foreground">Recommended</span>
-                </span>
-                <Input placeholder="URL" type="text" value={source.citationInfo.url} />
-            </label>
+
+            {/* Publication Date */}
+            <PublicationDate
+                value={publicationDate}
+                onChange={(value) => handleInputChange('publicationDate', value)}
+                isRecommended={true}
+            />
+
+            {/* Access Date */}
+            <AccessDate
+                value={localCitationInfo.accessDate}
+                onChange={(value) => handleInputChange('accessDate', value)}
+            />
+            <Line className="my-2" />
+
+            {/* URL */}
+            <URL
+                value={localCitationInfo.url}
+                onChange={(value) => handleInputChange('url', value)}
+                isRecommended={true}
+            />
+            <Line className="my-2" />
+
+            <p className="text-sm text-muted-foreground text-xs">All changes are saved automatically.</p>
         </div>
     )
 }
