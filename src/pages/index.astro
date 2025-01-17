@@ -7,49 +7,49 @@ import advantages from "../content/index/advantages";
 import faqs from "../content/index/faqs";
 
 import {
-    ArrowUpRightIcon,
-    DocumentTextIcon,
+  ArrowUpRightIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 
 const title = "MLA Generator | Reliable Citations in MLA, APA, & Chicago";
 const description =
-    "Effortlessly format & generate accurate citations in APA, MLA, Chicago & Harvard formats. MLA Generator: Trusted by students and researchers worldwide.";
+  "Effortlessly format & generate accurate citations in APA, MLA, Chicago & Harvard formats. MLA Generator: Trusted by students and researchers worldwide.";
 ---
 
 <Layout title={title} description={description}>
-    <section id="tool">
-        <div id="text-container">
-            <h1 class="heading-1">MLA Format <br />Citation Generator</h1>
-            <p class="subtitle">
-                <!-- <a href={site}>MLA Generator</a>:  -->
-                Easy and Reliable APA, MLA, Chicago and Harvard citations, trused
-                by students worldwide.
-            </p>
-        </div>
-        <CitationSearch includeDropdown includeManualCite client:load />
-    </section>
-    <!-- <div class="ad-container">
+  <section id="tool">
+    <div id="text-container">
+      <h1 class="heading-1">MLA Format <br />Citation Generator</h1>
+      <p class="subtitle">
+        <!-- <a href={site}>MLA Generator</a>:  -->
+        Easy and Reliable APA, MLA, Chicago and Harvard citations, trused by students
+        worldwide.
+      </p>
+    </div>
+    <CitationSearch includeDropdown includeManualCite client:load />
+  </section>
+  <!-- <div class="ad-container">
         <div class="ad"></div>
     </div> -->
-    <PageSegment title="MLA Citation Generator Features" background>
-        <div class="advantage-card-container">
-            {
-                advantages.map((advantage) => (
-                    <div class="advantage-card">
-                        <div class="advantage-card-top">
-                            {<advantage.icon className="advantage-card-icon" />}
-                            <h3>{advantage.heading}</h3>
-                        </div>
-                        <p>{advantage.text}</p>
-                    </div>
-                ))
-            }
-        </div>
-    </PageSegment>
-    <article id="guide-snippet">
-        <h2 class="heading-2">A quick guide to working with sources</h2>
-        <div id="guide-snippet-columns">
-            <nav id="guide-snippet-nav">
+  <PageSegment title="MLA Citation Generator Features" background>
+    <div class="advantage-card-container">
+      {
+        advantages.map((advantage) => (
+          <div class="advantage-card">
+            <div class="advantage-card-top">
+              {<advantage.icon className="advantage-card-icon" />}
+              <h3>{advantage.heading}</h3>
+            </div>
+            <p>{advantage.text}</p>
+          </div>
+        ))
+      }
+    </div>
+  </PageSegment>
+  <article id="guide-snippet">
+    <h2 class="heading-2">A Quick Guide to Working with Sources</h2>
+    <div id="guide-snippet-columns">
+      <!-- <nav id="guide-snippet-nav">
                 <p class="heading-3">Guide</p>
                 <ul>
                     <li>
@@ -81,347 +81,515 @@ const description =
                         </a>
                     </li>
                 </ul>
-            </nav>
-            <div id="guide-snippet-content">
-                <h2 class="heading-3">A quick guide to working with sources</h2>
-                <p>
-                    When you are writing a research paper, you will use
-                    information from a variety of sources. This includes books,
-                    websites, and journal articles. To avoid plagiarism, you
-                    must give credit to the authors of the sources you use. This
-                    is done by creating a works cited page at the end of your
-                    paper. The works cited page lists all of the sources you
-                    used in your paper and is formatted according to the
-                    citation style you are using, such as MLA, APA, Chicago, or
-                    Harvard.
-                </p>
-                <h3 class="heading-3">What is a works cited page?</h3>
-                <p>
-                    A works cited page is a list of all the sources you used in
-                    your paper. It is formatted according to the citation style
-                    you are using, such as MLA, APA, Chicago, or Harvard. The
-                    works cited page is located at the end of your paper and is
-                    arranged in alphabetical order by the author's last name.
-                    Each entry on the works cited page includes the author's
-                    name, the title of the source, the publication date, and
-                    other publication information.
-                </p>
-                <h3 class="heading-3">How to create a works cited page</h3>
-                <p>
-                    To create a works cited page, you will need to gather
-                    information about each source you used in your paper. This
-                    includes the author's name, the title of the source, the
-                    publication date, and other publication information. Once
-                    you have this information, you can use our MLA citation
-                    generator to create a works cited page in the correct
-                    format. Our generator will format the works cited page
-                    according to the citation style you are using, such as MLA,
-                    APA, Chicago, or Harvard.
-                </p>
-                <p>Learn more about <a href="">working with sources</a>.</p>
-                <!-- <a href="/guides/research-and-works-cited/" class="button-primary">
+            </nav> -->
+      <div id="guide-snippet-content">
+        <p>
+          Working with sources is a fundamental aspect of academic writing and
+          research. It involves acknowledging the ideas, information, and words
+          of others that you use in your work. Properly citing sources is
+          crucial for maintaining academic integrity, avoiding plagiarism, and
+          allowing readers to verify your claims and explore further.
+        </p>
+
+        <h3 class="heading-3">Why Cite Sources?</h3>
+
+        <p>
+          Citing sources is not just about following rules; it's about
+          respecting intellectual property and contributing to a scholarly
+          conversation. Here are some key reasons why citations are essential:
+        </p>
+
+        <ul>
+          <li>
+            Avoiding Plagiarism: Plagiarism, whether intentional or accidental,
+            is a serious academic offense. It involves presenting someone else's
+            work as your own. By citing your sources, you clearly distinguish
+            between your own ideas and those of others.
+          </li>
+          <li>
+            Credibility and Authority: Properly cited sources lend credibility
+            to your work. They demonstrate that your arguments are supported by
+            evidence and that you have engaged with relevant literature.
+          </li>
+          <li>
+            Transparency and Verifiability: Citations allow readers to trace the
+            origins of your information and verify your claims. This
+            transparency is crucial for maintaining the integrity of research.
+          </li>
+          <li>
+            Giving Credit: Citing sources gives credit where credit is due. It
+            acknowledges the intellectual contributions of others and helps
+            build a community of knowledge.
+          </li>
+          <li>
+            Further Research: Citations provide a roadmap for readers who want
+            to delve deeper into a particular topic. They can follow your
+            citations to explore related sources and expand their understanding.
+          </li>
+        </ul>
+
+        <h3 class="heading-3">What Needs to be Cited?</h3>
+
+        <p>
+          Any information that is not common knowledge or your own original idea
+          should be cited. This includes:
+        </p>
+
+        <ul>
+          <li>
+            Direct Quotations: Any time you use the exact words of another
+            author, you must enclose them in quotation marks and provide a
+            citation.
+          </li>
+          <li>
+            Paraphrases: When you rephrase someone else's ideas in your own
+            words, you still need to cite the original source.
+          </li>
+          <li>
+            Summaries: Even when you condense a longer passage into a brief
+            summary, you must acknowledge the source.
+          </li>
+          <li>
+            Facts and Statistics: Data, statistics, and specific facts that are
+            not widely known should be attributed to their source.
+          </li>
+          <li>
+            Theories and Concepts: When you discuss the theories, concepts, or
+            frameworks developed by others, proper citation is required.
+          </li>
+          <li>
+            Images, Tables, and Graphs: Visual materials created by others must
+            also be cited.
+          </li>
+        </ul>
+
+        <h3 class="heading-3">Popular Citation Styles</h3>
+
+        <p>
+          Different academic disciplines and publications often prefer specific
+          citation styles. Some of the most common styles include:
+        </p>
+
+        <ul>
+          <li>
+            MLA (Modern Language Association): Widely used in the humanities,
+            particularly in literature, language, and cultural studies.
+          </li>
+          <li>
+            APA (American Psychological Association): Common in social sciences,
+            education, and psychology.
+          </li>
+          <li>
+            Chicago/Turabian: Used in history, art history, and other
+            disciplines.
+          </li>
+          <li>IEEE: Often used in engineering and computer science.</li>
+          <li>Harvard: A commonly used style across multiple disciplines.</li>
+          <li>Vancouver: Often used in medical and scientific fields.</li>
+        </ul>
+
+        <p>
+          Each citation style has its own specific rules for formatting in-text
+          citations and the bibliography or works cited list. You can learn more
+          about these styles in our <a href="/guides/">guides</a>.
+        </p>
+
+        <h3 class="heading-3">
+          Using <cite>MLA Generator</cite> to Generate Citations
+        </h3>
+
+        <p>
+          <cite>MLA Generator</cite> simplifies the process of creating citations.
+          Our citation generator can help you quickly format citations for websites
+          and books in various popular styles, including MLA, APA, Chicago, and more.
+        </p>
+
+        <p>Here's how to use it:</p>
+
+        <ol>
+          <li>
+            Choose your source type: Select whether you are citing a website or
+            a book.
+          </li>
+          <li>
+            Enter source information: Provide the necessary details about your
+            source, such as the title, author, publication date, and URL (for
+            websites).
+          </li>
+          <li>
+            Select your citation style: Choose the citation style you need
+            (e.g., MLA, APA).
+          </li>
+          <li>
+            Generate your citation: Click the "Generate" button, and the
+            citation generator will automatically format the citation according
+            to the chosen style.
+          </li>
+          <li>
+            Copy and paste: Copy the generated citation and paste it into your
+            document.
+          </li>
+          <li>
+            Manage your references: You can add and manage your generated
+            citations on the <a href="/my-references">My References</a> page.
+          </li>
+        </ol>
+
+        <h3 class="heading-3">Tips for Effective Source Management</h3>
+
+        <ul>
+          <li>
+            Keep track of your sources as you research: Don't wait until the end
+            to start gathering citation information. Note down the details of
+            each source as you encounter it.
+          </li>
+          <li>
+            Use a consistent citation style: Stick to one citation style
+            throughout your paper unless instructed otherwise.
+          </li>
+          <li>
+            Double-check your citations: Make sure your citations are accurate
+            and complete. Errors in citations can undermine your credibility.
+          </li>
+          <li>
+            Create a bibliography or works cited list: Compile all your
+            citations in a list at the end of your paper. This list should be
+            alphabetized by author's last name.
+          </li>
+        </ul>
+
+        <h3 class="heading-3">Conclusion</h3>
+
+        <p>
+          Working with sources is an integral part of academic writing. By
+          understanding the principles of citation and utilizing tools like
+          <a href="https://mlagenerator.com">MLA Generator</a>, you can ensure
+          that your work is ethical, credible, and well-supported. Remember to
+          cite your sources diligently and accurately to contribute to a culture
+          of academic integrity.
+        </p>
+
+        <!-- <p>Learn more about <a href="">working with sources</a>.</p> -->
+        <!-- <a href="/guides/research-and-works-cited/" class="button-primary">
                     <DocumentTextIcon className="button-icon" />
                     <span>Working with Sources</span>
                 </a> -->
-            </div>
-        </div>
-    </article>
-    <PageSegment title="MLA Generator FAQs" background>
-        <div class="faq-container">
-            {
-                faqs.map((faq, i) => {
-                    const open = i === 0;
-                    return (
-                        <details class="faq" open={open}>
-                            <summary>{faq.question}</summary>
-                            <div set:html={faq.answer} class="faq-content" />
-                        </details>
-                    );
-                })
-            }
-            <a href="/my-references" class="button-primary">
-                <span>Citation Generator</span>
-                <ArrowUpRightIcon className="button-icon" />
-            </a>
-        </div>
-    </PageSegment>
+      </div>
+    </div>
+  </article>
+  <PageSegment title="MLA Generator FAQs" background>
+    <div class="faq-container">
+      {
+        faqs.map((faq, i) => {
+          const open = i === 0;
+          return (
+            <details class="faq" open={open}>
+              <summary>{faq.question}</summary>
+              <div set:html={faq.answer} class="faq-content" />
+            </details>
+          );
+        })
+      }
+      <a href="/my-references" class="button-primary">
+        <span>Citation Generator</span>
+        <ArrowUpRightIcon className="button-icon" />
+      </a>
+    </div>
+  </PageSegment>
 </Layout>
 
 <style is:global>
-    /* Guide */
-    #guide-snippet {
-        /* max-width: 1450px; */
-        margin: auto;
-        padding: min(calc(15vw + 2rem), 9rem) var(--page-inline-padding)
-            min(5vw, 3rem);
-        box-sizing: border-box;
-    }
+  /* Guide */
+  #guide-snippet {
+    /* max-width: 1450px; */
+    margin: auto;
+    padding: min(calc(15vw + 2rem), 9rem) var(--page-inline-padding)
+      min(5vw, 3rem);
+    box-sizing: border-box;
+  }
+  #guide-snippet-columns {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    /* gap: 3rem clamp(3rem, 6vw, 6rem); */
+    margin: auto;
+    max-width: 950px;
+  }
+  @media (max-width: 1100px) {
     #guide-snippet-columns {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        gap: 3rem clamp(3rem, 6vw, 6rem);
+      grid-template-columns: 1fr;
     }
-    @media (max-width: 1100px) {
-        #guide-snippet-columns {
-            grid-template-columns: 1fr;
-        }
-        #guide-snippet-nav {
-            position: static !important;
-            /* background-color: var(--color-background-2);
+    #guide-snippet-nav {
+      position: static !important;
+      /* background-color: var(--color-background-2);
             padding: 1.5rem 2rem;
             border-radius: 24px; */
-            /* width: fit-content; */
+      /* width: fit-content; */
 
-            border-top: 1px solid var(--color-border);
-            padding-top: min(3rem, 13vw);
-        }
-        #guide-snippet-nav ul {
-            width: fit-content;
-        }
+      border-top: 1px solid var(--color-border);
+      padding-top: min(3rem, 13vw);
     }
-    #guide-snippet .heading-2 {
-        text-align: center;
-        max-width: 20ch;
-        margin: 0 auto min(3.5rem, 13vw);
+    #guide-snippet-nav ul {
+      width: fit-content;
+    }
+  }
+  #guide-snippet .heading-2 {
+    text-align: center;
+    max-width: 20ch;
+    margin: 0 auto min(3.5rem, 13vw);
+    color: var(--color-text-light);
+  }
+  #guide-snippet-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  cite {
+        font-style: normal;
+  }
+  #guide-snippet-content ul {
+        list-style: circle;
+        padding-left: 1.5rem;
+  }
+  #guide-snippet-content ol {
+        list-style: auto;
+        padding-left: 1.5rem;
+  }
+  #guide-snippet-content li {
+        margin-bottom: .4rem;
         color: var(--color-text-light);
-    }
-    #guide-snippet-content {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
-    /* #guide-snippet-content .heading-2 {
+  }
+  /* #guide-snippet-content .heading-2 {
         margin-bottom: 1rem;
         max-width: 23ch;
     } */
-    #guide-snippet-content p + h3 {
-        margin-top: 1.1rem;
-    }
-    #guide-snippet-content .button-primary {
-        margin-top: 1rem;
-    }
-    #guide-snippet-content p {
-        line-height: 1.4;
-        color: var(--color-text-light);
-    }
-    #guide-snippet-content a {
-        text-decoration: underline;
-    }
-    #guide-snippet-nav {
-        position: sticky;
-        top: 6rem;
-        height: min-content;
-    }
-    #guide-snippet-nav ul {
-        border-left: 1px solid var(--color-border);
-    }
-    #guide-snippet-nav a {
-        padding: 4px 22px;
-        display: block;
-        color: var(--color-text-light);
-    }
-    #guide-snippet-nav a:hover {
-        color: var(--color-text-dark);
-        background-color: var(--color-background-2);
-        border-radius: 8px;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-    }
-    #guide-snippet-nav .heading-3 {
-        margin-bottom: 1rem;
-    }
-    #guide-snippet h3 {
-        font-size: 1.3rem;
-    }
-    /* FAQ */
-    .faq-container {
-        display: grid;
-        gap: 1rem;
-        max-width: calc(950px + var(--page-inline-padding) * 2);
-        padding: 0 var(--page-inline-padding);
-        margin: auto;
-    }
-    .faq {
-        padding: 1.3rem;
-        border-radius: 1rem;
-        background-color: var(--color-background-3);
-        text-align: left;
-    }
+  #guide-snippet-content p + h3 {
+    margin-top: 1.1rem;
+  }
+  #guide-snippet-content .button-primary {
+    margin-top: 1rem;
+  }
+  #guide-snippet-content p {
+    line-height: 1.4;
+    color: var(--color-text-light);
+  }
+  #guide-snippet-content a {
+    text-decoration: underline;
+  }
+  #guide-snippet-nav {
+    position: sticky;
+    top: 6rem;
+    height: min-content;
+  }
+  #guide-snippet-nav ul {
+    border-left: 1px solid var(--color-border);
+  }
+  #guide-snippet-nav a {
+    padding: 4px 22px;
+    display: block;
+    color: var(--color-text-light);
+  }
+  #guide-snippet-nav a:hover {
+    color: var(--color-text-dark);
+    background-color: var(--color-background-2);
+    border-radius: 8px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  #guide-snippet-nav .heading-3 {
+    margin-bottom: 1rem;
+  }
+  #guide-snippet h3 {
+    font-size: 1.3rem;
+  }
+  /* FAQ */
+  .faq-container {
+    display: grid;
+    gap: 1rem;
+    max-width: calc(950px + var(--page-inline-padding) * 2);
+    padding: 0 var(--page-inline-padding);
+    margin: auto;
+  }
+  .faq {
+    padding: 1.3rem;
+    border-radius: 1rem;
+    background-color: var(--color-background-3);
+    text-align: left;
+  }
+  .faq summary {
+    font-size: 1.3rem;
+    cursor: pointer;
+    user-select: none;
+    line-height: 1.2;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .faq[open] summary {
+    margin-bottom: 1rem;
+  }
+  .faq[open] summary::after {
+    content: url("/icons/close.svg");
+    transform: translate(0, 2px);
+  }
+  .faq summary::after {
+    content: url("/icons/open.svg");
+    display: flex;
+    align-items: center;
+    transform: translate(-1px, 2px);
+
+    width: 20px;
+    height: 20px;
+  }
+  .faq-content ul {
+    list-style-type: circle;
+  }
+  .faq-content a {
+    text-decoration: underline;
+    color: var(--color-text-dark);
+  }
+  .faq-content {
+    color: var(--color-text-light);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .faq-container .button-primary {
+    margin: 1rem auto 0 !important;
+    gap: 10px;
+  }
+  .faq-container .button-icon {
+    width: 17px;
+  }
+  @media (max-width: 700px) {
     .faq summary {
-        font-size: 1.3rem;
-        cursor: pointer;
-        user-select: none;
-        line-height: 1.2;
-
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
+      font-size: 1.2rem;
     }
-    .faq[open] summary {
-        margin-bottom: 1rem;
-    }
-    .faq[open] summary::after {
-        content: url("/icons/close.svg");
-        transform: translate(0, 2px);
-    }
-    .faq summary::after {
-        content: url("/icons/open.svg");
-        display: flex;
-        align-items: center;
-        transform: translate(-1px, 2px);
-
-        width: 20px;
-        height: 20px;
-    }
-    .faq-content ul {
-        list-style-type: circle;
-    }
-    .faq-content a {
-        text-decoration: underline;
-        color: var(--color-text-dark);
-    }
-    .faq-content {
-        color: var(--color-text-light);
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-    .faq-container .button-primary {
-        margin: 1rem auto 0 !important;
-        gap: 10px;
-    }
-    .faq-container .button-icon {
-        width: 17px;
-    }
-    @media (max-width: 700px) {
-        .faq summary {
-            font-size: 1.2rem;
-        }
-    }
-    /* Tool */
-    #tool {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 0 var(--page-inline-padding);
-    }
-    #text-container {
-        text-align: center;
-        margin: 4rem 0;
-        /* margin: 5rem 0 3rem; */
-    }
-    #text-container .heading-1 {
-        margin-bottom: 1rem;
-    }
-    #text-container .subtitle {
-        max-width: 44ch;
-        color: var(--color-text-light);
-    }
-    /* Features */
-    .features {
-        margin-top: 6rem;
-    }
-    /* #features .heading-2 a:hover {
+  }
+  /* Tool */
+  #tool {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 var(--page-inline-padding);
+  }
+  #text-container {
+    text-align: center;
+    margin: 4rem 0;
+    /* margin: 5rem 0 3rem; */
+  }
+  #text-container .heading-1 {
+    margin-bottom: 1rem;
+  }
+  #text-container .subtitle {
+    max-width: 44ch;
+    color: var(--color-text-light);
+  }
+  /* Features */
+  .features {
+    margin-top: 6rem;
+  }
+  /* #features .heading-2 a:hover {
 text-decoration: underline;
 text-decoration-thickness: 2px;
 } */
+  .advantage-card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+    gap: 2rem 1.6rem;
+    /* gap: 1rem; */
+    padding: 0 var(--page-inline-padding);
+  }
+  .advantage-card {
+    padding: 18px var(--page-inline-padding);
+    padding: 1.3rem 1.7rem;
+    padding: 1.1rem;
+    border-radius: 14px;
+    border-radius: 28px;
+    background-color: var(--color-background-2);
+    background-color: var(--color-background-3);
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .advantage-card > p {
+    /* max-width: 26ch; */
+    display: block;
+    color: var(--color-text-light);
+  }
+
+  .advantage-card-top {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: calc(1rem - 7px);
+  }
+  @media (max-width: 760px) {
     .advantage-card-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
-        gap: 2rem 1.6rem;
-        /* gap: 1rem; */
-        padding: 0 var(--page-inline-padding);
+      gap: 1.1rem;
     }
-    .advantage-card {
-        padding: 18px var(--page-inline-padding);
-        padding: 1.3rem 1.7rem;
-        padding: 1.1rem;
-        border-radius: 14px;
-        border-radius: 28px;
-        background-color: var(--color-background-2);
-        background-color: var(--color-background-3);
-        text-align: left;
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
-    }
-    .advantage-card > p {
-        /* max-width: 26ch; */
-        display: block;
-        color: var(--color-text-light);
-    }
-
+  }
+  @media (max-width: 475px) {
     .advantage-card-top {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: calc(1rem - 7px);
+      flex-direction: column;
+      align-items: flex-start;
     }
-    @media (max-width: 760px) {
-        .advantage-card-container {
-            gap: 1.1rem;
-        }
-    }
-    @media (max-width: 475px) {
-        .advantage-card-top {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-    }
-    .advantage-card-top h3 {
-        font-size: 1.3rem;
-    }
+  }
+  .advantage-card-top h3 {
+    font-size: 1.3rem;
+  }
 
-    .advantage-card-icon {
-        stroke-width: 1px;
-        height: 36px;
-        width: 44px;
-        height: 44px;
-        background-color: var(--color-brand);
-        padding: 5px;
-        box-sizing: border-box;
-        border-radius: 14px;
-        /* width: min-content; */
-    }
+  .advantage-card-icon {
+    stroke-width: 1px;
+    height: 36px;
+    width: 44px;
+    height: 44px;
+    background-color: var(--color-brand);
+    padding: 5px;
+    box-sizing: border-box;
+    border-radius: 14px;
+    /* width: min-content; */
+  }
 
+  .ad-container {
+    background-color: var(--color-background-2);
+    border-radius: 30px;
+    width: min-content;
+    margin: 4rem auto 0;
+    padding: 1.5rem;
+
+    overflow: hidden;
+    max-width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .ad {
+    width: 970px;
+    height: 250px;
+    background: url("https://via.placeholder.com/970x250") no-repeat center
+      center;
+  }
+  @media (max-width: 1000px) {
     .ad-container {
-        background-color: var(--color-background-2);
-        border-radius: 30px;
-        width: min-content;
-        margin: 4rem auto 0;
-        padding: 1.5rem;
-
-        overflow: hidden;
-        max-width: 100%;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+      margin: 4rem 1.5rem 0;
+      width: auto;
     }
     .ad {
-        width: 970px;
-        height: 250px;
-        background: url("https://via.placeholder.com/970x250") no-repeat center
-            center;
+      width: 100%;
     }
-    @media (max-width: 1000px) {
-        .ad-container {
-            margin: 4rem 1.5rem 0;
-            width: auto;
-        }
-        .ad {
-            width: 100%;
-        }
-    }
-    .ad-container::after {
-        content: "Advertisement";
-        line-height: 1;
-        color: var(--color-text-light);
-        margin-top: 9px;
-        display: block;
-        font-size: 15px;
-        text-align: center;
-    }
+  }
+  .ad-container::after {
+    content: "Advertisement";
+    line-height: 1;
+    color: var(--color-text-light);
+    margin-top: 9px;
+    display: block;
+    font-size: 15px;
+    text-align: center;
+  }
 </style>

@@ -56,7 +56,7 @@ function getRichText(source: Source, format: string): RichText[] {
             });
 
         case 'book':
-            const bookCitation = new BookCitation(source.citationInfo);
+            const bookCitation = new BookCitation(source.citationInfo as any);
             return bookCitation.formatCitation({
                 version,
                 style

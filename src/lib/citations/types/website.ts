@@ -43,6 +43,14 @@ export default class WebsiteCitation implements Citation {
         return `${months[date.month - 1]} ${date.day}, ${date.year}`;
     }
 
+    /**
+     * Format date as Year, Month Day
+     */
+    private _formatDateYMD(date: Date): string {
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        return `${date.year}, ${months[date.month - 1]} ${date.day}`;
+    }
+
     private _safelyFormatDate(publicationDate: PublicationDate): string {
         if (publicationDate?.date) {
             return this._formatDate(publicationDate.date);
@@ -102,7 +110,8 @@ export default class WebsiteCitation implements Citation {
             item.text !== ', ' &&
             item.text !== '. ' &&
             !(arr[i]?.text === '"' && arr[i + 2]?.text === '." ' && arr[i + 1].text === '') &&
-            !(arr[i]?.text === '." ' && arr[i - 2]?.text === '"' && arr[i - 1].text === '')
+            !(arr[i]?.text === '." ' && arr[i - 2]?.text === '"' && arr[i - 1].text === '') &&
+            item.text !== '(). '
         );
     }
 
@@ -172,14 +181,13 @@ export default class WebsiteCitation implements Citation {
     private _formatAPA(version: number): RichText[] {
         const authors = this._formatAuthors({ style: 'apa', version });
         const date = this.publicationDate[0]?.date;
-        const formattedDate = date ? `, ${this._formatDateMDY(date)}` : '';
-        const year = this._safelyFormatYear(this.publicationDate[0]);
+        const formattedDate = date ? `${this._formatDateYMD(date)}` : '';
 
         if (version >= 7) {
             // APA 7th edition
             return this._trimResult([
                 { text: `${authors}. ` },
-                { text: `(${year}${formattedDate}). ` },
+                { text: `(${formattedDate}). ` },
                 { text: `${this.sourceTitle}. ` },
                 { text: this.publisher, italic: true },
                 { text: `. ${this.url}` }
@@ -188,7 +196,7 @@ export default class WebsiteCitation implements Citation {
             // APA 6th edition
             return this._trimResult([
                 { text: `${authors}. ` },
-                { text: `(${year}${formattedDate}). ` },
+                { text: `(${formattedDate}). ` },
                 { text: `${this.sourceTitle}. ` },
                 { text: `Retrieved from ${this.url}` }
             ]);

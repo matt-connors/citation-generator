@@ -34,7 +34,7 @@ const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeMan
     const tabPanels = [
         { label: "Website", placeholder: "Paste the website URL", name: "website" },
         { label: "Book", placeholder: "Enter an ISBN", name: "book" },
-        { label: "Journal", placeholder: "Enter an ISBN", name: "journal" }
+        // { label: "Journal", placeholder: "Enter an ISBN", name: "journal" }
     ];
 
     return (
