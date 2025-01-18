@@ -1,9 +1,143 @@
 ---
-title: 'TODO'
-pubDate: 2024-03-11
-description: 'This will be completed at some point'
+title: 'Chicago Citation Guide: Mastering Notes and Bibliography Style'
+pubDate: 2025-01-18
+description: 'This comprehensive guide explains the Chicago citation style, focusing on the Notes and Bibliography system. Learn how to create footnotes or endnotes, format your bibliography, and cite sources accurately. Commonly used in history, art history, and other humanities disciplines.'
 author: 'John Doe'
-tags: ['research', 'citations', 'works cited', 'MLA', 'APA', 'Chicago', 'Harvard']
+tags: ['Chicago', 'citations', 'notes', 'bibliography', 'footnotes', 'endnotes', 'research', 'writing', 'formatting', 'history', 'humanities']
 ---
 
-TODO
+import TryMe from '../../components/astro/TryMe.astro';
+
+The Chicago Manual of Style (CMOS) offers two distinct citation systems: **Notes and Bibliography** and **Author-Date**. This guide focuses on the **Notes and Bibliography** style, which is widely preferred in the humanities, particularly history, art history, literature, and related fields. This system uses footnotes or endnotes for in-text citations and a comprehensive bibliography at the end of the paper.
+
+## Why Use Chicago Style (Notes and Bibliography)?
+
+The Chicago Notes and Bibliography style offers several advantages for scholarly writing:
+
+*   **Detailed Source Information:** Footnotes or endnotes provide comprehensive bibliographic information at the point of citation, allowing readers to immediately assess the source.
+*   **Flexibility for Commentary:** Notes allow for additional commentary, explanations, or tangential information without disrupting the flow of the main text.
+*   **Emphasis on Primary Sources:** The system is well-suited for citing a wide range of sources, including archival documents, manuscripts, and other primary materials often used in historical research.
+*   **Comprehensive Bibliography:** The bibliography provides a complete record of all sources consulted, offering a valuable resource for further research.
+*   **Avoids Plagiarism:** Accurate and thorough citations are crucial for avoiding plagiarism and giving proper credit to the original authors.
+
+## Notes: Footnotes and Endnotes
+
+In the Notes and Bibliography system, you use numbered footnotes or endnotes to cite your sources.
+
+*   **Footnotes:** Appear at the bottom of the page where the source is cited.
+*   **Endnotes:** Appear in a separate section titled "Notes" at the end of the paper, before the Bibliography.
+
+**Formatting Notes:**
+
+*   **Numbering:** Use superscript numbers (e.g., ¹, ², ³) in the text, corresponding to the numbered notes.
+*   **Placement:** In the text, place the superscript number at the end of the sentence or clause containing the information being cited, after any punctuation except a dash.
+*   **Content:** The first time you cite a source, provide full bibliographic information in the note. Subsequent citations of the same source can be shortened.
+*   **Indentation:** Indent the first line of each note.
+*   **Spacing:** Single-space individual notes, but double-space between them.
+
+## First Note vs. Subsequent (Shortened) Notes
+
+**First Note (Full Citation):**
+
+<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
+    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">1. John Doe, *The Art of Writing* (New York: Example Press, 2023), 45.</p>
+</div>
+
+**Subsequent (Shortened) Note:**
+
+<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
+    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">2. Doe, *The Art of Writing*, 60.</p>
+</div>
+
+**If you cite the same source consecutively, you can use "Ibid."**
+
+<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
+    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">
+        <span style="display: block;">3. Ibid.</span>
+        <span style="display: block;">4. Ibid., 75.</span>
+    </p>
+</div>
+
+```
+
+```
+
+## Creating a Bibliography in Chicago
+
+The Bibliography lists all the sources cited in your paper (and sometimes other relevant sources you consulted). It's arranged alphabetically by the author's last name.
+
+*   **Heading:** Center the title "Bibliography" at the top of the page.
+*   **Alphabetical Order:** List entries alphabetically by the author's last name. If no author, alphabetize by the first significant word in the title.
+*   **Hanging Indent:** Indent the second and subsequent lines of each entry by 0.5 inches.
+*   **Spacing:** Single-space individual entries, but double-space between them.
+
+## Key Differences Between Notes and Bibliography Entries
+
+| Feature        | Note                                    | Bibliography                               |
+| -------------- | --------------------------------------- | ------------------------------------------ |
+| Author         | First name first                        | Last name first                           |
+| Punctuation    | Commas between elements                 | Periods between elements                  |
+| Page Numbers   | Specific page numbers cited             | No page numbers (except for journal articles) |
+| Parentheses    | Publication details in parentheses       | Publication year not in parentheses       |
+| Indentation    | First line indented                     | Hanging indent                             |
+
+## Common Source Types and Their Chicago Citations
+
+Here's how to cite common source types in Chicago style (Notes and Bibliography):
+
+### Book
+
+**Note:**
+
+<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
+    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">1. John Doe, *The Art of Writing* (New York: Example Press, 2023), 45.</p>
+</div>
+
+**Bibliography:**
+
+<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
+    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">Doe, John. *The Art of Writing*. New York: Example Press, 2023.</p>
+</div>
+
+### Journal Article
+
+**Note:**
+
+<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
+    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">2. Jane Smith and Alice Brown, "The Future of Technology," *Journal of Innovation* 10, no. 2 (2022): 50, doi.org/10.1234/xyz.</p>
+</div>
+
+
+**Bibliography:**
+
+<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
+    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">Smith, Jane, and Alice Brown. "The Future of Technology." *Journal of Innovation* 10, no. 2 (2022): 45-60. doi.org/10.1234/xyz.</p>
+</div>
+
+### Website
+
+**Note:**
+
+<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
+    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">3. Leslie M. Johnson, "Chicago Citation Guide," MLA Generator (blog), March 15, 2024, mlagenerator.com/guides/chicago.</p>
+</div>
+
+**Bibliography:**
+
+<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
+    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">Johnson, Leslie M. "Chicago Citation Guide." MLA Generator (blog). March 15, 2024. mlagenerator.com/guideschicago.</p>
+</div>
+
+<TryMe />
+
+## Tips for Mastering Chicago Style
+
+*   **Consult the official *Chicago Manual of Style* (17th edition):** This is the definitive guide to Chicago style.
+*   **Use a citation generator:** While mlagenerator.com is named after MLA, it can still help you generate Chicago-style citations. However, always double-check them against the official manual.
+*   **Pay close attention to details:** Chicago style is known for its meticulous attention to punctuation and formatting.
+*   **Be consistent:** Consistency is crucial in Chicago style. Follow the guidelines meticulously throughout your paper.
+*   **Practice:** The more you practice creating Chicago citations, the more proficient you'll become.
+
+## Conclusion
+
+The Chicago Manual of Style's Notes and Bibliography system is a comprehensive and flexible citation method favored in many humanities disciplines. By mastering the guidelines presented in this guide, you can accurately cite your sources, format your notes and bibliography correctly, and avoid plagiarism. Proper citation practices demonstrate your respect for the work of others, enhance your credibility as a researcher, and contribute to the scholarly conversation in your field. Using Chicago style correctly will ensure that your work is both well-researched and ethically sound.
