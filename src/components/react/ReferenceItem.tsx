@@ -19,14 +19,36 @@ export default function ReferenceItem({ source, index, citationFormat, onCheckCh
         const target = event.currentTarget;
         const targetSpan = target.querySelector('span') as HTMLSpanElement;
         const currentText = targetSpan.textContent;
-        const formattedText = formatSource(source, citationFormat);
+        const formattedHtml = formatSource(source, citationFormat);
         
-        navigator.clipboard.writeText(formattedText).then(() => {
-            targetSpan.textContent = 'Copied';
-            setTimeout(() => {
-                targetSpan.textContent = currentText;
-            }, 1000);
-        });
+        // Create a temporary div for copying
+        const tempDiv = document.createElement('div');
+        tempDiv.style.cssText = `
+            position: fixed;
+            left: -9999px;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 12pt;
+            line-height: 2;
+        `;
+        tempDiv.innerHTML = formattedHtml;
+        document.body.appendChild(tempDiv);
+
+        // Select and copy the content
+        const range = document.createRange();
+        range.selectNodeContents(tempDiv);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        document.execCommand('copy');
+        
+        // Clean up
+        document.body.removeChild(tempDiv);
+        selection?.removeAllRanges();
+
+        targetSpan.textContent = 'Copied';
+        setTimeout(() => {
+            targetSpan.textContent = currentText;
+        }, 1000);
     };
 
     return (

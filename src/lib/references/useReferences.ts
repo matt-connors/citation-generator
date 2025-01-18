@@ -59,14 +59,50 @@ export function useReferences(): UseReferencesReturn {
             const checkbox = document.querySelector(`#source-${index}`) as HTMLInputElement;
             return checkbox?.checked;
         });
+
+        // Create a temporary div for copying
+        const tempDiv = document.createElement('div');
+        tempDiv.style.cssText = `
+            position: fixed;
+            left: -9999px;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 12pt;
+            line-height: 2;
+        `;
+        document.body.appendChild(tempDiv);
+
+        // Add each selected source's formatted HTML
+        selectedSources.forEach((source, index) => {
+            const formattedHtml = formatSource(source, citationFormat);
+            const sourceDiv = document.createElement('div');
+            sourceDiv.style.cssText = `
+                font-family: "Times New Roman", Times, serif;
+                font-size: 12pt;
+                line-height: 2;
+            `;
+            sourceDiv.innerHTML = formattedHtml;
+            if (index > 0) {
+                tempDiv.appendChild(document.createElement('br'));
+                tempDiv.appendChild(document.createElement('br'));
+            }
+            tempDiv.appendChild(sourceDiv);
+        });
+
+        // Select and copy the content
+        const range = document.createRange();
+        range.selectNodeContents(tempDiv);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        document.execCommand('copy');
         
-        const formattedText = selectedSources
-            .map(source => formatSource(source, citationFormat))
-            .join('\n\n');
+        // Clean up
+        document.body.removeChild(tempDiv);
+        selection?.removeAllRanges();
 
-        navigator.clipboard.writeText(formattedText).then(onCopy);
+        onCopy();
     };
-
+    
     const loadInitialSources = async () => {
         try {
             const requestUrl = getRequestUrl();
@@ -80,11 +116,11 @@ export function useReferences(): UseReferencesReturn {
 
             const response = await fetch('https://mlagenerator.com/api' + requestUrl);
             const data = await response.json();
-            
+
             if (data.error) throw new Error('API Error: ' + data.error);
-            
+
             const mergedSources = [...existingSources, data].filter(
-                (source, index, self) => 
+                (source, index, self) =>
                     index === self.findIndex(element => element.uuid === source.uuid)
             );
 
