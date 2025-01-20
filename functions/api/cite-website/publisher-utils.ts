@@ -70,6 +70,7 @@ const knownPublishers = {
     "buzzfeed": "BuzzFeed",
     "vice": "VICE Media",
     "vox": "Vox Media",
+    "theguardian": "The Guardian"
 }
 
 export function getPublisher(url: string) {

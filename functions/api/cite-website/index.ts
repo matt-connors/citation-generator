@@ -81,7 +81,7 @@ export async function onRequest(context) {
             url: cleanUrl(params.url),
             accessDate: {
                 year: date.getFullYear(),
-                month: date.getMonth(),
+                month: date.getMonth() + 1,
                 day: date.getDate()
             }
         }

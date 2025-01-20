@@ -3,6 +3,7 @@
  */
 
 import { Author } from "../definitions";
+import { capitalizeFirstLetter } from "../utils";
 
 // <a rel="author" href="https://www.example.com/author/author-name">Author Name</a>
 // "author" included in class name
@@ -32,8 +33,8 @@ export function getAuthorMatches(text: string): Author[] {
         )
         .map((author, index) => ({
             type: "person",
-            firstName: author.split(' ')[0],
-            lastName: author.split(' ')[1],
+            firstName: capitalizeFirstLetter(author.split(' ')[0]),
+            lastName: capitalizeFirstLetter(author.split(' ')[1]),
             id: index
         }));
 }

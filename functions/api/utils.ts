@@ -26,3 +26,10 @@ export function isUrlInvalid(url: string) {
 export function cleanUrl(url) {
     return url.replace(/(^\w+:|^)\/\//, '');
 }
+
+/**
+ * Capitalize the first letter of a string
+ */
+export function capitalizeFirstLetter(string: string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
