@@ -35,41 +35,59 @@ export default class WebsiteCitation extends BaseCitation implements Citation {
 
     private _formatMLA(version: number): RichText[] {
         const authors = this.formatAuthors({ style: 'mla', version });
-        const pageTitle = this.sourceTitle?.split('|')[0]?.trim() || '';
+        const pageTitle = this.sourceTitle?.trim() || '';
         const websiteTitle = this.publisher?.trim() || '';
         const publicationDate = this.safelyFormatDate(this.publicationDate[0]);
+        const accessDate = this.formatAccessDate();
 
         if (version >= 9) {
-            // MLA 9th edition
+            // MLA 9th edition (2021-Present)
+            // Author Last Name, First Name. "Title of Webpage." Title of Website, Publisher/Sponsor, Publication Date, URL. Accessed Date.
             return this.trimResult([
                 this.createRichText(authors && `${authors}. `),
-                this.createRichText(this.wrapInQuotes(pageTitle), true),
-                this.createRichText('. '),
+                this.createRichText(`"${pageTitle}." `),
                 this.createRichText(websiteTitle, true),
                 this.createRichText(publicationDate && `, ${publicationDate}, `),
                 this.createRichText(this.url),
+                this.createRichText(accessDate && `. Accessed ${accessDate}`),
                 this.createRichText('.')
             ]);
         } else if (version >= 8) {
-            // MLA 8th edition
+            // MLA 8th edition (2016-2021)
+            // Author Last Name, First Name. "Title of Webpage." Title of Website, Publisher/Sponsor, Publication Date, URL.
             return this.trimResult([
                 this.createRichText(authors && `${authors}. `),
-                this.createRichText(this.wrapInQuotes(pageTitle)),
+                this.createRichText(`"${pageTitle}." `),
                 this.createRichText(websiteTitle, true),
                 this.createRichText(publicationDate && `, ${publicationDate}, `),
                 this.createRichText(this.url),
                 this.createRichText('.')
             ]);
-        } else {
-            // MLA 7th edition and earlier
-            const accessDate = this.formatAccessDate();
+        } else if (version >= 7) {
+            // MLA 7th edition (2009-2016)
+            // Author Last Name, First Name. "Title of Webpage." Title of Website. Publisher/Sponsor, Publication Date. Web. Date of Access.
             return this.trimResult([
                 this.createRichText(authors && `${authors}. `),
-                this.createRichText(this.wrapInQuotes(pageTitle)),
+                this.createRichText(`"${pageTitle}." `),
                 this.createRichText(websiteTitle, true),
-                this.createRichText(this.publisher && `. ${this.publisher}. `),
-                this.createRichText(publicationDate && `${publicationDate}. Web. `),
-                this.createRichText(accessDate && `${accessDate}.`)
+                this.createRichText(`. `),
+                this.createRichText(publicationDate && `${publicationDate}. `),
+                this.createRichText('Web. '),
+                this.createRichText(accessDate && `${accessDate}`),
+                this.createRichText('.')
+            ]);
+        } else {
+            // MLA 6th edition (2003-2009)
+            // Author Last Name, First Name. "Title of Webpage." Title of Website. Publisher/Sponsor, Publication Date. Date of Access <URL>.
+            return this.trimResult([
+                this.createRichText(authors && `${authors}. `),
+                this.createRichText(`"${pageTitle}." `),
+                this.createRichText(websiteTitle, true),
+                this.createRichText(`. `),
+                this.createRichText(publicationDate && `${publicationDate}. `),
+                this.createRichText(accessDate && `${accessDate} `),
+                this.createRichText(`<${this.url}>`),
+                this.createRichText('.')
             ]);
         }
     }
@@ -77,24 +95,30 @@ export default class WebsiteCitation extends BaseCitation implements Citation {
     private _formatAPA(version: number): RichText[] {
         const authors = this.formatAuthors({ style: 'apa', version });
         const formattedDate = this.publicationDate[0]?.date ? 
-            `(${this.formatDateYMD(this.publicationDate[0].date)})` : '';
+            `(${this.formatDateYMD(this.publicationDate[0].date)})` : '(n.d.)';
+        const accessDate = this.formatDateMDY(this.accessDate);
 
         if (version >= 7) {
-            // APA 7th edition
+            // APA 7th edition (2020-Present)
+            // Structure: Author. (Date). Title. Site Name. URL
+            // Example: Google. (n.d.). Google. Retrieved January 20, 2025, from https://google.com
             return this.trimResult([
-                this.createRichText(authors && `${authors}. `),
+                this.createRichText(authors ? `${authors}. ` : this.sourceTitle ? `${this.sourceTitle}. ` : ''),
                 this.createRichText(formattedDate && `${formattedDate}. `),
-                this.createRichText(this.sourceTitle && `${this.sourceTitle}. `),
-                this.createRichText(this.publisher, true),
-                this.createRichText(this.url && `. ${this.url}`)
+                this.createRichText(authors ? `${this.sourceTitle}. ` : ''),
+                this.createRichText(this.publisher && `${this.publisher}. `),
+                this.createRichText(accessDate && `Retrieved ${accessDate}, from `),
+                this.createRichText(this.url && `https://${this.url.replace(/^https?:\/\//, '')}`)
             ]);
         } else {
-            // APA 6th edition
+            // APA 6th edition (2009-2020)
+            // Structure: Author. (Date). Title. Retrieved from Site Name: URL
             return this.trimResult([
-                this.createRichText(authors && `${authors}. `),
+                this.createRichText(authors ? `${authors}. ` : this.sourceTitle ? `${this.sourceTitle}. ` : ''),
                 this.createRichText(formattedDate && `${formattedDate}. `),
-                this.createRichText(this.sourceTitle && `${this.sourceTitle}. `),
-                this.createRichText(this.url && `Retrieved from ${this.url}`)
+                this.createRichText(authors ? `${this.sourceTitle}. ` : ''),
+                this.createRichText(`Retrieved from ${this.publisher}${this.publisher ? ': ' : ''}`),
+                this.createRichText(this.url && `https://${this.url.replace(/^https?:\/\//, '')}`)
             ]);
         }
     }
@@ -104,28 +128,17 @@ export default class WebsiteCitation extends BaseCitation implements Citation {
         const publicationDate = this.safelyFormatDate(this.publicationDate[0]);
         const accessDate = this.formatAccessDate();
 
-        if (version >= 17) {
-            // Chicago 17th edition
-            return this.trimResult([
-                this.createRichText(authors && `${authors}. `),
-                this.createRichText(this.wrapInQuotes(this.sourceTitle)),
-                this.createRichText(this.publisher, true),
-                this.createRichText(publicationDate && `. ${publicationDate}. `),
-                this.createRichText(this.url),
-                this.createRichText('.')
-            ]);
-        } else {
-            // Chicago 16th edition
-            return this.trimResult([
-                this.createRichText(authors && `${authors}. `),
-                this.createRichText(this.wrapInQuotes(this.sourceTitle)),
-                this.createRichText(this.publisher, true),
-                this.createRichText(publicationDate && `. Last modified ${publicationDate}. `),
-                this.createRichText(accessDate && `Accessed ${accessDate}. `),
-                this.createRichText(this.url),
-                this.createRichText('.')
-            ]);
-        }
+        // Chicago 17th and 16th editions are virtually identical for websites
+        // Bibliography format:
+        // Author Last Name, First Name. "Title of Webpage." Website Name. Month Day, Year. URL.
+        return this.trimResult([
+            this.createRichText(authors && `${authors}. `),
+            this.createRichText(`"${this.sourceTitle}." `),
+            this.createRichText(this.publisher, true),
+            this.createRichText(publicationDate && `. ${publicationDate}. `),
+            this.createRichText(this.url),
+            this.createRichText('.')
+        ]);
     }
 
     private _formatAMA(version: number): RichText[] {
@@ -133,28 +146,17 @@ export default class WebsiteCitation extends BaseCitation implements Citation {
         const publicationDate = this.safelyFormatDateMDY(this.publicationDate[0]);
         const accessDate = this.formatDateMDY(this.accessDate);
 
-        if (version >= 11) {
-            // AMA 11th edition
-            return this.trimResult([
-                this.createRichText(authors && `${authors}. `),
-                this.createRichText(this.sourceTitle && `${this.sourceTitle}. `),
-                this.createRichText(this.publisher, true),
-                this.createRichText(publicationDate && `. Published ${publicationDate}. `),
-                this.createRichText(accessDate && `Accessed ${accessDate}. `),
-                this.createRichText(this.url),
-                this.createRichText('.')
-            ]);
-        } else {
-            // AMA 10th edition
-            return this.trimResult([
-                this.createRichText(authors && `${authors}. `),
-                this.createRichText(this.sourceTitle && `${this.sourceTitle}. `),
-                this.createRichText(this.publisher, true),
-                this.createRichText(publicationDate && `. ${publicationDate}. `),
-                this.createRichText(this.url && `Available at: ${this.url}. `),
-                this.createRichText(accessDate && `Accessed ${accessDate}.`)
-            ]);
-        }
+        // AMA 11th and 10th editions
+        // Author Last Name First Initial. Title of webpage. Website Name. Published Month Day, Year. Accessed Month Day, Year. URL
+        return this.trimResult([
+            this.createRichText(authors && `${authors}. `),
+            this.createRichText(this.sourceTitle && `${this.sourceTitle}. `),
+            this.createRichText(this.publisher, true),
+            this.createRichText(publicationDate && `. Published ${publicationDate}. `),
+            this.createRichText(accessDate && `Accessed ${accessDate}. `),
+            this.createRichText(this.url),
+            this.createRichText('.')
+        ]);
     }
 
     private _formatHarvard(): RichText[] {
@@ -162,12 +164,17 @@ export default class WebsiteCitation extends BaseCitation implements Citation {
         const year = this.safelyFormatYear(this.publicationDate[0]);
         const accessDate = this.formatAccessDate();
 
+        // Author Last Name, First Initial. (Year) Title of webpage. [online] Website Name. Available at: URL [Accessed Date]
         return this.trimResult([
             this.createRichText(authors && `${authors} `),
-            this.createRichText(year && `(${year}). `),
-            this.createRichText(this.wrapInQuotes(this.sourceTitle)),
-            this.createRichText(`[Online]. Available at: ${this.url} `),
-            this.createRichText(accessDate && `[Accessed ${accessDate}].`)
+            this.createRichText(year && `(${year}) `),
+            this.createRichText(this.sourceTitle, true),
+            this.createRichText('. [online] '),
+            this.createRichText(this.publisher),
+            this.createRichText('. Available at: '),
+            this.createRichText(this.url),
+            this.createRichText(accessDate && ` [Accessed ${accessDate}]`),
+            this.createRichText('.')
         ]);
     }
 
@@ -175,12 +182,14 @@ export default class WebsiteCitation extends BaseCitation implements Citation {
         const authors = this.formatAuthors({ style: 'ieee', version: 1 });
         const accessDate = this.formatAccessDate();
 
+        // [Number] Author First Initial. Last Name, "Title of Webpage," Website Name, URL (accessed Month Day, Year)
         return this.trimResult([
             this.createRichText(authors && `${authors}, `),
-            this.createRichText(this.wrapInQuotes(this.sourceTitle)),
+            this.createRichText(`"${this.sourceTitle}," `),
             this.createRichText(this.publisher, true),
-            this.createRichText(`. [Online]. Available: ${this.url}. `),
-            this.createRichText(accessDate && `[Accessed: ${accessDate}].`)
+            this.createRichText(`, ${this.url} `),
+            this.createRichText(accessDate && `(accessed ${accessDate})`),
+            this.createRichText('.')
         ]);
     }
 
@@ -189,13 +198,17 @@ export default class WebsiteCitation extends BaseCitation implements Citation {
         const publicationDate = this.safelyFormatDate(this.publicationDate[0]);
         const accessDate = this.formatAccessDate();
 
+        // Author Last Name First Initial. Title of Webpage. Website Name [Internet]. Year [cited Year Month Day]. Available from: URL
         return this.trimResult([
             this.createRichText(authors && `${authors}. `),
-            this.createRichText(this.sourceTitle && `${this.sourceTitle} [Internet]. `),
-            this.createRichText(this.publisher && `${this.publisher}; `),
+            this.createRichText(this.sourceTitle && `${this.sourceTitle}. `),
+            this.createRichText(this.publisher),
+            this.createRichText(' [Internet]. '),
             this.createRichText(publicationDate && `${publicationDate} `),
             this.createRichText(accessDate && `[cited ${accessDate}]. `),
-            this.createRichText(this.url && `Available from: ${this.url}`)
+            this.createRichText('Available from: '),
+            this.createRichText(this.url),
+            this.createRichText('.')
         ]);
     }
 }

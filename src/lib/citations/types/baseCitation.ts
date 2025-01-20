@@ -226,31 +226,65 @@ export default abstract class BaseCitation implements Citation {
      */
     protected trimResult(result: RichText[]): RichText[] {
         // First, filter out any RichText elements with empty or undefined text
-        const filteredResult = result.filter(item => item?.text && item.text.trim() !== '');
+        let filteredResult = result.filter(item => item?.text && item.text.trim() !== '');
 
-        // Then apply the punctuation rules
+        // Clean up the text elements
+        filteredResult = filteredResult.map((item, i, arr) => {
+            if (!item?.text) return item;
+
+            let text = item.text;
+
+            // Handle URLs
+            const isURL = text.includes('http://') || text.includes('https://') || 
+                         text.includes('.com') || text.includes('.org') || 
+                         text.includes('.edu') || text.includes('.gov');
+            
+            if (isURL) {
+                // Ensure proper spacing around URLs
+                const prevItem = arr[i - 1]?.text;
+                if (prevItem && !prevItem.endsWith(' ')) {
+                    text = ' ' + text;
+                }
+                return { ...item, text };
+            }
+
+            // Handle ending punctuation
+            if (i === arr.length - 1) {
+                // Ensure only one period at the end
+                if (text.endsWith('..')) {
+                    text = text.slice(0, -1);
+                }
+                // Add period if missing
+                if (!text.endsWith('.')) {
+                    text = text + '.';
+                }
+            }
+
+            // Handle spacing between elements
+            if (i > 0 && !text.startsWith(' ') && !text.startsWith('.') && !text.startsWith(',')) {
+                const prevText = arr[i - 1]?.text;
+                if (prevText && !prevText.endsWith(' ') && !prevText.endsWith('"')) {
+                    text = ' ' + text;
+                }
+            }
+
+            return { ...item, text };
+        });
+
+        // Filter out unnecessary elements
         return filteredResult.filter((item, i, arr) => {
-            // Skip if current item is empty
             if (!item?.text) return false;
 
-            // Remove standalone punctuation
-            if (item.text === ', ' || item.text === '. ') return false;
+            // Keep non-empty elements
+            if (item.text.trim().length > 0) {
+                // Remove redundant punctuation
+                if (i < arr.length - 1 && (item.text === '.' || item.text === ', ')) {
+                    return false;
+                }
+                return true;
+            }
 
-            // Remove empty quoted sections
-            const isEmptyQuote = arr[i]?.text === '"' && 
-                               arr[i + 2]?.text === '." ' && 
-                               (!arr[i + 1]?.text || arr[i + 1].text === '');
-            if (isEmptyQuote) return false;
-
-            const isEmptyQuoteEnd = arr[i]?.text === '." ' && 
-                                  arr[i - 2]?.text === '"' && 
-                                  (!arr[i - 1]?.text || arr[i - 1].text === '');
-            if (isEmptyQuoteEnd) return false;
-
-            // Remove empty parentheses
-            if (item.text === '(). ') return false;
-
-            return true;
+            return false;
         });
     }
 

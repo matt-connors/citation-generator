@@ -1,3 +1,5 @@
+import { capitalizeFirstLetter } from "../utils";
+
 const knownPublishers = {
     "wikipedia": "Wikimedia Foundation",
     "youtube": "Google",
@@ -70,12 +72,20 @@ const knownPublishers = {
     "buzzfeed": "BuzzFeed",
     "vice": "VICE Media",
     "vox": "Vox Media",
-    "theguardian": "The Guardian"
+    "theguardian": "The Guardian",
+    "bridgew": "Bridgewater State University",
+    "jstor": "JSTOR",
+    "academicjournals": "Academic Journals",
+    "doaj": "Directory of Open Access Journals",
+    "researchgate": "ResearchGate",
+    "pubmed": "National Center for Biotechnology Information",
+    "ncbi": "National Center for Biotechnology Information",
+    "sciencedirect": "Science Direct",
 }
 
 export function getPublisher(url: string) {
     const domain = new URL(url).hostname;
     const domainParts = domain.split('.');
     const domainName = domainParts[domainParts.length - 2];
-    return knownPublishers[domainName] || domainName;
+    return knownPublishers[domainName] || capitalizeFirstLetter(domainName);
 }
