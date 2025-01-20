@@ -1,4 +1,4 @@
-import React from "react"
+import React, { forwardRef } from "react"
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "./Drawer"
 import {
     Dialog,
@@ -30,10 +30,35 @@ const Content = ({ source, setSources }: { source: Source, setSources: (sources:
     )
 }
 
-export default function EditReferenceDialogDrawer({ source, setSources }: { source: Source, setSources: (sources: Source[]) => void }) {
+const isEmptyCitation = (source: Source): boolean => {
+    const { citationInfo } = source;
+    return (
+        citationInfo.authors.length === 0 &&
+        !citationInfo.sourceTitle &&
+        !citationInfo.publisher &&
+        !citationInfo.url &&
+        citationInfo.publicationDate.date.year === 0
+    );
+};
 
+interface EditReferenceDialogDrawerProps {
+    source: Source;
+    sources: Source[];
+    setSources: (sources: Source[]) => void;
+}
+
+const EditReferenceDialogDrawer = forwardRef<HTMLButtonElement, EditReferenceDialogDrawerProps>(({ source, sources, setSources }, ref) => {
     const [open, setOpen] = React.useState(false);
     const isDesktop = useMediaQuery("(min-width: 900px)");
+
+    const handleOpenChange = (newOpen: boolean) => {
+        if (!newOpen && isEmptyCitation(source)) {
+            const updatedSources = sources.filter(s => s.uuid !== source.uuid);
+            setSources(updatedSources);
+            localStorage.setItem('sources', JSON.stringify(updatedSources));
+        }
+        setOpen(newOpen);
+    };
 
     const HeaderComponent = isDesktop ? DialogHeader : DrawerHeader;
     const TitleComponent = isDesktop ? DialogTitle : DrawerTitle;
@@ -50,7 +75,11 @@ export default function EditReferenceDialogDrawer({ source, setSources }: { sour
 
     const TriggerButton = () => {
         return (
-            <button className="flex gap-[5px] items-center text-[var(--color-text-light)] hover:text-[var(--color-text-primary)]" onClick={() => setOpen(true)}>
+            <button 
+                ref={ref}
+                className="flex gap-[5px] items-center text-[var(--color-text-light)] hover:text-[var(--color-text-primary)]" 
+                onClick={() => setOpen(true)}
+            >
                 <Pencil className="w-[20px] h-[20px]" />
                 <span>Edit</span>
             </button>
@@ -59,7 +88,7 @@ export default function EditReferenceDialogDrawer({ source, setSources }: { sour
 
     if (isDesktop) {
         return (
-            <Dialog open={open} onOpenChange={setOpen}>
+            <Dialog open={open} onOpenChange={handleOpenChange}>
                 <DialogTrigger asChild>
                     <TriggerButton />
                 </DialogTrigger>
@@ -72,7 +101,7 @@ export default function EditReferenceDialogDrawer({ source, setSources }: { sour
     }
 
     return (
-        <Drawer open={open} onOpenChange={setOpen}>
+        <Drawer open={open} onOpenChange={handleOpenChange}>
             <DrawerTrigger asChild>
                 <TriggerButton />
             </DrawerTrigger>
@@ -82,4 +111,8 @@ export default function EditReferenceDialogDrawer({ source, setSources }: { sour
             </DrawerContent>
         </Drawer>
     )
-}
+});
+
+EditReferenceDialogDrawer.displayName = 'EditReferenceDialogDrawer';
+
+export default EditReferenceDialogDrawer;

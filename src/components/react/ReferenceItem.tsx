@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ClipboardIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 import type { Source } from '../../lib/citations/definitions';
 import formatSource from '../../lib/citations/formatSource';
@@ -8,13 +8,23 @@ import { Clipboard, Globe } from 'lucide-react';
 
 interface ReferenceItemProps {
     source: Source;
+    sources: Source[];
     index: number;
     citationFormat: string;
     onCheckChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     setSources: (sources: Source[]) => void;
+    autoOpenEdit?: boolean;
 }
 
-export default function ReferenceItem({ source, index, citationFormat, onCheckChange, setSources }: ReferenceItemProps) {
+export default function ReferenceItem({ source, sources, index, citationFormat, onCheckChange, setSources, autoOpenEdit }: ReferenceItemProps) {
+    const editButtonRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (autoOpenEdit && editButtonRef.current) {
+            editButtonRef.current.click();
+        }
+    }, [source.uuid]);
+
     const handleCopy = (event: React.MouseEvent<HTMLButtonElement>) => {
         const target = event.currentTarget;
         const targetSpan = target.querySelector('span') as HTMLSpanElement;
@@ -77,7 +87,7 @@ export default function ReferenceItem({ source, index, citationFormat, onCheckCh
                     <Clipboard className={styles.icon} />
                     <span>Copy</span>
                 </button>
-                <EditReferenceDialogDrawer source={source} setSources={setSources} />
+                <EditReferenceDialogDrawer source={source} sources={sources} setSources={setSources} ref={editButtonRef} />
                 {source.citationInfo.url && (
                     <a 
                         className={styles.button} 

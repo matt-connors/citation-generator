@@ -168,13 +168,16 @@ export default function EditCitationForm({ source, setSources }: { source: Sourc
 
     // Debounce the update to parent state to avoid unnecessary re-renders
     const debouncedSetSources = useDebounce((updates: SourceUpdate) => {
-        setSources((prevSources) =>
-            prevSources.map(s =>
+        setSources((prevSources) => {
+            const updatedSources = prevSources.map(s =>
                 s.uuid === source.uuid
                     ? { ...s, ...updates } as Source
                     : s
-            )
-        );
+            );
+            // Save to localStorage whenever sources are updated
+            localStorage.setItem('sources', JSON.stringify(updatedSources));
+            return updatedSources;
+        });
     }, 500);
 
     const handleInputChange = useCallback((name: string, value: string | Date) => {

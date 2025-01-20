@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { ClipboardIcon, TrashIcon } from '@heroicons/react/24/outline';
 import styles from '../../styles/references.module.css';
 import type { Option } from './Dropdown';
@@ -7,8 +7,31 @@ import Dropdown from './Dropdown';
 import CitationSearch from './CitationSearch';
 import ReferenceItem from './ReferenceItem';
 import { useReferences } from '../../lib/references/useReferences';
-import { Clipboard, Trash, Trash2 } from 'lucide-react';
+import { Clipboard, Plus, Trash, Trash2 } from 'lucide-react';
 import { cn } from './utils';
+import { Button } from './Button';
+import type { Source, PublicationDate } from '../../lib/citations/definitions';
+
+// Generate a new empty citation
+function createEmptyCitation(): Source {
+    const emptyDate: PublicationDate = {
+        context: { prefix: '', matchedText: '' },
+        date: { year: 0, month: 0, day: 0 }
+    };
+
+    return {
+        uuid: crypto.randomUUID(),
+        citationType: 'website',
+        citationInfo: {
+            authors: [],
+            sourceTitle: '',
+            publisher: '',
+            publicationDate: emptyDate,
+            accessDate: { year: 0, month: 0, day: 0 },
+            url: ''
+        }
+    };
+}
 
 export default function References() {
     const {
@@ -23,6 +46,7 @@ export default function References() {
         copySelected
     } = useReferences();
 
+    const [lastAddedId, setLastAddedId] = useState<string | null>(null);
     const citationFormatRef = useRef<HTMLInputElement>(null);
     const selectAllRef = useRef<HTMLInputElement>(null);
 
@@ -58,6 +82,15 @@ export default function References() {
                 }
             }
         });
+    };
+
+    const handleAddManually = () => {
+        const newSource = createEmptyCitation();
+        const updatedSources = [...sources, newSource];
+        setSources(updatedSources);
+        setLastAddedId(newSource.uuid);
+        // Save to localStorage
+        localStorage.setItem('sources', JSON.stringify(updatedSources));
     };
 
     const ReferenceTitleButtons = () => {
@@ -122,6 +155,13 @@ export default function References() {
                         </span>
                     </label>
                     <ReferenceTitleButtons />
+                    <Button 
+                        className="leading-none shadow-none text-white bg-primary rounded-lg flex gap-3 ml-7"
+                        onClick={handleAddManually}
+                    >
+                        <Plus size={19} />
+                        <span>Add Manually</span>
+                    </Button>
                 </div>
                 {sources.length > 0 && (
                     <ul className={styles.citationSourceContainer} role="list">
@@ -129,10 +169,12 @@ export default function References() {
                             <ReferenceItem
                                 key={source.uuid}
                                 source={source}
+                                sources={sources}
                                 setSources={setSources}
                                 index={index}
                                 citationFormat={citationFormat}
                                 onCheckChange={handleCheckChange}
+                                autoOpenEdit={source.uuid === lastAddedId}
                             />
                         ))}
                     </ul>
@@ -141,21 +183,3 @@ export default function References() {
         </div>
     );
 }
-
-
-/*
-
-TODO:
- - (done) Remove dropdown from <CitationSearch /> on the references page
- - (done) Improve font used on references page (similar to scribbr)
- - Change from /citations to /my-references
- - (done) Fix dropdown for format selector
- - (done) Implement dynamic island of references buttons, so when the users clicks [] sources button, the buttons change to copy all, etc
- - (done) Replace Copy all button and replace with sort, filter, and group buttons, in addition to search
- - Handle "invalid" responses from the server
- - Implement copy to clipboard functionality
- - Implement search functionality
- - Break into logical subcomponents
- - (done) Handle when user goes to "cite manually" -- no query params
- - Handle when info is missing and the user must manually enter it
- */

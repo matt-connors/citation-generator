@@ -105,6 +105,8 @@
 
 .referenceTitle {
     line-height: 1;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
 }
 
 .referenceTitleButtons {

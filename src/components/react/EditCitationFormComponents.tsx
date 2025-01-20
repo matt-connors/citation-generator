@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Input } from "./Input";
-import type { Author, CorporateAuthor, PersonAuthor, Source } from "../../lib/citations/definitions";
+import type { Author, CorporateAuthor, PersonAuthor, Source, BookSource, WebsiteSource } from "../../lib/citations/definitions";
 import { cn } from "./utils";
 import { Button } from "./Button";
 import { Building2, Calendar, ChevronDown, Trash2, UserRound } from "lucide-react";
@@ -52,29 +52,39 @@ export const Line = ({ className }: { className?: string }) => <div className={c
  * @param setSources - The function to set the sources
  */
 export const Contributors = ({ source, setSources }: { source: Source, setSources: React.Dispatch<React.SetStateAction<Source[]>> }) => {
-
     const [lastOpenedAuthorId, setLastOpenedAuthorId] = useState<number | null>(null);
+
+    const handleAuthorChange = (authors: Author[]) => {
+        setSources((prevSources: Source[]) => {
+            const updatedSources = prevSources.map(s => {
+                if (s.uuid === source.uuid) {
+                    const updatedSource = {
+                        ...s,
+                        citationInfo: {
+                            ...s.citationInfo,
+                            authors
+                        }
+                    };
+                    // Preserve the original source type
+                    if (s.citationType === 'book') {
+                        return updatedSource as BookSource;
+                    } else {
+                        return updatedSource as WebsiteSource;
+                    }
+                }
+                return s;
+            });
+            localStorage.setItem('sources', JSON.stringify(updatedSources));
+            return updatedSources;
+        });
+    };
 
     /**
      * Delete an author from the source
      * @param author - The author to delete
      */
     const handleDelete = (author: Author) => {
-        setSources((prevSources: any) => {
-            const updatedSources = prevSources.map((source) => {
-                if (source.uuid === source.uuid) {
-                    return {
-                        ...source,
-                        citationInfo: {
-                            ...source.citationInfo,
-                            authors: source.citationInfo.authors.filter((_author) => _author !== author)
-                        }
-                    };
-                }
-                return source;
-            });
-            return updatedSources;
-        });
+        handleAuthorChange(source.citationInfo.authors.filter((_author) => _author !== author));
     }
 
     const handleAddContributor = (type: "person" | "organization") => {
@@ -82,48 +92,20 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
         let newAuthorId = source.citationInfo.authors.length + 1;
 
         // Update the source to initialize a new contributor
-        setSources((prevSources: any) => {
-            const updatedSources = prevSources.map((source) => {
-                if (source.uuid === source.uuid) {
-                    return {
-                        ...source,
-                        citationInfo: {
-                            ...source.citationInfo,
-                            authors: [...source.citationInfo.authors, { type, id: newAuthorId } as Author]
-                        }
-                    }
-                }
-                return source;
-            });
-            return updatedSources;
-        });
+        handleAuthorChange([...source.citationInfo.authors, { type, id: newAuthorId } as Author]);
         setLastOpenedAuthorId(newAuthorId);
     }
 
     const handleEditAuthor = (authorId: number, field: string, value: string) => {
-        setSources((prevSources: any) => {
-            const updatedSources = prevSources.map((source) => {
-                if (source.uuid === source.uuid) {
-                    return {
-                        ...source,
-                        citationInfo: {
-                            ...source.citationInfo,
-                            authors: source.citationInfo.authors.map((author) => {
-                                if (author.id === authorId) {
-                                    return {
-                                        ...author,
-                                        [field]: value
-                                    }
-                                }
-                                return author;
-                            })
-                        }
-                    };
+        handleAuthorChange(source.citationInfo.authors.map((author) => {
+            if (author.id === authorId) {
+                return {
+                    ...author,
+                    [field]: value
                 }
-                return source;
-            });
-            return updatedSources;
-        });
+            }
+            return author;
+        }));
     }
 
     const AuthorPreviewName = (author: Author) => {
