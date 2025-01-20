@@ -156,7 +156,7 @@ export default function References() {
                     </label>
                     <ReferenceTitleButtons />
                     <Button 
-                        className="leading-none shadow-none text-white bg-primary rounded-lg flex gap-3 ml-7"
+                        className="leading-none shadow-none text-white bg-primary rounded-full flex gap-3 ml-7"
                         onClick={handleAddManually}
                     >
                         <Plus size={19} />
