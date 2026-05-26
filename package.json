@@ -9,7 +9,9 @@
     "build": "astro build",
     "preview": "npm run build && wrangler pages dev ./dist --compatibility-flags=\"nodejs_compat\"",
     "watch": "nodemon --ext tsx,astro,html,css --exec npm run build-tailwind",
-    "build-tailwind": "tailwindcss -i ./src/styles/tailwind.css -o ./src/styles/tailwind-output.css"
+    "build-tailwind": "tailwindcss -i ./src/styles/tailwind.css -o ./src/styles/tailwind-output.css",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "author": "",
   "license": "ISC",
