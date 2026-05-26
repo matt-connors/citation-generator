@@ -1,0 +1,73 @@
+{
+ "kind": "books#volumes",
+ "totalItems": 1,
+ "items": [
+  {
+   "kind": "books#volume",
+   "id": "i-bUBQAAQBAJ",
+   "etag": "K3aJrLE9Xa4",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/i-bUBQAAQBAJ",
+   "volumeInfo": {
+    "title": "Introduction to Algorithms",
+    "authors": [
+     "Thomas H. Cormen",
+     "Charles E. Leiserson",
+     "Ronald L. Rivest",
+     "Clifford Stein"
+    ],
+    "publisher": "MIT Press",
+    "publishedDate": "2009-07-31",
+    "description": "A comprehensive update of the leading algorithms text, with new material on matchings in bipartite graphs, flow networks, and multithreaded algorithms.",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_13",
+      "identifier": "9780262032933"
+     },
+     {
+      "type": "ISBN_10",
+      "identifier": "0262032937"
+     }
+    ],
+    "readingModes": {
+     "text": false,
+     "image": true
+    },
+    "pageCount": 1292,
+    "printType": "BOOK",
+    "categories": [
+     "Computers / Programming / Algorithms"
+    ],
+    "averageRating": 4.5,
+    "ratingsCount": 41,
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "2.1.2.0.preview.1",
+    "language": "en",
+    "previewLink": "http://books.google.com/books?id=i-bUBQAAQBAJ&printsec=frontcover&dq=isbn:9780262032933&hl=&cd=1&source=gbs_api",
+    "infoLink": "http://books.google.com/books?id=i-bUBQAAQBAJ&dq=isbn:9780262032933&hl=&source=gbs_api",
+    "canonicalVolumeLink": "https://books.google.com/books/about/Introduction_to_Algorithms.html?hl=&id=i-bUBQAAQBAJ"
+   },
+   "saleInfo": {
+    "country": "US",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+   },
+   "accessInfo": {
+    "country": "US",
+    "viewability": "PARTIAL",
+    "embeddable": true,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+     "isAvailable": false
+    },
+    "pdf": {
+     "isAvailable": true
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=i-bUBQAAQBAJ&hl=&source=gbs_api",
+    "accessViewStatus": "SAMPLE",
+    "quoteSharingAllowed": false
+   }
+  }
+ ]
+}

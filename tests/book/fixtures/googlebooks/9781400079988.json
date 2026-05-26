@@ -1,0 +1,70 @@
+{
+ "kind": "books#volumes",
+ "totalItems": 1,
+ "items": [
+  {
+   "kind": "books#volume",
+   "id": "yk1RfVnXyXkC",
+   "etag": "2dEJsxk7VqA",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/yk1RfVnXyXkC",
+   "volumeInfo": {
+    "title": "Anna Karenina",
+    "authors": [
+     "Leo Tolstoy"
+    ],
+    "publisher": "Vintage",
+    "publishedDate": "2004-05-11",
+    "description": "Acclaimed by many as the world's greatest novel, Anna Karenina provides a vast panorama of contemporary life in Russia and of humanity in general.",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_13",
+      "identifier": "9781400079988"
+     },
+     {
+      "type": "ISBN_10",
+      "identifier": "140007998X"
+     }
+    ],
+    "readingModes": {
+     "text": false,
+     "image": false
+    },
+    "pageCount": 864,
+    "printType": "BOOK",
+    "categories": [
+     "Fiction / Classics"
+    ],
+    "averageRating": 4.0,
+    "ratingsCount": 87,
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "preview-1.0.0",
+    "language": "en",
+    "previewLink": "http://books.google.com/books?id=yk1RfVnXyXkC&dq=isbn:9781400079988&hl=&cd=1&source=gbs_api",
+    "infoLink": "http://books.google.com/books?id=yk1RfVnXyXkC&dq=isbn:9781400079988&hl=&source=gbs_api",
+    "canonicalVolumeLink": "https://books.google.com/books/about/Anna_Karenina.html?hl=&id=yk1RfVnXyXkC"
+   },
+   "saleInfo": {
+    "country": "US",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+   },
+   "accessInfo": {
+    "country": "US",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+     "isAvailable": false
+    },
+    "pdf": {
+     "isAvailable": false
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=yk1RfVnXyXkC&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+   }
+  }
+ ]
+}
