@@ -1,46 +1,102 @@
 ---
 import Layout from "../layouts/page.astro";
-const { frontmatter, headings } = Astro.props;
+import Breadcrumbs from "../components/astro/Breadcrumbs.astro";
+import RelatedGuides from "../components/astro/RelatedGuides.astro";
+import GuideFaq from "../components/astro/GuideFaq.astro";
+import TryGenerator from "../components/astro/TryGenerator.astro";
+
+interface Props {
+    frontmatter: {
+        title: string;
+        description: string;
+        pubDate: Date;
+        updatedDate?: Date;
+        author: string;
+        category: string;
+        relatedGuides?: string[];
+        faq?: { question: string; answer: string }[];
+    };
+    headings: { level: number; text: string; slug: string }[];
+    slug: string;
+    extraSchemas: object[];
+}
+
+const { frontmatter, headings, slug, extraSchemas } = Astro.props;
+const displayDate = frontmatter.updatedDate ?? frontmatter.pubDate;
+const dateLabel = frontmatter.updatedDate ? 'Updated' : 'Published';
 ---
 
-<Layout title={frontmatter.title}>
+<Layout
+    title={frontmatter.title}
+    description={frontmatter.description}
+    pageType="article"
+    article={{
+        publishedTime: frontmatter.pubDate,
+        modifiedTime: frontmatter.updatedDate,
+        author: frontmatter.author,
+        section: frontmatter.category,
+    }}
+    extraSchemas={extraSchemas}
+>
     <article>
-        <nav id="guide-nav">
+        <nav id="guide-nav" aria-label="Guide contents">
             <p class="heading-3">Guide</p>
             <ul>
                 {
                     headings
                         .filter((heading) => heading.level === 2)
-                        .map((heading) => {
-                            const headingId = heading.text
-                                .toLowerCase()
-                                .replace(/ /g, "-");
-                            return (
-                                <li>
-                                    <a href={`#${headingId}`}>{heading.text}</a>
-                                </li>
-                            );
-                        })
+                        .map((heading) => (
+                            <li>
+                                <a href={`#${heading.slug}`}>{heading.text}</a>
+                            </li>
+                        ))
                 }
             </ul>
         </nav>
         <div id="guide-content">
+            <Breadcrumbs
+                items={[
+                    { name: 'Home', href: '/' },
+                    { name: 'Guides', href: '/guides' },
+                    { name: frontmatter.title, href: `/guides/${slug}`, current: true },
+                ]}
+            />
             <h1>{frontmatter.title}</h1>
-            <!-- <p>Written by {frontmatter.author}</p> -->
-            <p class="date">
-                Published on
-                <time datetime={frontmatter.pubDate.toISOString()}>{new Date(frontmatter.pubDate).toLocaleDateString()}</time>
+            <p class="byline">
+                By {frontmatter.author} ·
+                <time datetime={displayDate.toISOString()}>
+                    {dateLabel} {new Date(displayDate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                </time>
             </p>
             <slot />
+            {frontmatter.faq && frontmatter.faq.length > 0 && (
+                <GuideFaq items={frontmatter.faq} />
+            )}
+            <TryGenerator />
+            {frontmatter.relatedGuides && (
+                <RelatedGuides slugs={frontmatter.relatedGuides} />
+            )}
+            <p class="editorial-link">
+                <a href="/about">Editorial methodology and sources</a>
+            </p>
         </div>
     </article>
 </Layout>
 
 <style is:global>
-    .date {
+    .byline {
         font-size: 15px;
         font-weight: 440;
         color: var(--color-text-light);
+    }
+    .editorial-link {
+        margin-top: 2rem;
+        font-size: 14px;
+        color: var(--color-text-light);
+    }
+    .editorial-link a {
+        color: var(--color-text-light);
+        text-decoration: underline;
     }
     ol {
         list-style: decimal;
@@ -74,7 +130,6 @@ const { frontmatter, headings } = Astro.props;
     #guide-content h3 {
         color: var(--color-text-dark);
         line-height: 1.2;
-        /* font-weight: 410; */
     }
     #guide-content * + h2,
     #guide-content * + h3 {
@@ -93,7 +148,6 @@ const { frontmatter, headings } = Astro.props;
         border-radius: 14px;
         overflow: hidden;
         margin: 0.5rem 0;
-
         --border-radius: 8px;
     }
     #guide-content th:first-child {
@@ -127,8 +181,6 @@ const { frontmatter, headings } = Astro.props;
     #guide-content th {
         background-color: var(--color-background-2);
         font-weight: 510;
-        /* font-size: 15px; */
-        /* font-weight: 440; */
         color: var(--color-text-light);
         text-align: left;
     }
@@ -151,22 +203,22 @@ const { frontmatter, headings } = Astro.props;
         padding: 6px 22px;
         display: block;
         color: var(--color-text-light);
-        /* max-width: 21ch; */
     }
     #guide-nav a.active {
         color: var(--color-text-dark);
-        /* background-color: var(--color-background-2);
-        border-radius: 8px;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0; */
-        /* font-weight: 420; */
     }
-    #guide-nav a:hover {
+    #guide-nav a:hover,
+    #guide-nav a:focus-visible {
         color: var(--color-text-dark);
         background-color: var(--color-background-2);
         border-radius: 8px;
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
+        outline: none;
+    }
+    #guide-nav a:focus-visible {
+        outline: 2px solid var(--color-text-dark);
+        outline-offset: -2px;
     }
     #guide-nav .heading-3 {
         margin-bottom: 1rem;
@@ -187,42 +239,40 @@ const { frontmatter, headings } = Astro.props;
 </style>
 
 <script>
-    // Add smooth scrolling to all links
-    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-        anchor.addEventListener("click", function (e) {
-            e.preventDefault();
+    // Respect prefers-reduced-motion: only smooth-scroll if the user
+    // has not opted out.
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            document.querySelector(this.getAttribute("href")).scrollIntoView({
-                behavior: "smooth",
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener('click', function (this: HTMLAnchorElement, e) {
+            const href = this.getAttribute('href');
+            if (!href || href === '#') return;
+            const target = document.querySelector(href);
+            if (!target) return;
+            e.preventDefault();
+            target.scrollIntoView({
+                behavior: prefersReduced ? 'auto' : 'smooth',
             });
         });
     });
-    // auto highlight the current section in the guide
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-            const id = entry.target.getAttribute("id");
-            const matchingAnchor = document.querySelector(
-                `nav a[href="#${id}"]`,
-            );
-            if (matchingAnchor === null) {
-                return;
-            }
+            const id = entry.target.getAttribute('id');
+            const matchingAnchor = document.querySelector(`#guide-nav a[href="#${id}"]`);
+            if (matchingAnchor === null) return;
             if (entry.intersectionRatio > 0) {
-                matchingAnchor.classList.add("active");
-                // unactive the other anchors
-                document.querySelectorAll("nav a").forEach((anchor) => {
-                    if (anchor !== matchingAnchor) {
-                        anchor.classList.remove("active");
-                    }
+                matchingAnchor.classList.add('active');
+                document.querySelectorAll('#guide-nav a').forEach((anchor) => {
+                    if (anchor !== matchingAnchor) anchor.classList.remove('active');
                 });
             } else {
-                matchingAnchor.classList.remove("active");
+                matchingAnchor.classList.remove('active');
             }
         });
     });
 
-    // Track all sections that have an `id` applied
-    document.querySelectorAll("h2[id]").forEach((section) => {
+    document.querySelectorAll('h2[id]').forEach((section) => {
         observer.observe(section);
     });
 </script>
