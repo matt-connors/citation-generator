@@ -32,6 +32,25 @@ After the next deploy, every `/api/cite-website`, `/api/cite-book`, `/api/cite-j
 
 > The code is intentionally not gated behind a wrangler.toml so that the existing Cloudflare Pages dashboard config (compatibility flags, secrets, etc.) keeps owning deploy settings unchanged. Adding a wrangler.toml would override that config and was avoided.
 
+## Excluding test traffic from analytics
+
+Any request that includes **either** of these signals skips analytics emission entirely — no row is written to the dataset, so the dashboard and SQL queries don't need to filter test traffic out:
+
+- HTTP header **`X-Mla-Test: 1`** (works for GET and POST)
+- Query param **`?nocache=1`** (reuses the existing cache-bypass convention)
+
+Use either for smoke tests, CI scripts, or any one-off curl probes against the production endpoints. Example:
+
+```bash
+# Both of these are filtered from analytics
+curl 'https://mlagenerator.com/api/cite-website?url=https://en.wikipedia.org/wiki/Citation&nocache=1'
+curl 'https://mlagenerator.com/api/format' -X POST \
+  -H 'X-Mla-Test: 1' -H 'content-type: application/json' \
+  --data '{"csl":{"id":"u","type":"webpage","title":"smoke"},"style":"mla-9"}'
+```
+
+Real user traffic never carries either signal, so this filter is operator-only.
+
 ## Querying
 
 Go to **Workers & Pages** → **Analytics Engine** in the sidebar to open the SQL query interface. Or hit the SQL API directly:
@@ -46,13 +65,15 @@ curl "https://api.cloudflare.com/client/v4/accounts/{account_id}/analytics_engin
 
 Analytics Engine stores columns positionally, not by name. The writer in `functions/lib/analytics.ts` puts the event name in `blob1` (and duplicates it into `index1` for fast filtering). Dimensions follow in insertion order; metrics live in the `doubleN` columns.
 
-| Event           | blob1            | blob2                  | blob3                 | blob4 | double1        | double2        | double3   |
-| --------------- | ---------------- | ---------------------- | --------------------- | ----- | -------------- | -------------- | --------- |
-| `cite_website`  | `"cite_website"` | signal_winner_title    | signal_winner_url     | host  | html_size_kb   | extraction_ms  | cache_hit |
-| `cite_book`     | `"cite_book"`    | source (openlibrary\|googlebooks) | —          | —     | latency_ms     | cache_hit      | —         |
-| `cite_journal`  | `"cite_journal"` | source (crossref\|openalex)       | —          | —     | latency_ms     | cache_hit      | —         |
-| `format`        | `"format"`       | style                  | —                     | —     | latency_ms     | —              | —         |
-| `error`         | `"error"`        | endpoint               | code                  | —     | count (always 1) | —            | —         |
+| Event           | blob1            | blob2                  | blob3                 | blob4 | double1        | double2        | double3   | double4  |
+| --------------- | ---------------- | ---------------------- | --------------------- | ----- | -------------- | -------------- | --------- | -------- |
+| `cite_website`  | `"cite_website"` | signal_winner_title    | signal_winner_url     | host  | html_size_kb   | extraction_ms  | cache_hit | fetch_ms |
+| `cite_book`     | `"cite_book"`    | source (openlibrary\|googlebooks) | —          | —     | latency_ms     | cache_hit      | —         | —        |
+| `cite_journal`  | `"cite_journal"` | source (crossref\|openalex)       | —          | —     | latency_ms     | cache_hit      | —         | —        |
+| `format`        | `"format"`       | style                  | —                     | —     | latency_ms     | —              | —         | —        |
+| `error`         | `"error"`        | endpoint               | code                  | —     | count (always 1) | —            | —         | —        |
+
+The `fetch_ms` column on `cite_website` was added 2026-05-27 — older rows have null/empty for that column. It separates network fetch time from extraction time so you can tell whether a slow citation was upstream (`fetch_ms` high) or our pipeline (`extraction_ms` high).
 
 On a cache hit, `source` for cite_book / cite_journal is `''` (empty string) because we didn't talk to either upstream; the `cache_hit` metric is the source of truth for "this was a cache hit". **Per-source SQL slices should filter on the metric, not on `blob2`** — e.g. to count fresh OpenLibrary hits, write `WHERE index1 = 'cite_book' AND double2 = 0 AND blob2 = 'openlibrary'`, not `WHERE blob2 = 'openlibrary'` alone (that's already correct, but the omission of `double2 = 0` would silently exclude cache hits even though they came from "openlibrary" originally — usually the desired behavior, but be explicit). cite_website on a cache hit carries the cached signal-winner dimensions but `html_size_kb` and `extraction_ms` are both 0.
 
