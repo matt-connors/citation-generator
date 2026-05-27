@@ -17,7 +17,7 @@ faq:
   - question: 'Where do I find a journal''s official Vancouver abbreviation?'
     answer: 'The NLM Catalog (https://www.ncbi.nlm.nih.gov/nlmcatalog/journals) is the canonical source. Search for the journal name and the "Title Abbreviation" field gives the NLM-standard short form. If the journal isn''t indexed by NLM, abbreviate using the same conventions (drop articles like "the" and "of"; abbreviate common words per ISO 4 / List of Title Word Abbreviations). When in doubt, use the full name — readers and editors find that less confusing than a guessed abbreviation.'
   - question: 'Do I include DOIs in Vancouver references?'
-    answer: 'Yes when one exists. NLM *Citing Medicine* recommends including the DOI for any journal article when available, formatted as the full URL: "https://doi.org/...". Add a colon and the DOI after the page range, with no space before. For online-only sources without a DOI, include the full URL with an "Available from:" prefix (note: NLM uses "Available from:" with a colon, not Cite Them Right''s "Available at:").'
+    answer: 'Yes when one exists. NLM *Citing Medicine* recommends including the DOI for any journal article when available. The engine renders it as `doi:10.1037/cogdev0000412` (lowercase prefix, no URL form, no `https://`) appended to the page range. For online-only sources without a DOI, include the full URL with an `Available from:` prefix instead. NLM uses `Available from:` (with a colon), distinct from MLA''s `Available at:` and Cite Them Right''s `Available at:`.'
 ogImage: '/images/banner.png'
 ---
 
@@ -53,7 +53,7 @@ Non-consecutive: Several reviews report the same effect (1,4,7).
 
 Mixed: A broader literature supports the finding (1–3,7,9–11).
 
-The engine sorts the numbers ascending and applies the collapse automatically. NLM *Citing Medicine* uses a comma with no following space inside the parenthetical, which is what this site's generator produces.
+NLM *Citing Medicine* uses a comma with no following space inside the parenthetical.
 
 ### Author-prominent narrative
 
@@ -79,7 +79,7 @@ The practical consequence is that reordering paragraphs during revision can requ
 
 ## Reference list format
 
-The reference list goes on its own page at the end of the manuscript with the heading **References** at the top — not italicized, not bolded, just the word "References" in the same font as the body. Some journals prefer "Bibliography" or no heading at all; check your target journal's instructions to authors. Every source cited in the body must appear here, and every entry here must be cited at least once.
+The reference list goes on its own page at the end of the manuscript with the heading **References** at the top — not italicized, not bolded, just the word "References" in the same font as the body. NLM uses "References"; the occasional journal may specify a different heading, so check your target journal's instructions to authors if in doubt. Every source cited in the body must appear here, and every entry here must be cited at least once.
 
 Entries are **numbered**, starting at 1, in the order they were first cited in the text. The number is followed by a period and a single space, then the entry. The page is single-spaced within and between entries in most submission formats. There is no hanging indent — Vancouver entries are flush left, or the citation number is set apart in its own column with the entry text aligned beside it. Either rendering is correct.
 
@@ -95,15 +95,15 @@ The entries below use the same fixture sources referenced throughout this guide 
 
 | Source type | Reference list entry |
 | --- | --- |
-| Book (single author) | Chen MS. The architecture of working memory. Cambridge (UK): Cambridge University Press; 2021. |
-| Chapter in edited book | Lin DK, Patel HJ. Cross-modal attention in early development. In: Morrison RT, editor. Handbook of developmental cognition. London: Routledge; 2022. p. 142–168. |
-| Journal article with DOI | Goldstein A, Ramanathan P, O'Connor L. Sleep consolidation effects on procedural learning in adolescents. J Cogn Dev. 2024;19(2):87–104. https://doi.org/10.1037/cogdev0000412. |
-| Web article | Alvarez S. How working memory predicts reading comprehension. Psychology Today. 2023 Mar 12 [cited 2026 May 20]. Available from: https://www.psychologytoday.com/intl/blog/working-memory-reading-comprehension. |
-| Government report | U.S. Department of Education, Institute of Education Sciences. Reading proficiency and learning loss in U.S. fourth-graders, 2019–2022. Washington (DC): National Center for Education Statistics; 2023. Report No.: NCES 2023-145. Available from: https://nces.ed.gov/pubsearch/pubsinfo.asp?pubid=2023145. |
-| Conference paper | Tanaka Y, Hoffmann M. A unified model of attention in dual-task performance. In: Proceedings of the 63rd Annual Meeting of the Psychonomic Society; 2022 Nov 4–6; Boston (MA). |
-| Doctoral dissertation | Kowalski ER. Memory consolidation in bilingual speakers: an fMRI investigation [doctoral dissertation]. Ann Arbor (MI): University of Michigan; 2020. |
+| Book (single author) | Chen MS. The architecture of working memory. Cambridge, UK: Cambridge University Press; 2021. |
+| Chapter in edited book | Lin DK, Patel HJ. Cross-modal attention in early development. In: Morrison RT, editor. Handbook of developmental cognition. London: Routledge; 2022. p. 142–68. |
+| Journal article with DOI | Goldstein A, Ramanathan P, O'Connor L. Sleep consolidation effects on procedural learning in adolescents. J Cogn Dev. 2024;19(2):87–104. doi:10.1037/cogdev0000412. |
+| Web article | Alvarez S. Psychology Today [Internet]. 2023 [cited 2026 May 20]. How working memory predicts reading comprehension. Available from: https://www.psychologytoday.com/intl/blog/working-memory-reading-comprehension. |
+| Government report | U.S. Department of Education, Institute of Education Sciences. Reading proficiency and learning loss in U.S. fourth-graders, 2019–2022. Washington, DC: National Center for Education Statistics; 2023. Report NCES 2023-145. Available from: https://nces.ed.gov/pubsearch/pubsinfo.asp?pubid=2023145. |
+| Conference paper | Tanaka Y, Hoffmann M. A unified model of attention in dual-task performance. In: Proceedings of the 63rd Annual Meeting of the Psychonomic Society. 2022. |
+| Doctoral dissertation | Kowalski ER. Memory consolidation in bilingual speakers: an fMRI investigation [doctoral dissertation]. [Ann Arbor, MI]: University of Michigan; 2020. |
 
-A few details to notice. The book entry uses `Cambridge (UK)` to disambiguate the city — NLM *Citing Medicine* recommends a country or U.S. state abbreviation for any city that could be confused with another (Cambridge UK vs. Cambridge MA). The chapter entry uses `In:` (no italics) and labels the editor explicitly (`Morrison RT, editor.`) rather than wrapping the name in parentheses the way APA does. The journal entry collapses the title to its NLM abbreviation and packs year, volume, issue, and pages into the no-space `2024;19(2):87–104` block, with the DOI hanging at the end as a full URL. The web article uses NLM's bracketed `[cited 2026 May 20]` for the access date and prefixes the URL with `Available from:` — different from MLA's `Available at:`. The government report carries a `Report No.:` element after the publisher and year. The conference paper opens with `In: Proceedings of…` and gives the dates in NLM's `2022 Nov 4–6` form. The dissertation is bracketed as `[doctoral dissertation]`. If you're entering one of these into the generator at /, the tool assembles the dense punctuation for you.
+A few details to notice. Place is rendered as `City, Region:` — `Cambridge, UK:` or `Washington, DC:`. For works where the place is inferred rather than printed on the source, the place is bracketed: `[Ann Arbor, MI]:`. NLM *Citing Medicine* uses parentheses around the disambiguator (`Cambridge (UK)`); the comma form is what this site's generator produces. The chapter entry uses `In:` (no italics) and labels the editor explicitly (`Morrison RT, editor.`) rather than wrapping the name in parentheses the way APA does. Page ranges use minimal elision — the engine drops leading digits shared by the start and end pages, so `142–168` becomes `142–68`. The journal entry packs year, volume, issue, and pages into the no-space `2024;19(2):87–104` block, with the DOI in the compact `doi:10.1037/cogdev0000412` form (lowercase prefix, no `https://`). Web articles invert what print conventions would suggest: the container (site name) comes first, followed by `[Internet]`, then the year, then the bracketed access date, then the title. Month and day drop from the issued date for web articles — `2023 Mar 12` becomes just `2023`. The URL is prefixed with `Available from:` — different from MLA's `Available at:`. The government report carries a `Report` element (`Report NCES 2023-145`) after the publisher and year, with no `No.:` label. The conference paper drops the host city and collapses the date to just the year — `In: Proceedings of the 63rd Annual Meeting of the Psychonomic Society. 2022.` — using periods rather than semicolons between elements. The dissertation is bracketed as `[doctoral dissertation]`.
 
 ## Common mistakes
 
@@ -119,7 +119,7 @@ Vancouver italicizes nothing in standard references. If your word-processor temp
 Wrong: …predicts reading comprehension¹.
 Right: …predicts reading comprehension (1).
 
-Both forms exist across Vancouver-style journals. The ICMJE *Recommendations* accept either as long as the choice is consistent. This site's generator produces parentheses; if your target journal requires superscript, convert by hand.
+Both forms exist across Vancouver-style journals. The ICMJE *Recommendations* accept either as long as the choice is consistent. If your target journal requires superscript, convert by hand.
 
 **Spelling out the journal name in full.**
 Wrong: Journal of Cognitive Development. 2024;19(2):87–104.
@@ -149,9 +149,9 @@ Take the journal-article fixture. In APA 7, the reference is:
 
 In Vancouver (NLM *Citing Medicine* 2nd ed.), the same source is:
 
-> Goldstein A, Ramanathan P, O'Connor L. Sleep consolidation effects on procedural learning in adolescents. J Cogn Dev. 2024;19(2):87–104. https://doi.org/10.1037/cogdev0000412.
+> Goldstein A, Ramanathan P, O'Connor L. Sleep consolidation effects on procedural learning in adolescents. J Cogn Dev. 2024;19(2):87–104. doi:10.1037/cogdev0000412.
 
-The two entries point to the same article. They differ in five places, every one reflecting Vancouver's compactness ethos. The authors lose their commas, their periods after initials, and the ampersand. The year moves from immediately-after-the-author to immediately-after-the-journal-title. The journal name shrinks to its NLM abbreviation and loses its italics. The volume, issue, and pages compress into a no-space `19(2):87–104` block. The DOI hangs at the end with a trailing period.
+The two entries point to the same article. They differ in five places, every one reflecting Vancouver's compactness ethos. The authors lose their commas, their periods after initials, and the ampersand. The year moves from immediately-after-the-author to immediately-after-the-journal-title. The journal name shrinks to its NLM abbreviation and loses its italics. The volume, issue, and pages compress into a no-space `19(2):87–104` block. The DOI shrinks from the full URL form to the compact `doi:10.1037/cogdev0000412` prefix.
 
 The in-text citations differ even more visibly. APA wants `(Goldstein et al., 2024)`; Vancouver wants `(1)`. APA's parenthetical carries authorship and date that the reader can interpret without flipping pages; Vancouver's number means nothing until you turn to the reference list. The trade-off is that APA's parentheticals become unreadable when several stack up — `(Goldstein et al., 2024; Chen, 2021; Lin & Patel, 2022; Tanaka & Hoffmann, 2022)` is a mouthful — while Vancouver collapses the same string to `(1–4)`. The ICMJE *Recommendations* prefer the numeric form precisely because clinical writing supports dense, multi-source claims that author–date parentheticals cannot carry without disrupting the reader.
 
