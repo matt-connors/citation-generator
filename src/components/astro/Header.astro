@@ -36,10 +36,10 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
     </ul>
   </nav>
   <div id="obscure"></div>
-  <button id="mobile-menu-toggle">
-    <div class="menu-bar"></div>
-    <div class="menu-bar"></div>
-    <div class="menu-bar"></div>
+  <button id="mobile-menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">
+    <div class="menu-bar" aria-hidden="true"></div>
+    <div class="menu-bar" aria-hidden="true"></div>
+    <div class="menu-bar" aria-hidden="true"></div>
   </button>
   <a class="button-primary" href="/">
     <BookOpenIcon className="button-icon" />
@@ -135,6 +135,14 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
     }
   }
   @media (max-width: 1050px) {
+    /* Take the nav landmark out of the header grid below 1050px so the
+       hamburger doesn't get pushed onto a second row. The nav still exists
+       in the DOM (its role is preserved by modern browsers/screen readers);
+       its children become direct grid items, and the menu ul is itself
+       display:none until header[open] adds the position-absolute dropdown. */
+    #primary-nav {
+      display: contents;
+    }
     .sub-menu {
       flex-direction: column;
       align-items: flex-start !important;
@@ -252,11 +260,13 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
   const obscure = document.getElementById("obscure");
 
   mobileMenuToggle!.addEventListener("click", () => {
-    header!.toggleAttribute("open");
+    const isOpen = header!.toggleAttribute("open");
+    mobileMenuToggle!.setAttribute("aria-expanded", String(isOpen));
   });
 
   obscure!.addEventListener("click", (e) => {
     header!.removeAttribute("open");
+    mobileMenuToggle!.setAttribute("aria-expanded", "false");
   });
 
   // Sub-menu trigger: toggle aria-expanded on the button so screen readers
