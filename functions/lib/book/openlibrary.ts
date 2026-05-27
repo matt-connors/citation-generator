@@ -9,7 +9,12 @@ export interface OpenLibraryBook {
   url?: string;
 }
 
-const TIMEOUT_MS = 5_000;
+// Open Library's /api/books endpoint has been observed timing out at 10s+
+// during normal operation (verified 2026-05-27 against five test ISBNs:
+// one out of five required >20s to resolve). 5s caused premature cascade to
+// the Google Books fallback, which has its own quota constraints. 10s gives
+// OL the time it usually needs without blocking long enough to feel broken.
+const TIMEOUT_MS = 10_000;
 
 export async function fetchOpenLibrary(isbn: string): Promise<OpenLibraryBook | null> {
   const ctrl = new AbortController();
