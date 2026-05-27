@@ -8,12 +8,13 @@ import styles from "../../styles/citation-search.module.css";
 
 // Component for each search input field
 const SearchPanel = ({ label, placeholder, name }) => {
+    const inputId = `${name}-input`;
     return (
-        <div role="group" aria-labelledby={name} className={styles.labelContent}>
-            <span id={name} className={styles.inputLabel}>{label}</span>
+        <div className={styles.labelContent}>
+            <label htmlFor={inputId} id={name} className={styles.inputLabel}>{label}</label>
             <div className={styles.inputWrapper}>
-                <div className={styles.inputFade}></div>
-                <input type="text" placeholder={placeholder} name={name} autoComplete="off" />
+                <div className={styles.inputFade} aria-hidden="true"></div>
+                <input id={inputId} type="text" placeholder={placeholder} name={name} autoComplete="off" />
             </div>
         </div>
     );
@@ -73,7 +74,7 @@ const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeMan
             {props.includeManualCite && (
                 <a href="/my-references" className={styles.smallButton}>
                     <span>Cite Manually</span>
-                    <ChevronRightIcon className={styles.icon} />
+                    <ChevronRightIcon className={styles.icon} aria-hidden="true" />
                 </a>
             )}
         </Tabs>
