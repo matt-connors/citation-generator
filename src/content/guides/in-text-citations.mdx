@@ -8,15 +8,15 @@ tags: ['in-text citations', 'parenthetical citations', 'author-date', 'numeric',
 relatedGuides: ['apa', 'mla', 'chicago', 'harvard', 'vancouver', 'ieee', 'ama']
 faq:
   - question: 'When do I need to include a page number in an in-text citation?'
-    answer: 'For direct quotations, always. For paraphrasing, the rules differ by style. APA encourages page or paragraph numbers for paraphrases but does not require them. MLA requires page numbers for both quotes and paraphrases when the source has pages. Chicago author–date and Harvard (Cite Them Right) match APA''s pattern: required for quotes, recommended for paraphrases. The numeric styles (Vancouver, IEEE, AMA) handle page numbers differently — the number in the body refers to the reference list entry; specific page numbers go either after the citation number ("[3, p. 47]" in IEEE) or in the reference list entry itself.'
+    answer: 'For direct quotations, always. For paraphrasing, the rules differ by style. APA encourages page or paragraph numbers for paraphrases but does not require them. MLA requires page numbers for both quotes and paraphrases when the source has pages. Chicago author–date and Cite Them Right Harvard treat paraphrase locators as optional — the author and year alone are sufficient. The numeric styles (Vancouver, IEEE, AMA) handle page numbers differently — the number in the body refers to the reference list entry; specific page numbers go either after the citation number ("[3, p. 47]" in IEEE) or in the reference list entry itself.'
   - question: 'Why does Chicago author–date drop the comma between author and year when APA keeps it?'
     answer: 'It is a convention choice with no deep logic — Chicago has always set the in-text citation as "(Chen 2021)" without a comma, while APA has always set it as "(Chen, 2021)" with one. Mixing them is the single most common in-text citation error in student papers because the two styles look almost identical at a glance. Pick one based on your assignment and apply it consistently across the whole paper.'
   - question: 'What is the et al. threshold for each style?'
     answer: 'APA 7, MLA 9, and Chicago 18 all use "et al." starting at three or more authors, from the very first in-text citation. Harvard (Cite Them Right 12) keeps its threshold at four or more — three-author works spell out every surname every time. Vancouver and IEEE name only the first author plus "et al." in body prose when there are three or more authors, but the citation itself is just a number. AMA italicizes "et al." in body prose; IEEE italicizes "et al." in both body and reference list; the other styles set it roman.'
   - question: 'How do I cite an in-text source with no author?'
-    answer: 'Move the title (in short form) into the author slot. APA: ("Cognitive Load," 2023) for a short web piece, *Cognitive Load* (2023) for a whole book or report. MLA: ("Cognitive Load"). Chicago author–date and Harvard follow APA''s pattern with their own punctuation. For organizational authors — a government agency, a corporation — use the full name on first appearance and an introduced abbreviation thereafter. The in-text citation always points to a specific reference list entry, so the first word of the citation must match the first word of that entry exactly.'
+    answer: 'Move the title (in short form) into the author slot. APA: ("Cognitive Load," 2023) for a short web piece, (*Cognitive Load*, 2023) for a whole book or report. MLA: ("Cognitive Load"). Chicago author–date and Harvard follow APA''s pattern with their own punctuation. For organizational authors — a government agency, a corporation — use the full name on first appearance and an introduced abbreviation thereafter. The in-text citation always points to a specific reference list entry, so the first word of the citation must match the first word of that entry exactly.'
   - question: 'Can I include multiple sources in one in-text citation?'
-    answer: 'Yes, and it is often the right choice when several sources support the same claim. APA, Chicago author–date, and Harvard separate sources with semicolons: "(Chen, 2021; Lin & Patel, 2022)" in APA, "(Chen 2021; Lin and Patel 2022)" in Chicago. MLA separates with a semicolon as well: "(Chen 47; Lin and Patel 122)." The numeric styles concatenate the numbers: "[1, 2, 5]" in IEEE, "(1,2,5)" or "¹⁻³" in Vancouver and AMA when the range is consecutive. Order is by alphabet for author–date styles and by citation sequence for numeric.'
+    answer: 'Yes, and it is often the right choice when several sources support the same claim. The author–date styles all separate sources with semicolons, but they order them differently. APA: alphabetical by first author. MLA: by the sense of the passage (no fixed order). Chicago author–date: alphabetical or chronological, whichever serves the passage. Cite Them Right Harvard: strictly chronological, oldest first. Vancouver and AMA concatenate numbers with no spaces ("(1,4,7)" or superscript "¹,⁴,⁷"); IEEE uses bracketed lists ("[1], [3], [5]"). Consecutive ranges collapse with an en dash in Vancouver and IEEE, with a hyphen in AMA.'
 ogImage: '/images/banner.png'
 ---
 
@@ -75,27 +75,37 @@ This is where students most often slip. Each style sets its own threshold for co
 | [Chicago 18 (author–date)](/guides/chicago) | 3 authors, first citation onward | Roman | Up to 6 authors, then "first three et al." |
 | [Harvard (Cite Them Right 12)](/guides/harvard) | 4 authors | Roman | Up to 3 authors in full; 4+ uses first author + et al. |
 | [Vancouver](/guides/vancouver) | 3 authors in prose (citation is just a number) | Roman | Up to 6 authors, then et al. |
-| [IEEE](/guides/ieee) | 3 authors in prose | *Italic* | Up to 6 authors, then et al. |
+| [IEEE](/guides/ieee) | 3 authors in prose | *Italic* | First author + et al. once 7 or more authors |
 | [AMA 11](/guides/ama) | 3 authors in prose | *Italic* (body); roman (reference list) | First 3 authors then et al. once total ≥ 7 |
 
-The combinations matter. A three-author source — Goldstein, Ramanathan, and O'Connor — collapses to `(Goldstein et al., 2024)` in APA, MLA, and Chicago author–date, but stays as `(Goldstein, Ramanathan and O'Connor, 2024)` in Harvard. Picking the wrong threshold for your assigned style produces a paper that looks subtly off to a marker who knows the rules.
+The combinations matter, and each style's normal punctuation still applies after the collapse. A three-author source — Goldstein, Ramanathan, and O'Connor — collapses to *et al.* in APA, MLA, and Chicago author–date, but stays spelled out in Harvard:
+
+- APA: `(Goldstein et al., 2024)`
+- MLA: `(Goldstein et al. 88)` — page-specific, no year
+- Chicago author–date: `(Goldstein et al. 2024)` — no comma between name and year
+- Harvard (Cite Them Right): `(Goldstein, Ramanathan and O'Connor, 2024)` — spelled out below the four-author threshold
+
+Picking the wrong threshold for your assigned style produces a paper that looks subtly off to a marker who knows the rules.
 
 ## No author and no date
 
-When the source has no individual author, every style moves the title to the author slot. APA uses sentence case with a short title for shorter works: `("Cognitive Load and Curriculum Design," 2023)`; italics for whole works: `(*Reading Proficiency and Learning Loss*, 2023)`. MLA uses a short title in quotation marks or italics depending on the work type. Chicago author–date and Harvard follow APA's pattern with their own punctuation.
+When the source has no individual author, every author–date style moves the title to the author slot. APA uses sentence case with a short title for shorter works: `("Cognitive Load and Curriculum Design," 2023)`; italics for whole works: `(*Reading Proficiency and Learning Loss*, 2023)`. MLA uses a short title in quotation marks or italics depending on the work type. Chicago author–date and Harvard follow APA's pattern with their own punctuation. The numeric styles handle no-author cases at the reference-list level — the in-text citation is still just a number.
 
 When the source has an organizational author, use the full name on first in-text appearance; APA and Harvard permit introducing an abbreviation on first mention for use in subsequent in-text citations. `(American Psychological Association [APA], 2020)` on first mention, `(APA, 2020)` thereafter.
 
-When the date is missing, use `n.d.` (no date) in APA, Chicago, and Harvard. MLA simply omits the date and relies on the access date you record at the end of the reference list entry. The numeric styles do not encounter this case in-text because the citation is just a number.
+When the date is missing, use `n.d.` (no date) in APA and Chicago author–date. Cite Them Right Harvard spells it out as `no date` in both the in-text citation and the reference list: `(Alvarez, no date)`. MLA simply omits the date and relies on the access date you record at the end of the reference list entry. The numeric styles do not encounter this case in-text because the citation is just a number.
 
 ## Multiple sources in one citation
 
-When several sources support the same claim, put them in one citation rather than ending three consecutive sentences with parentheticals. The styles differ on separator and ordering:
+When several sources support the same claim, put them in one citation rather than ending three consecutive sentences with parentheticals. The styles differ on separator and on the order the sources appear:
 
-- **APA, Chicago author–date, Harvard:** Semicolon between sources; alphabetical order by first author. `(Chen, 2021; Goldstein et al., 2024; Lin & Patel, 2022)` in APA.
-- **MLA:** Semicolon between sources; alphabetical order. `(Chen 47; Lin and Patel 122)`.
-- **Vancouver, AMA:** Concatenated numbers in citation order. `(1, 3, 5)`. Consecutive numbers collapse to a range with an en-dash: `(1–3)` or superscript `¹⁻³`.
-- **IEEE:** Bracketed list in citation order. `[1], [3], [5]` or `[1]–[3]` for a range.
+- **APA:** Semicolons between sources, alphabetical by first author. `(Chen, 2021; Goldstein et al., 2024; Lin & Patel, 2022)`.
+- **MLA:** Semicolons, ordered by the sense of the passage — no fixed alphabetical rule. `(Chen 47; Lin and Patel 122)`.
+- **Chicago author–date:** Semicolons; either alphabetical or chronological, whichever serves the passage. `(Chen 2021; Lin and Patel 2022; Goldstein et al. 2024)`.
+- **Harvard (Cite Them Right):** Semicolons, ordered **chronologically — oldest first**. `(Chen, 2021; Lin and Patel, 2022; Goldstein, Ramanathan and O'Connor, 2024)`.
+- **Vancouver:** Numbers in one parenthesis, comma-separated with **no spaces**: `(1,4,7)`. Consecutive numbers collapse to a range with an en dash: `(1–3)`.
+- **AMA:** Superscript numerals separated by commas with no spaces; consecutive ranges joined with a **hyphen**: `¹,⁴,⁷` or `¹⁻³`.
+- **IEEE:** Bracketed numbers, comma-separated: `[1], [3], [5]`. Consecutive ranges: `[1]–[3]`.
 
 The grouping does real work — a sentence ending in five sources tells the reader the claim is well-supported, where the same five citations sprinkled across the paragraph hide the strength of evidence.
 
