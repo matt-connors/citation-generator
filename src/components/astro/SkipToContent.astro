@@ -1,0 +1,30 @@
+---
+// src/components/astro/SkipToContent.astro
+// Visually-hidden link that becomes visible on keyboard focus.
+// Targets the page's <main> landmark.
+---
+
+<a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+<style>
+    .skip-to-content {
+        position: absolute;
+        top: -100px;
+        left: 1rem;
+        z-index: 10000;
+        padding: 0.75rem 1.25rem;
+        background-color: var(--color-background-1);
+        color: var(--color-text-dark);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        font-weight: 510;
+        text-decoration: none;
+        transition: top 120ms ease-out;
+    }
+    .skip-to-content:focus,
+    .skip-to-content:focus-visible {
+        top: 1rem;
+        outline: 2px solid var(--color-text-dark);
+        outline-offset: 2px;
+    }
+</style>
