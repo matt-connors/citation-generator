@@ -6,7 +6,7 @@ export function createSlugifier() {
   return function slugify(input: string): string {
     const rawBase = input
       .normalize('NFKD')
-      .replace(/[̀-ͯ]/g, '')
+      .replace(/[\u0300-\u036F]/g, '')
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
       .trim()
