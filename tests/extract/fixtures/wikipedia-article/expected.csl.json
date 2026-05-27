@@ -1,0 +1,8 @@
+{
+  "type": "webpage",
+  "title": "reference to a source",
+  "author": [{ "literal": "Contributors to Wikimedia projects" }],
+  "issued": { "date-parts": [[2002, 10, 1]] },
+  "publisher": "Wikimedia Foundation, Inc.",
+  "URL": "https://en.wikipedia.org/wiki/Citation"
+}

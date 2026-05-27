@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <title>Claude Code&#x27;s creator on the end of the software engineer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="preload" as="style" href="https://www.platformer.news/assets/built/screen.css?v=6df893527b">
+    <link rel="preload" as="script" href="https://www.platformer.news/assets/built/source.js?v=6df893527b">
+
+    <link rel="stylesheet" type="text/css" href="https://www.platformer.news/assets/built/screen.css?v=6df893527b">
+
+    <style>
+        :root {
+            --background-color: #ffffff
+        }
+    </style>
+
+    <script>
+        /* The script for calculating the color contrast has been taken from
+        https://gomakethings.com/dynamically-changing-the-text-color-based-on-background-color-contrast-with-vanilla-js/ */
+        var accentColor = getComputedStyle(document.documentElement).getPropertyValue('--background-color');
+        accentColor = accentColor.trim().slice(1);
+
+        if (accentColor.length === 3) {
+            accentColor = accentColor[0] + accentColor[0] + accentColor[1] + accentColor[1] + accentColor[2] + accentColor[2];
+        }
+
+        var r = parseInt(accentColor.substr(0, 2), 16);
+        var g = parseInt(accentColor.substr(2, 2), 16);
+        var b = parseInt(accentColor.substr(4, 2), 16);
+        var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        var textColor = (yiq >= 128) ? 'dark' : 'light';
+
+        document.documentElement.className = `has-${textColor}-text`;
+    </script>
+
+    <meta name="description" content="Anthropic&#x27;s Boris Cherny tells me major job loss due to automation really is coming — but job creation is, too. PLUS: the Pope&#x27;s AI encyclical, and Trump abandons an AI executive order">
+    <link rel="icon" href="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w256h256/2024/05/Logomark_Blue_800px.png" type="image/png">
+    <link rel="canonical" href="https://www.platformer.news/boris-cherny-interview-ai-jobs/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    <meta property="og:site_name" content="Platformer">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Claude Code&#x27;s creator on the end of the software engineer">
+    <meta property="og:description" content="Anthropic&#x27;s Boris Cherny tells me major job loss due to automation really is coming — but job creation is, too. PLUS: the Pope&#x27;s AI encyclical, and Trump abandons an AI executive order">
+    <meta property="og:url" content="https://www.platformer.news/boris-cherny-interview-ai-jobs/">
+    <meta property="og:image" content="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w1200/2024/01/1500x500-1.jpeg">
+    <meta property="article:published_time" content="2026-05-27T00:00:06.000Z">
+    <meta property="article:modified_time" content="2026-05-27T00:00:07.000Z">
+    <meta property="article:tag" content="Anthropic">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Claude Code&#x27;s creator on the end of the software engineer">
+    <meta name="twitter:description" content="Anthropic&#x27;s Boris Cherny tells me major job loss due to automation really is coming — but job creation is, too. PLUS: the Pope&#x27;s AI encyclical, and Trump abandons an AI executive order">
+    <meta name="twitter:url" content="https://www.platformer.news/boris-cherny-interview-ai-jobs/">
+    <meta name="twitter:image" content="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w1200/2024/01/1500x500.jpeg">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Casey Newton">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="Anthropic">
+    <meta name="twitter:site" content="@platformer">
+    <meta name="twitter:creator" content="@CaseyNewton">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="400">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Platformer",
+        "url": "https://www.platformer.news/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2024/05/Wordmark_Transparent_Slate_NoPadding.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Casey Newton",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2024/01/8a6ee2c2-52ed-4f9b-a701-e3467774d7f0_917x1297.webp",
+            "width": 128,
+            "height": 128
+        },
+        "url": "https://www.platformer.news/author/casey-newton/",
+        "sameAs": [
+            "https://x.com/CaseyNewton"
+        ]
+    },
+    "headline": "Claude Code&#x27;s creator on the end of the software engineer",
+    "url": "https://www.platformer.news/boris-cherny-interview-ai-jobs/",
+    "datePublished": "2026-05-27T00:00:06.000Z",
+    "dateModified": "2026-05-27T00:00:07.000Z",
+    "keywords": "Anthropic",
+    "description": "Anthropic&#x27;s Boris Cherny tells me major job loss due to automation really is coming — but job creation is, too. PLUS: the Pope&#x27;s AI encyclical, and Trump abandons an AI executive order",
+    "mainEntityOfPage": "https://www.platformer.news/boris-cherny-interview-ai-jobs/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 6.41">
+    <link rel="alternate" type="application/rss+xml" title="Platformer" href="https://www.platformer.news/rss/">
+    <script defer src="https://cdn.jsdelivr.net/ghost/portal@~2.68/umd/portal.min.js" data-i18n="true" data-ghost="https://www.platformer.news/" data-key="784efcca5a3abd410ac226ae79" data-api="https://platformer.ghost.io/ghost/api/content/" data-locale="en" crossorigin="anonymous"></script><style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style><script async src="https://js.stripe.com/v3/"></script>
+    <script defer src="https://cdn.jsdelivr.net/ghost/sodo-search@~1.8/umd/sodo-search.min.js" data-key="784efcca5a3abd410ac226ae79" data-styles="https://cdn.jsdelivr.net/ghost/sodo-search@~1.8/umd/main.css" data-sodo-search="https://platformer.ghost.io/" data-locale="en" crossorigin="anonymous"></script>
+    
+    <link href="https://www.platformer.news/webmentions/receive/" rel="webmention">
+    <script defer src="/public/cards.min.js?v=6df893527b"></script>
+    <link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=6df893527b">
+    <script defer src="/public/comment-counts.min.js?v=6df893527b" data-ghost-comments-counts-api="https://www.platformer.news/members/api/comments/counts/"></script>
+    <script defer src="/public/member-attribution.min.js?v=6df893527b"></script>
+    <script defer src="/public/ghost-stats.min.js?v=6df893527b" data-stringify-payload="false" data-datasource="analytics_events" data-storage="localStorage" data-host="https://www.platformer.news/.ghost/analytics/api/v1/page_hit"  tb_site_uuid="a04c7225-d919-4d78-9b7c-a3fdd071349b" tb_post_uuid="2d5aeee1-0110-48d0-8baa-cd0b4250ead4" tb_post_type="post" tb_member_uuid="undefined" tb_member_status="undefined"></script><style>:root {--ghost-accent-color: #2047FF;}</style>
+
+</head>
+<body class="post-template tag-anthropic has-sans-title has-sans-body">
+
+<div class="gh-viewport">
+    
+    <header id="gh-navigation" class="gh-navigation is-middle-logo gh-outer">
+    <div class="gh-navigation-inner gh-inner">
+
+        <div class="gh-navigation-brand">
+            <a class="gh-navigation-logo is-title" href="https://www.platformer.news">
+                    <img src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2024/05/Wordmark_Transparent_Slate_NoPadding.png" alt="Platformer">
+            </a>
+            <button class="gh-search gh-icon-button" aria-label="Search this site" data-ghost-search>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>            <button class="gh-burger gh-icon-button" aria-label="Menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path></svg>                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>            </button>
+        </div>
+
+        <nav class="gh-navigation-menu">
+            <ul class="nav">
+    <li class="nav-home"><a href="https://www.platformer.news/">Home</a></li>
+    <li class="nav-about"><a href="https://www.platformer.news/about/">About</a></li>
+    <li class="nav-ethics"><a href="https://www.platformer.news/ethics/">Ethics</a></li>
+</ul>
+
+        </nav>
+
+        <div class="gh-navigation-actions">
+                <button class="gh-search gh-icon-button" aria-label="Search this site" data-ghost-search>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>                <div class="gh-navigation-members">
+                            <a href="#/portal/signin" data-portal="signin">Sign in</a>
+                                <a class="gh-button" href="#/portal/signup" data-portal="signup">Subscribe</a>
+                </div>
+        </div>
+
+    </div>
+</header>
+
+    
+
+<main class="gh-main">
+
+    <article class="gh-article post tag-anthropic no-image">
+
+        <header class="gh-article-header gh-canvas">
+
+                <a class="gh-article-tag" href="https://www.platformer.news/tag/anthropic/">Anthropic</a>
+            <h1 class="gh-article-title is-title">Claude Code&#x27;s creator on the end of the software engineer</h1>
+                <p class="gh-article-excerpt is-body">Anthropic&#x27;s Boris Cherny tells me major job loss due to automation really is coming — but job creation is, too. PLUS: the Pope&#x27;s AI encyclical, and Trump abandons an AI executive order</p>
+
+            <div class="gh-article-meta">
+                <div class="gh-article-author-image">
+                            <a href="/author/casey-newton/">
+                                <img class="author-profile-image" src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w160/2024/01/8a6ee2c2-52ed-4f9b-a701-e3467774d7f0_917x1297.webp" alt="Casey Newton" />
+                            </a>
+                </div>
+                <div class="gh-article-meta-wrapper">
+                    <h4 class="gh-article-author-name"><a href="/author/casey-newton/">Casey Newton</a></h4>
+                    <div class="gh-article-meta-content">
+                        <time class="gh-article-meta-date" datetime="2026-05-26">May 26, 2026</time>
+                            <span class="gh-article-meta-length"><span class="bull">—</span> 27 min read</span>
+                    </div>
+                </div>
+            </div>
+
+            
+        </header>
+
+        <section class="gh-content gh-canvas is-body">
+            <figure class="kg-card kg-image-card"><a href="https://www.atlassian.com/software/rovo?utm_source=alltogether&utm_medium=paid-social&utm_campaign=P:rovo|O:ppm|V:alltogether|G:us|L:en|F:aware|T:prospecting|I:imc-rovo-iyryk|A:image|D:alld&utm_content=P:rovo|O:ppm|V:alltogether|G:us|L:en|F:aware|T:prospecting|I:imc-rovo-iyryk|A:image|D:alld|U:alltogethernewsletter_image-core-brand-default-iyryk-na-na-na-AllTogetherNewsletter"><img src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2026/04/Atlassian-Rovo-mock--1100x100-.png" class="kg-image" alt="" loading="lazy" width="1100" height="100" srcset="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w600/2026/04/Atlassian-Rovo-mock--1100x100-.png 600w, https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w1000/2026/04/Atlassian-Rovo-mock--1100x100-.png 1000w, https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2026/04/Atlassian-Rovo-mock--1100x100-.png 1100w" sizes="(min-width: 720px) 720px"></a></figure><div class="kg-card kg-callout-card kg-callout-card-grey"><div class="kg-callout-text">Some fun news: we're doing our first-ever&nbsp;<b><strong style="white-space: pre-wrap;">Platformer </strong></b>live event on June 2 at Atlassian headquarters in San Francisco, and you can join us! <b><strong style="white-space: pre-wrap;">Replika </strong></b>and <b><strong style="white-space: pre-wrap;">Wabi</strong></b> founder <b><strong style="white-space: pre-wrap;">Eugenia Kuyda</strong></b> will join us for a fascinating conversation about DIY software, the SaasPocalypyse, AI companions, and much more. Plus <b><strong style="white-space: pre-wrap;">Platformer</strong></b> fellow and Gen Z AI correspondent Ella Markianos will join me to present the latest research about tech's impact on labor. Only a few dozen tickets are available, so if you're interested I suggest buying one soon.&nbsp;<a href="https://luma.com/0vqv394u?ref=platformer.news" rel="noreferrer">Get all the details here</a>.</div></div><figure class="kg-card kg-embed-card"><iframe width="200" height="113" src="https://www.youtube.com/embed/PZ9u6DR8qOU?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="" title="Claude Code creator Boris Cherny on the end of the software engineer"></iframe></figure><p><em>This is a column about AI. My fiancé works at Anthropic. See&nbsp;my full ethics disclosure </em><a href="https://platformer.news/ethics?ref=platformer.news" rel="noreferrer"><em>here</em></a><em>.</em></p><p>In the first two episodes of <strong>Platformer</strong>’s mini-series on AI and jobs, we heard from two tech leaders who pushed back on the idea that AI is about to leave most white-collar jobs worthless. Box CEO Aaron Levie <a href="https://www.platformer.news/ai-job-loss-box-ceo-aaron-levie/"><u>argued</u></a> that the “last mile” of human labor will resist efforts to automate it. And Google’s senior vice president of technology and society, James Manyika, explained how tech has improved at automating tasks but not jobs.</p><p>For our third episode, I wanted to highlight a contrasting view — someone who believes that AI really is on its way toward eliminating certain jobs. Boris Cherny is the creator and head of Claude Code — the agentic coding tool that Anthropic released last year and is, by most measures, the fastest-growing AI coding tool in the world.&nbsp;</p><p>Cherny belongs firmly to the camp that believes the end of software engineering as we know it is already underway. He hasn't written a line of code himself in more than six months, and he says that for the kind of work he does, coding is effectively "solved."</p><p>Given that he is, by his own account, actively automating his own job, it's no surprise that Cherny sees the disruption arriving far faster than our first two guests. He told me that the title "software engineer" could start to disappear by the end of this year, dissolving into something closer to something like "builder" as the designers, product managers, and managers around him start shipping code of their own.</p><p>But his own jobs forecast is more optimistic — and in some ways similar to our first guests — than some of his more prominent comments about coding being “solved” might suggest. While companies may hire fewer engineers as we know them today, he argues, they’ll hire more of whatever “builder” role replaces them.&nbsp;</p><p>"I don't think we're going to call them engineers," Cherny told me. "But if we talk about people writing code, or using agents to write code, I think there will be 100 times more engineers than there are today. That's my prediction."</p><p>Cherny was an unlikely candidate to lead a revolution in coding. He studied economics, dropped out of college to run a startup at 18, did a stint at a hedge fund, and spent five years as a principal engineer at Meta before arriving at Anthropic in September 2024. When he arrived, Cherny began to explore what the company's API could do. The product that became Claude Code began life as a tool to tell him what song he was currently listening to. After iterating it on a couple months, he released the first version of Claude Code internally — and 20 percent of Anthropic’s engineers began using it on the first day.</p><p>As always, note that my fiancé works at Anthropic. But I couldn’t imagine trying to understand the AI and jobs story in this moment without talking to the person behind Claude Code.</p><p>Highlights of our conversation are below, edited for clarity and length. Listen to the entire conversation wherever you get your podcasts — just search for <strong>Platformer</strong> — or watch it on YouTube at<a href="https://youtube.com/caseynewton?ref=platformer.news"> <u>youtube.com/caseynewton</u></a>.</p><p>And let us know what you think — we're new to podcast production, and welcome your feedback at <a href="mailto:casey@platformer.news"><u>casey@platformer.news</u></a>.</p><hr><p><strong>Casey Newton:</strong> <strong>You joined Anthropic in September 2024, and my understanding is that no one told you to go build a coding product — you were just trying to learn the API. Can you tell us the origin story of Claude Code? I've read that it controlled your music.</strong></p><p><strong>Boris Cherny:</strong> All of these things are true. I joined this team called the Labs team, which built a bunch of cool stuff. We built Claude Code — I built that. A different person built MCP, someone built Skills, and two other people built the desktop app. That was essentially the size of the team. It was tiny. We built these features over the course of a few months, and because a lot of them were weird ideas, we had no idea whether they were going to work.</p><p>For a while, Anthropic's focus has been on the same kinds of things: enterprise, coding, and safety. We knew that somewhere in this journey we should probably build some kind of product. Early on, Anthropic didn't actually know if it wanted to build products at all, but if we were going to, it needed to be coding-related, because that helps us build better coding models and it helps us study safety.&nbsp;</p><p>We didn't know what it should be, though. At the time, the coding products out there were all <a href="https://en.wikipedia.org/wiki/Integrated_development_environment?ref=platformer.news"><u>IDEs</u></a> or IDE extensions, because the capability of the model — this was Sonnet 3.5 — was not very good yet. The best it could do was fancy autocomplete: you'd write a little code and it would complete the line. We had this feeling that there was a product overhang — this idea that you could build a product that does something the model is totally capable of doing, but no one has built the product that lets the model do it. And I'll tell you, it's still the same feeling today. The model can do all these things, and there's no product that lets it.</p><p>So I wanted to learn how to use the Anthropic API, and I built the cheapest possible thing — a little thing that ran in the terminal, so I didn't have to build a user interface or an app. I built it in a couple of days and started giving it to people to see whether they'd use it and how, just out of curiosity. Over the next few weeks, more and more people at Anthropic started using it. First it was the people who literally sat around me, then the next layer of the onion, and a few weeks in, a lot of Anthropic was using it every day. It was weird, because it was a little prototype in the terminal — the most "engineering" product possible. A lot of engineers don't want to touch a terminal, but they did, and they used it.</p><p><strong>Newton:</strong> <strong>I've read that within five days of the initial release, half the engineering team was already using it. As that was happening, did you have a moment of thinking, "Okay, software engineering just changed forever"? Or were you still just iterating on the product?</strong></p><p><strong>Cherny:</strong> I was so focused on shipping. As soon as I got the idea, I spent every night and every weekend on it — it was the only thing I thought about, the only thing I worked on. I started having dreams about Claude Code, and that's still all I dream about: what should we do next, what do we build next. There's a chance now to zoom out, because a lot of people are using it and there's a lot to learn about how. But for a long time we were so focused on building that I didn't even have a chance to think about what it was.</p><p><strong>Newton:</strong> <strong>Was there a moment when you did zoom out? It might be too minimizing to say you stumbled across it, but it does seem like there was a sense of accidental discovery. Was there a moment of "Oh gosh, this is different from the other things I've hacked on"?</strong></p><p><strong>Cherny:</strong> There was a lot of surprise. Broadly, we knew we wanted to build a coding product, but no one thought it would be in a terminal. The first moment was when Claude told me what music I was listening to. There were a couple of versions of this — we actually have a video demo I recorded, which we just donated to a computer museum— it's a weird historical artifact. I remember posting it in my Slack and getting two reactions, because no one understood that this would be it. I asked Claude what music I was listening to, and it wrote a little code to open my music player. It wrote the code in AppleScript, which I don't know, and I wouldn't have thought to write code to answer that question. It just did it, and I thought, this is surprising — it solved the problem in a way I wouldn't have as an engineer.&nbsp;</p><p>Over the last year and a half there have been so many moments like that. I had one with Cowork recently. Every time we release a new model, I experiment with it to see the frontier of what it can do, because one of the hardest things about building on a model is that it's advancing so fast — you have to recalibrate every month, as I'm sure you know. I used Cowork to book a bunch of flights. Usually it works okay; this time it worked perfectly. Now, any time I travel, I use Cowork to book it. It booked eight flights and five hotels. The only mistake was that one of the hotels was way over budget — I think it was like $5,000 a night.</p><p><strong>Newton:</strong> <strong>Cowork wants you to have a great time when you go on your stay.</strong></p><p><strong>Cherny:</strong> I said, "Please rebook this one." But otherwise it just worked for a couple of hours and did all of it. It was so cool. I feel that surprise every week, every month.</p><p><strong>Newton:</strong> <strong>This feels like a moment to zoom out from the story of an initial discovery that spreads rapidly through Anthropic, and now Claude Code has become a default tool for a growing number of engineers. It's one of the products making the question of job automation feel really salient — at least for software engineers, but maybe for more people than that. During our first episode, Aaron Levie told me he didn't see jobs going anywhere — that there's always going to be a last mile of human work the software can't do. You have publicly predicted that the title "software engineer" could start to go away as soon as this year. So is Aaron wrong about this?</strong></p><p><strong>Cherny:</strong> There's a bunch of stuff that's true, and a bunch we don't know. The trends are exponential, and exponentials are very hard to think in. Honestly, anyone saying they know is guessing — some of these are educated guesses based on what we're seeing and on history.&nbsp;</p><p>I think a few things are going to happen. One is that a lot of companies will need fewer engineers, because each engineer is more productive, so you don't need as many to do the same work. At the same time, a lot of companies will need many more engineers, because every engineer is more productive — the company can do more things, start more products, create more businesses. You see this with our team: we are constantly bottlenecked on good engineers. We're hiring as quickly as we can, and a lot of our customers are exactly the same. So I think both things will happen, and it depends on the company and the business.</p><p>There's another thing happening, where the roles are all blending together in an interesting way I don't think anyone would have predicted. Our manager, Fiona, hadn't coded in 15 years; she joined Claude Code and now she's coding. Kat, our product manager, codes. Megan, our designer, codes. Everyone on the team codes — you don't have to be an engineer anymore. If you project the trend a little, everyone who's not an engineer is going to code a little more, and engineers like me are going to code less. I haven't written a line of code in over six months; I'm building stuff all day. I see it all blending into one thing. Call it a builder, call it an engineer, call it a product manager — I don't know what the title is, but the role is changing.</p><p><strong>Newton:</strong> <strong>So how we conceive of these roles is definitely going to change, but what that means for how many jobs are available at which companies is still unclear.</strong></p><p><strong>Cherny:</strong> Yeah, and history has a lot of examples. The tractor was invented in the 1890s — I was just reading about this. A guy named John Froelich invented it in Iowa. At the time, farm work was all horse-powered; you needed horses. Even though the tractor was invented in the 1890s, it wasn't until the '60s in the US that there were more tractors than horses. It took about 70 years. The number of tractors went up, the number of horses went down, and the lines crossed in the '60s.&nbsp;</p><p>There were a bunch of reasons. The technology was magical — you could harvest a lot more crops, productivity was much higher — but if you were a farmer who wanted to learn to use a tractor, it took training. At the beginning, tractors were expensive, so in a lot of cases horses were still cheaper. And the tractors weren't very good at first: maybe you could use one for wheat but not for corn, so it took a long time for someone to make a tractor that worked for corn, and for okra, and for all the other things. That just took a while. What we're seeing right now is the same thing on a speed run — but we're seeing very similar issues.</p><p><strong>Newton:</strong> <strong>This is the "</strong><a href="https://knightcolumbia.org/content/ai-as-normal-technology?ref=platformer.news"><strong><u>AI as normal technology</u></strong></a><strong>" argument: even as labs come up with incredibly capable models, people are slow to change, organizations are slow to change, and it takes time for these technologies to filter through companies. At the same time, people look at what's been reported about Anthropic's revenue and say — it doesn't seem like it's taking that long this time. So we're still trying to hone in on the actual rate of change.</strong></p><p><strong>Cherny:</strong> Here's a question for you: do computers make you more productive?</p><p><strong>Newton:</strong> <strong>Yes. But "do they make me more productive" feels like a different question from "do I work less because of computers," if that makes sense.</strong></p><p><strong>Cherny:</strong> So because you can do more, you do more — you fit more into the same eight hours.</p><p><strong>Newton:</strong> <strong>Absolutely. To be candid, I used to record one podcast episode a week in addition to writing a couple of newsletters. During this miniseries I'm experimenting with doing a couple of podcasts a week in addition to writing multiple newsletters, and AI is a reason I can do that. It's an incredible research assistant and podcast producer. I'm able to produce more. But I don't feel like I'm working less — and that's not a complaint, just how I'm navigating this moment.</strong></p><p><strong>Cherny:</strong> I feel the same way. I can do so much more — all this stuff I didn't get to before, because I didn't have enough hours in the day. There's another weird historical thing. In the '90s, when companies were adopting the personal computer — after the mainframe, after these big industrial computers that cost millions — they got miniaturized, so the average startup could just get computers. And there was a real question of whether computers made you more productive. People were complaining that they didn't. Now we look back and think, of course they do — I can't imagine going back to filing and paper.&nbsp;</p><p>There's an awesome <em>Harvard Business Review</em> <a href="https://hbr.org/1990/07/reengineering-work-dont-automate-obliterate?ref=platformer.news" rel="noreferrer">article</a> from 1990, and the case it made was this: they studied companies adopting computers and found that some were getting more productive and some weren't. The difference was that the companies getting more productive were the ones that threw away all their paper — the filing cabinets, the pens, the desk drawers — and put a computer at the center of everything. The other companies still had teams writing everything by hand, with a computer in the corner used for one thing. The first category had big productivity gains; the second didn't.</p><p>It's similar right now. At Anthropic, we organize everything around Claude. When people join, if they have questions about how to write code or contribute to a codebase, the answer is: ask Claude. If the question is how to file an expense receipt, ask Claude. If it's when the next company holiday is, ask Claude. All this stuff you used to do manually, Claude is at the center of. The companies that are really getting it put Claude right at the center — not on the outskirts somewhere. You have to change all the business processes, and that takes time.</p><p><strong>Newton:</strong> <strong>I've been reading about </strong><a href="https://en.wikipedia.org/wiki/Productivity_paradox?ref=platformer.news"><strong><u>the Solow paradox</u></strong></a><strong>, which is basically what you just described. It's an observation by an economist in the '80s that you could “see the computer age everywhere except in the productivity statistics.” Despite a very large build-out of computers, you weren't seeing people get much more productive. Eventually the gains did materialize, because companies reinvented their workflows around the new technology. So the question now is how quickly the economy can do that.</strong></p><p><strong>I want to ask a couple more fine-grained questions about software engineering, because I've heard you say coding is effectively solved and that you haven't written code in six months. Engineers push back on this, saying coding isn't only about typing — it's about judgment and taste and critical thinking, and agents can still be quite bad at those. What do you make of that critique? Are there parts of coding that remain unsolved?</strong></p><p><strong>Cherny:</strong> The critique is totally right. This is one of those things that gets taken out of context. The full quote is: coding is solved for the kinds of coding that I do. I work on pretty simple codebases — the Claude CLI is fairly new, the desktop and mobile apps are small, simple codebases. But we have so many enterprise customers now — some of the biggest enterprises. NASA is one of our customers. They have really big, really complicated codebases, and for them it's not solved yet; the model still makes mistakes, and its code isn't always perfect.</p><p>When you think about what engineers do, coding is a small percentage of it. It used to be that maybe 50% of my day was actually typing code, and the other 50% was talking to users, brainstorming and coming up with ideas, debugging, thinking through how something works, planning. There are all these things engineers do that aren't coding. So when I say coding is solved, I mean for the kind of coding I do — and coding is a small subset of what engineers do. You see this with the engineers at Anthropic, and more and more in the industry: when the model does the coding, they're freed up to do all the other stuff they actually enjoy, like talking to users and figuring out what's next.</p><p>Claude Code has been 100% written by Claude Code for over six months. That's true for Cowork and a lot of other products too, and we're hearing it more from customers. I was doing a talk for the latest Y Combinator batch earlier this week — a fireside. I used to start every talk by asking people to raise their hand if they used Claude Code. Now everyone does, so I stopped asking. Instead I ask people to raise their hand if 100% of their code is written by Claude Code. These are the most cutting-edge startups — usually a few people each — and half the hands went up. Then I asked people to raise their hand if none of their code is written by the model, and out of a couple hundred people, one hand went up. Everyone else was somewhere between 50% and 100%. So coding is getting solved for a bigger and bigger percentage of the code we write. Our team is an early indicator of what's happening in engineering, and engineering is an early indicator of what happens everywhere else. The shift started six months ago, and it's accelerating.</p><p><strong>Newton: Let me ask about another fear: that in a world where engineers aren't writing as much code, people's understanding of their own profession will atrophy, which might be dangerous. You haven't written code in six months. Do you feel that atrophy starting? And how do you feel about it?</strong></p><p><strong>Cherny:</strong> There's one engineer on the team, Lena, who still writes C++ by hand on weekends, just for fun, because she still enjoys writing the code — and there's always room for that. But for me this is part of a much broader transition, and it's not about atrophy at all. Programming is always in flux. My grandpa programmed on punch cards in the Soviet Union 70 years ago, and for him that was programming — there was no JavaScript, no Python. The punch cards were pieces of paper a machine punched holes in; you'd feed it into a mainframe, it would process it, and a few lights would light up. Before that, programming was a room full of people — often women — doing math on paper, sometimes by hand. That was called programming. Then it became writing machine code, then assembly, then JavaScript and Python and Java. Now it's changing again: you talk to the agent. And I think it's about to change once more, where you talk to an agent that talks to agents that do the coding. It's always changed like this. It doesn't feel like atrophy to me; it feels like a sea change in the technology.</p><p><strong>Newton:</strong> <strong>My feeling has been that using a graphing calculator probably caused some of my math skills to atrophy, but my solution is that I'll just keep using a calculator. I'm fine ceding some of that. Now, if over time the calculator becomes superintelligent and tries to undermine me in subtle ways, that would freak me out — but maybe we haven't crossed that bridge yet.&nbsp;</strong></p><p><strong>Let me ask about your Claude swarm. You asked me earlier whether computers make me more productive. It seems clear Claude is making you more productive, but it doesn't seem to be reducing the amount of work you do. This feels important if we're curious what AI means for jobs: you believe companies will need fewer engineers, and yet you're never running out of things to do. Will there ever be a case where being more productive actually means you work less?</strong></p><p><strong>Cherny:</strong> There's a name for this — some paradox, I forget what it's called. I think it's really individual. Some of it is up to the company, because depending on the business there might be more or less need for people. But a lot of it is individual preference. When the washing machine came out — I'm going to give a historical analogy, because this is such a crazy technological change that I need history to anchor myself —</p><p><strong>Newton:</strong> <strong>I love the stories.</strong></p><p><strong>Cherny:</strong> — to do a load of laundry took about five or six hours, and you had to walk something like 3,000 feet to get water. You'd collect it, boil it, put in the laundry, scrub it on a washboard, wring it out, and repeat for your entire family, maybe every day. It was a lot of work. The washing machine took about three hours off that, and it was one of the factors that let women enter the workforce en masse — because usually, not always, it was the women of the house doing this work, which kept them stuck at home. Suddenly there were three hours freed up every day, and different people could choose how to spend that time. For some it was hanging out with their kids or walking the dog or reading a book. But for a lot of people the answer was: I'm ready to enter the workforce, I want to work at a factory or an office. Because the time was freed up, you had a choice. It's similar now. Like any technology, it gives you more choice.</p><p><strong>Newton:</strong> <strong>A couple of last questions on software engineering. I've been asking all our guests: if a 22-year-old just finished a CS degree this month and came to you and said, "Okay, now what?" — what do you say? Is there an entry-level job waiting for them, or do they need to think differently about the first part of their career?</strong></p><p><strong>Cherny:</strong> If you want to work at a company, you can totally still do that — there are entry-level jobs, there's a lot you can do. But if you're at all entrepreneurial, go start a startup. There has never been a better time in history to do it; it's the golden age. You and your agents can build a giant company. People are building billion-dollar companies with just a few people. Claude Code started as just a few of us. We have so many customers building really big businesses with one or two or three people. One person with the right idea has so much leverage. I couldn't imagine a better time to go into it.</p><p><strong>Newton:</strong> <strong>That's interesting, because the view we often get from the AI world is that model capabilities are advancing so quickly that maybe we won't even have companies in five years. But you think that, at least for now, there's still plenty of room to start a company.</strong></p><p><strong>Cherny:</strong> At least for the next few years. If you trace out the exponential, it gets really weird — there's a version where the idea of jobs doesn't make sense anymore, or companies don't, or software doesn't. But in the meantime there's so much to do. We're all here figuring out what the model means and what it can do, so you might as well be one of the people exploring the frontier.</p><p><strong>Newton:</strong> <strong>Last one on engineering. Three years from now, do you think we'll see more engineers, fewer engineers, or will it be impossible to answer because we might not be calling them engineers anymore?</strong></p><p><strong>Cherny:</strong> I don't think we're going to call them engineers. But if we talk about people writing code or using agents to write code, I think there will be 100 times more of them than there are today. That's my prediction.</p><p><strong>Newton:</strong> <strong>Let's return to Cowork, which you helped develop. It's the Anthropic product I actually use the most now. I use it as an editor on my columns, to help produce the podcast, even as a kind of financial advisor — you create projects, add some skills, and it can imitate lots of different roles in a workplace. As a non-technical person, I find the UI intuitive, because it mostly involves dragging and dropping documents into a box. Talk to me about the road ahead for Cowork, and whether you think it can solve for other jobs the way coding is now partially solved.</strong></p><p><strong>Cherny:</strong> Cowork is so exciting. We started building it when we saw people using Claude Code for things that aren't coding — someone installed the terminal just so they could do their tax returns in it. That's not what a terminal is for, but from a product standpoint it's amazing, because people clearly want this. The next few months are about figuring out how to make it work really well for people who aren't engineers, which is new for us, because most of our team works on coding and we just build for ourselves.&nbsp;</p><p>With Cowork, it's useful for everything that isn't engineering — accounting, finance, legal. I used it to buy a clamming license so I could go clamming in Washington. I use it to book flights and concert tickets. The challenge is making it really good at all of that, and the way we do it is we use it all day, every day, and talk to customers all day, every day. I'd also expect it to keep getting better at running for long periods. A year and a half ago, Claude Code could run maybe 30 seconds before going off the rails. Now every night I have hundreds, sometimes thousands of agents running 5, 10, 20 hours. That's just how engineering is done now, and I think the same thing will happen with Cowork.</p><p><strong>Newton:</strong> <strong>As we zoom out to the implications of a world where more jobs are disappearing or transforming — you've said you think this transition will be painful for a lot of people, and Anthropic is in a unique position: potentially a source of unemployment among software engineers and others. Does the company have an obligation to those people? Is this something government needs to pay attention to? What do we do?</strong></p><p><strong>Cherny:</strong> Like any technology, it's going to be mixed — good effects and bad effects, and we don't know the exact timing or mix; you can never predict it in the moment. I feel an immense obligation, as an engineer, that there's always more we should be doing to tell people what's coming, make sure they can use the tools, educate them, and bring them along. The team and I talk about this a lot. But broadly, this isn't a problem one company can solve — it's bigger than any company, and you really don't want one company to solve it, because it could be the wrong solution. This is a society-wide question we should be debating. What Anthropic is trying to add is <a href="https://www.anthropic.com/economic-index?ref=platformer.news"><u>economic reports</u></a> and policy work — to make it obvious what we're seeing, so everyone else can decide what to do about it.</p><p><strong>Newton:</strong> <strong>Our most recent guest, James Manyika from Google, studies technology at the level of economies and whole societies, and he's worried that what started as a digital divide — not everyone having equal access to the internet or a good laptop — is about to become an AI divide. The data so far shows the people getting the most out of AI are already near the top of the income ladder. Does Claude Code make that better or worse? Who do you see using it and not using it, and are there efforts to get it into the hands of people who haven't always had access to cutting-edge technology?</strong></p><p><strong>Cherny:</strong> There are a couple of programs to spread access, and Anthropic does this. The thing that continuously surprises me is that the people who get the most value out of Claude Code are not the people I'd expect. We just did a hackathon for the Opus 4.7 release, and the people who won were largely not professional engineers — there was an electrician, a doctor, a carpenter who used it to build an app. We saw the same thing with the 4.6 hackathon. A while ago it would have been mostly engineers, but the models are sophisticated enough now that it's often not engineers who learn to really harness them. We see this at big customers, too. As companies think about adopting AI tools, the biggest question is the business-process change — how you put Claude at the center. One approach that works best is to give everyone tokens and make everyone feel safe experimenting, because the ideas come from people you don't expect. It's not necessarily the senior engineer who was most productive before; it might be an accountant in the corner of the org, or a go-to-market person who built an internal dashboard that sped everything up or solved a problem no one realized the business had. It's important that people learn to use the tools, because the people who are best with today's tools aren't necessarily the ones who'll be best with tomorrow's.</p><p><strong>Newton:</strong> <strong>Last question. In addition to everything you're doing with Claude Code and Cowork, you're amazingly omnipresent on X and Threads. I see you every day troubleshooting users' problems and offering tips. If you could automate that part of your job, would you? And how close are we to that world?</strong></p><p><strong>Cherny:</strong> I have automated it, but I prefer to do it myself.</p><p>The way I did it is I have a loop set up in Claude Code — I've actually moved it to a routine that runs every 30 minutes. Threads has an API, X has an API, so it aggregates the feedback and I look at it. But my favorite part of my job is interacting with people, even when they're telling me something is broken or could be 10 times better. That's still my favorite thing, because it lets us make the product better. People sometimes look back at a product and say it was a moment of genius — someone conceived it and built it and it was perfect. That's never how it works. Claude Code has so many flaws; it's so far from the product it could be. The only way to make it better is to listen to people, especially when they say something doesn't work, and to keep improving it. That's how good products get built, and it's the only reason Claude Code improves a little bit every day.</p><p><strong>Newton:</strong> It strikes me that's also a really human part of your job. When you talk to someone using a product you made, it probably reminds you why you started in the first place. Those moments of connection feel important at a time when we're not always sure what value we'll bring to an AI-enabled workplace.</p><p><strong>Cherny:</strong> That's right. We're all trying to figure this out together. We have hypotheses about where this is going, and we're building a bunch of stuff because we think we know — but I'm often wrong; not all my guesses are right. Good ideas come from all sorts of people, so you have to listen, try a bunch of stuff, and sometimes it works.</p><p><strong>Newton:</strong> Boris, thanks so much for joining us.</p><p><strong>Cherny:</strong> Thanks so much, Casey.</p><figure class="kg-card kg-image-card"><img src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2024/05/floating_linebreak_600px-1.png" class="kg-image" alt="" loading="lazy" width="600" height="157" srcset="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2024/05/floating_linebreak_600px-1.png 600w"></figure><p><strong>A MESSAGE FROM OUR SPONSOR</strong></p><h3 id="become-an-ai-native-team-with-rovo">Become an AI-native team with Rovo</h3><figure class="kg-card kg-image-card"><a href="https://www.atlassian.com/software/rovo?utm_source=alltogether&utm_medium=paid-social&utm_campaign=P:rovo|O:ppm|V:alltogether|G:us|L:en|F:aware|T:prospecting|I:imc-rovo-iyryk|A:image|D:alld&utm_content=P:rovo|O:ppm|V:alltogether|G:us|L:en|F:aware|T:prospecting|I:imc-rovo-iyryk|A:image|D:alld|U:alltogethernewsletter_image-core-brand-default-iyryk-na-na-na-AllTogetherNewsletter"><img src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2026/04/CSD-25538-Rovo-Novice-to-Native-Sprout-Social-1200x628.png" class="kg-image" alt="" loading="lazy" width="1200" height="628" srcset="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w600/2026/04/CSD-25538-Rovo-Novice-to-Native-Sprout-Social-1200x628.png 600w, https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w1000/2026/04/CSD-25538-Rovo-Novice-to-Native-Sprout-Social-1200x628.png 1000w, https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2026/04/CSD-25538-Rovo-Novice-to-Native-Sprout-Social-1200x628.png 1200w" sizes="(min-width: 720px) 720px"></a></figure><p>Atlassian Rovo is AI that knows your projects, code, and people so it can bring context (and guardrails) to every workflow.<br><br>And because Rovo lives where your teams already work, it doesn’t just find the answers — it helps you do the work.<br><br>See how Sprout Social is becoming an AI-native team with Rovo.</p><p><a href="https://www.atlassian.com/software/rovo?utm_source=alltogether&utm_medium=paid-social&utm_campaign=P:rovo|O:ppm|V:alltogether|G:us|L:en|F:aware|T:prospecting|I:imc-rovo-iyryk|A:image|D:alld&utm_content=P:rovo|O:ppm|V:alltogether|G:us|L:en|F:aware|T:prospecting|I:imc-rovo-iyryk|A:image|D:alld|U:alltogethernewsletter_image-core-brand-default-iyryk-na-na-na-AllTogetherNewsletter" rel="noreferrer">Learn more.</a></p><figure class="kg-card kg-image-card"><img src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2024/05/floating_linebreak_600px-1.png" class="kg-image" alt="" loading="lazy" width="600" height="157" srcset="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2024/05/floating_linebreak_600px-1.png 600w"></figure><h2 id="following">Following<br></h2><h3 id="the-pope-drops-43000-words-about-ai">The Pope drops 43,000 words about AI</h3><p><strong>What happened:</strong>&nbsp;<strong> Pope Leo XIV</strong> <a href="https://www.nytimes.com/2026/05/25/world/europe/pope-leo-encyclical.html?unlocked_article_code=1.lFA.ZO8g.ywQ-ffnOl1j9&smid=nytcore-ios-share&ref=platformer.news"><u>delivered his first encyclical</u></a> — a papal address to “all people of good will.” (Think of it as kind of holy <strong>Substack</strong>.) The encyclical, “Magnifica Humanitas,” concerns “safeguarding the human person in the time of artificial intelligence.”</p><p>The encyclical follows <a href="https://www.politico.eu/article/pope-leo-xiv-ai-meetings-silicon-valley-vatican/?ref=platformer.news"><u>months of discussions</u></a> between Silicon Valley and the Vatican; <strong>Meta</strong>, <strong>Google</strong>, and <strong>Amazon</strong> executives met with <strong>Vatican</strong> officials in April. In an unusual move, Pope Leo presented the encyclical alongside <strong>Anthropic</strong> co-founder <strong>Chris Olah</strong>.</p><p>The encyclical weighs in on AI and work, suggesting a “social criteria” for introducing automation and AI, alongside protections and re-training for workers.</p><p>While he acknowledged that “technology should not be considered, in itself, as a force antagonistic to humanity,” Pope Leo wrote that “the pursuit of greater profits cannot justify choices that systematically sacrifice jobs.”</p><p>Some of the encyclical <a href="https://www.washingtonpost.com/world/2026/05/25/pope-elevates-ai-ethics-religious-imperative-with-first-encyclical/?ref=platformer.news"><u>mirrors terminology</u></a> Anthropic has used to describe AI, such as one section that says AI systems can be unpredictable because engineers don’t directly code AI outputs — instead creating a framework within which AI “grows.”</p><p>Pope Leo’s encyclical addresses potential dangers of AI in warfare, writing that “it is not permissible to entrust lethal or otherwise irreversible decisions to artificial systems.”</p><p>The encyclical also calls for policies that protect children from violent, hypersexualized, or fake information generated by AI.</p><p>Chris Olah offered brief remarks on the encyclical. He <a href="https://x.com/ch402/status/2058907108725211476?s=20&ref=platformer.news"><u>emphasized</u></a> that companies like Anthropic face “a set of incentives and constraints that can sometimes conflict with doing the right thing.”</p><p>“We need moral voices that the incentives cannot bend,” Mr. Olah said.</p><p><strong>Why we’re following:</strong> It’s fascinating, and a bit surreal, to see the Pope engaging so directly with tech leaders on AI.&nbsp;(And to see His Holiness standing shoulder to shoulder with a tech executive.)</p><p>While it’s somewhat headache-inducing to imagine Meta lobbyists influencing the Vatican’s stance on AI, ultimately the Pope did not shy away from warning about the technology’s potential ill effects on work, war, and child safety.</p><p>Pope Leo’s teachings on AI will certainly have influence on the world's billion-plus Catholics. And his warnings about AI replacing jobs will at least get a listen from policymakers and tech executives. (Although some of those executives are probably fine with AI taking your job, regardless of what the Pope says.)</p><p><strong>What people are saying: </strong>On <strong>LinkedIn</strong>, Turing Award winning computer scientist <strong>Yoshua Bengio</strong> responded to the Pope’s point that “Decisions about technology must never be separated from conscience and responsibility.” Bengio <a href="https://www.linkedin.com/feed/update/urn:li:share:7464674733616332800/?ref=platformer.news"><u>wrote</u></a>, “I agree with this sentiment by Pope Leo XIV. The Vatican and other global institutions can and must play a role in the global dialogue on AI to raise public awareness and mobilize society for the challenges ahead.”</p><p>On <strong>X</strong>, investor and former <strong>Trump</strong> AI advisor <strong>David Sacks</strong> said that while “The Pope rightly warns that AI must serve human dignity,” he worries about what will happen if “we hand governments sweeping power over AI development in the name of safety,” including using AI to “surveil, and control citizens.” (You mean like <a href="https://www.aclum.org/publications/ai-powered-surveillance-is-turning-the-united-states-into-a-digital-police-state-now-is-the-time-to-stop-it/?ref=platformer.news" rel="noreferrer"><u>the Trump administration is already doing, David?</u></a>)</p><p>Others took note of the strange pairing of Pope Leo with a tech executive. X account <strong>@CoastalFuturist</strong> <a href="https://x.com/CoastalFuturist/status/2058961087416967266?s=20&ref=platformer.news"><u>posted</u></a>, “BREAKING NEWS: God joins Anthropic as member of technical staff.”</p><p>X user <strong>@Delicious_Tacos</strong> speculated that OpenAI might attempt to compete with Anthropic by backing an anti-pope, medieval monarch style. “It’s my honor to announce that the true pope is working with us from Avignon,” @Delicious_Tacos <a href="https://x.com/Delicious_Tacos/status/2058947361154773029?s=20&ref=platformer.news"><u>posted</u></a>, alongside a photo of a smiling Sam Altman.</p><p>Billionaire and Democrat activist <strong>Tom Steyer</strong> <a href="https://x.com/tomsteyer/status/2058951268853592517?ref=platformer.news"><u>wrote</u></a>, “Pope Leo is right: The AI era demands moral clarity and urgent action from leaders everywhere. We can’t allow AI to be a technology that turns billionaires into trillionaires while putting millions out of work.”</p><p>Many X users, including an account called “<strong>Pope Crave</strong>,” were <a href="https://x.com/ClubConcrave/status/2058906808811425958?s=20&ref=platformer.news"><u>excited to see</u></a> that Pope Leo included a Gandalf quote from the Lord of the Rings in his encyclical.</p><p>Blogger <strong>Matt Yglesias</strong> had some <a href="https://x.com/mattyglesias/status/2058921231647215919?ref=platformer.news"><u>philosophical disagreements</u></a> with the Pope: “It is not surprising to see that the Pope endorses a lot of superstitious mind/body dualism about artificial intelligence but it’s still wrong, even as he is also raising a lot of good points about some of the risks at play.”</p><p>Jesuit and X user <strong>Joseph Nolla</strong> <a href="https://x.com/josephnollasj/status/2058932592817168632?s=20&ref=platformer.news"><u>wrote</u></a>, “Pope Leo was a math major? I wonder what his encyclicals will be like,” attaching a passage where Pope Leo describes the Gospel as a “multifaceted polyhedron.”</p><p><strong>@BicameralGrind</strong> replied with an <a href="https://x.com/BicameralGrind/status/2058961018056048751?s=20&ref=platformer.news"><u>excellent math pun</u></a>: “Not only does he understand sin, he understands cos too.”</p><p>—<em>Ella Markianos</em></p><hr><h3 id="trump%E2%80%99s-ai-executive-order-fizzles">Trump’s AI executive order fizzles</h3><p><strong>What happened: </strong>President <strong>Trump</strong> <a href="https://www.axios.com/2026/05/21/trump-ai-executive-order-postponed-why?ref=platformer.news"><u>postponed</u></a> a highly anticipated executive order on AI and cybersecurity Thursday after he spoke with a few oligarchs and decided that he “just hates regulation,” a source familiar with the matter told <em>Axios</em>.</p><p>“The whole thing was unnecessary” and “just something doomers wanted,” the source added.&nbsp;</p><p>The executive order wasn’t drafted to be all that restrictive in the first place. According to <a href="https://www.politico.com/news/2026/05/22/heres-a-draft-of-trumps-unsigned-ai-executive-order-00933411?ref=platformer.news"><u>a draft obtained by <em>Politico</em></u></a>, it was aimed at addressing concerns that advanced AI products could be weaponized to deploy destructive cyber attacks if criminals got a hold of them. </p><p>The order would have created a <em>voluntary </em>oversight system where AI developers could submit their products for a review by federal agencies before release. But it seems that even asking for voluntary cooperation with the industry was a bridge too far.</p><p><strong>Why we’re following: </strong>There still isn’t any federal consensus on how powerful AI models should be regulated, weeks after <strong>Anthropic’s Mythos</strong> rattled <strong>Washington</strong> with its ability to identify previously unknown cybersecurity threats at scale. (Anthropic said last week that Mythos has <a href="https://www.anthropic.com/research/glasswing-initial-update?ref=platformer.news" rel="noreferrer">since found</a> "more than ten thousand high- or critical-severity vulnerabilities across the most systemically important software in the world.")</p><p>The draft order “was about as modest a frontier-AI intervention as the federal government could put on paper,” law professors <strong>Kevin Frazier</strong> and <strong>Alan Rozenshtein</strong> <a href="https://www.lawfaremedia.org/article/ai-governance-by-phone-call?ref=platformer.news"><u>wrote</u></a>. “Killing the order just leaves in place what [former White House AI adviser <strong>Dean</strong>]<strong> Ball</strong> has described as the ‘opaque and essentially lawless alternative: government access happening through back channels, on terms set case by case, with no stable rules at all. It may also slow AI adoption.”&nbsp;</p><p><strong>What people are saying: </strong>“I didn’t like certain aspects of it,” Trump told reporters in his usual style of speaking while saying nothing. “I think it gets in the way of — you know, we’re leading <strong>China</strong>, we’re leading everybody, and I didn’t want to do anything to get in the way of that lead,” he said.</p><p><strong>Meta</strong> and <strong>Elon Musk</strong> sharply rebuked reports that <strong>Mark Zuckerberg</strong> and Musk had anything to do with the delay of the executive order, but acknowledged they spoke to the president at some point.&nbsp;</p><p>“Mark didn't speak to the president until after the event had already been canceled,” Meta spokesman <strong>Andy Stone</strong> <a href="https://x.com/andymstone/status/2057861749735567752?ref=platformer.news"><u>wrote</u></a> on <strong>X</strong>.&nbsp;</p><p>"I still don’t know what was in that EO and the President only spoke to me after declining to sign,” Musk <a href="https://x.com/elonmusk/status/2057737150800560583?ref=platformer.news"><u>wrote</u></a>.</p><p><em>—Lindsey Choo</em></p><figure class="kg-card kg-image-card"><img src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2024/05/floating_linebreak_600px-1.png" class="kg-image" alt="" loading="lazy" width="600" height="157" srcset="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2024/05/floating_linebreak_600px-1.png 600w"></figure><h3 id="those-good-posts">Those good posts</h3><p><em>For more good posts every day, </em><a href="https://www.instagram.com/crumbler/?ref=platformer.news"><em>follow Casey’s Instagram stories</em></a><em>.</em></p><figure class="kg-card kg-image-card"><img src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2026/05/Screenshot-2026-05-26-at-4.50.00---PM.png" class="kg-image" alt="" loading="lazy" width="1160" height="256" srcset="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w600/2026/05/Screenshot-2026-05-26-at-4.50.00---PM.png 600w, https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w1000/2026/05/Screenshot-2026-05-26-at-4.50.00---PM.png 1000w, https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2026/05/Screenshot-2026-05-26-at-4.50.00---PM.png 1160w" sizes="(min-width: 720px) 720px"></figure><p>(<a href="https://www.threads.com/@thisone0verhere/post/DYw65NZkW2D?ref=platformer.news" rel="noreferrer">Link</a>)</p><figure class="kg-card kg-image-card"><img src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2026/05/Screenshot-2026-05-26-at-4.50.27---PM.png" class="kg-image" alt="" loading="lazy" width="1150" height="516" srcset="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w600/2026/05/Screenshot-2026-05-26-at-4.50.27---PM.png 600w, https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w1000/2026/05/Screenshot-2026-05-26-at-4.50.27---PM.png 1000w, https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2026/05/Screenshot-2026-05-26-at-4.50.27---PM.png 1150w" sizes="(min-width: 720px) 720px"></figure><p>(<a href="https://www.threads.com/@pigeoni_240/post/DYxpEhBEapE?ref=platformer.news" rel="noreferrer">Link</a>)</p><figure class="kg-card kg-image-card"><img src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2026/05/Screenshot-2026-05-26-at-4.50.50---PM.png" class="kg-image" alt="" loading="lazy" width="1152" height="630" srcset="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w600/2026/05/Screenshot-2026-05-26-at-4.50.50---PM.png 600w, https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w1000/2026/05/Screenshot-2026-05-26-at-4.50.50---PM.png 1000w, https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2026/05/Screenshot-2026-05-26-at-4.50.50---PM.png 1152w" sizes="(min-width: 720px) 720px"></figure><p>(<a href="https://www.threads.com/@cassaparilla/post/DYxfV3aEUCG?ref=platformer.news" rel="noreferrer">Link</a>)</p><figure class="kg-card kg-image-card"><img src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2024/05/floating_linebreak_600px-1.png" class="kg-image" alt="" loading="lazy" width="600" height="157" srcset="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2024/05/floating_linebreak_600px-1.png 600w"></figure><h3 id="talk-to-us">Talk to us</h3><p>Send us tips, comments, questions, and feedback on these changes: <a href="mailto:casey@platformer.news">casey@platformer.news</a>. Read <a href="https://www.platformer.news/ethics/">our ethics policy here</a>.</p><figure class="kg-card kg-image-card"><a href="https://www.atlassian.com/software/rovo?utm_source=alltogether&utm_medium=paid-social&utm_campaign=P:rovo|O:ppm|V:alltogether|G:us|L:en|F:aware|T:prospecting|I:imc-rovo-iyryk|A:image|D:alld&utm_content=P:rovo|O:ppm|V:alltogether|G:us|L:en|F:aware|T:prospecting|I:imc-rovo-iyryk|A:image|D:alld|U:alltogethernewsletter_image-core-brand-default-iyryk-na-na-na-AllTogetherNewsletter"><img src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2026/04/Atlassian-Rovo-mock--1100x100-.png" class="kg-image" alt="" loading="lazy" width="1100" height="100" srcset="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w600/2026/04/Atlassian-Rovo-mock--1100x100-.png 600w, https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w1000/2026/04/Atlassian-Rovo-mock--1100x100-.png 1000w, https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2026/04/Atlassian-Rovo-mock--1100x100-.png 1100w" sizes="(min-width: 720px) 720px"></a></figure>
+        </section>
+
+    </article>
+
+        <div class="gh-comments gh-canvas">
+            
+        <script defer src="https://cdn.jsdelivr.net/ghost/comments-ui@~1.4/umd/comments-ui.min.js" data-locale="en" data-ghost-comments="https://www.platformer.news/" data-api="https://platformer.ghost.io/ghost/api/content/" data-admin="https://platformer.ghost.io/ghost/" data-key="784efcca5a3abd410ac226ae79" data-title="null" data-count="true" data-post-id="6a15e5dc73179d0001e501b2" data-color-scheme="auto" data-avatar-saturation="60" data-accent-color="#2047FF" data-comments-enabled="paid" data-publication="Platformer" crossorigin="anonymous"></script>
+    
+        </div>
+
+</main>
+
+
+            <section class="gh-container is-grid gh-outer">
+                <div class="gh-container-inner gh-inner">
+                    <h2 class="gh-container-title">Read more</h2>
+                    <div class="gh-feed">
+                            <article class="gh-card post">
+    <a class="gh-card-link" href="/google-agents-daily-brief-newsletters-ask-youtube/">
+            <figure class="gh-card-image">
+                <img
+                    srcset="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w160/format/webp/2026/05/DSC_1849.jpg 160w,
+                            https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w320/format/webp/2026/05/DSC_1849.jpg 320w,
+                            https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w600/format/webp/2026/05/DSC_1849.jpg 600w,
+                            https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w960/format/webp/2026/05/DSC_1849.jpg 960w,
+                            https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w1200/format/webp/2026/05/DSC_1849.jpg 1200w,
+                            https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w2000/format/webp/2026/05/DSC_1849.jpg 2000w"
+                    sizes="320px"
+                    src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w600/2026/05/DSC_1849.jpg"
+                    alt="A photo of the Google I/O keynote on Tuesday showing the Daily Brief and Gemini Spark"
+                    loading="lazy"
+                >
+            </figure>
+        <div class="gh-card-wrapper">
+            <h3 class="gh-card-title is-title">Is the web being summarized to death?</h3>
+                <p class="gh-card-excerpt is-body">At Google I/O, new features bring AI agents into the inbox and YouTube in ways that further strain the relationship between publishers and platforms</p>
+            <footer class="gh-card-meta">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" height="20" width="20" id="Lock-1--Streamline-Ultimate"><defs></defs><title>lock-1</title><path d="M4.375 8.125h11.25s1.25 0 1.25 1.25v8.75s0 1.25 -1.25 1.25H4.375s-1.25 0 -1.25 -1.25v-8.75s0 -1.25 1.25 -1.25" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path><path d="M5.625 8.125V5a4.375 4.375 0 0 1 8.75 0v3.125" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path><path d="m10 12.5 0 2.5" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>                <!--
+             -->
+                    <span class="gh-card-author">By Casey Newton</span>
+                    <time class="gh-card-date" datetime="2026-05-21">May 21, 2026</time>
+                <!--
+         --></footer>
+        </div>
+    </a>
+</article>                            <article class="gh-card post no-image">
+    <a class="gh-card-link" href="/james-manyika-google-ai-jobs-io-2026/">
+        <div class="gh-card-wrapper">
+            <h3 class="gh-card-title is-title">Google&#x27;s James Manyika is betting that doomers are wrong about AI and jobs</h3>
+                <p class="gh-card-excerpt is-body">Tasks are getting easier to automate — jobs aren&#x27;t. What now? </p>
+            <footer class="gh-card-meta">
+<!--
+             -->
+                    <span class="gh-card-author">By Casey Newton</span>
+                    <time class="gh-card-date" datetime="2026-05-19">May 19, 2026</time>
+                <!--
+         --></footer>
+        </div>
+    </a>
+</article>                            <article class="gh-card post no-image">
+    <a class="gh-card-link" href="/elon-musk-loses-openai-trial/">
+        <div class="gh-card-wrapper">
+            <h3 class="gh-card-title is-title">Following: Elon loses the OpenAI trial</h3>
+                <p class="gh-card-excerpt is-body">Musk vows to appeal; the judge vows to throw that case out, too</p>
+            <footer class="gh-card-meta">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" height="20" width="20" id="Lock-1--Streamline-Ultimate"><defs></defs><title>lock-1</title><path d="M4.375 8.125h11.25s1.25 0 1.25 1.25v8.75s0 1.25 -1.25 1.25H4.375s-1.25 0 -1.25 -1.25v-8.75s0 -1.25 1.25 -1.25" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path><path d="M5.625 8.125V5a4.375 4.375 0 0 1 8.75 0v3.125" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path><path d="m10 12.5 0 2.5" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>                <!--
+             -->
+                    <span class="gh-card-author">By Ella Markianos</span>
+                    <time class="gh-card-date" datetime="2026-05-18">May 18, 2026</time>
+                <!--
+         --></footer>
+        </div>
+    </a>
+</article>                            <article class="gh-card post">
+    <a class="gh-card-link" href="/threads-bluesky-x-usage-utopia-twitter-clones/">
+            <figure class="gh-card-image">
+                <img
+                    srcset="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w160/format/webp/2026/05/shutterstock_2329539327.jpg 160w,
+                            https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w320/format/webp/2026/05/shutterstock_2329539327.jpg 320w,
+                            https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w600/format/webp/2026/05/shutterstock_2329539327.jpg 600w,
+                            https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w960/format/webp/2026/05/shutterstock_2329539327.jpg 960w,
+                            https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w1200/format/webp/2026/05/shutterstock_2329539327.jpg 1200w,
+                            https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w2000/format/webp/2026/05/shutterstock_2329539327.jpg 2000w"
+                    sizes="320px"
+                    src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w600/2026/05/shutterstock_2329539327.jpg"
+                    alt="The Threads logo shown on a smartphone held in a person&#x27;s hand"
+                    loading="lazy"
+                >
+            </figure>
+        <div class="gh-card-wrapper">
+            <h3 class="gh-card-title is-title">Are the Twitter clones in trouble?</h3>
+                <p class="gh-card-excerpt is-body">A new report says X is resurgent — but it may be missing the bigger picture</p>
+            <footer class="gh-card-meta">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" height="20" width="20" id="Lock-1--Streamline-Ultimate"><defs></defs><title>lock-1</title><path d="M4.375 8.125h11.25s1.25 0 1.25 1.25v8.75s0 1.25 -1.25 1.25H4.375s-1.25 0 -1.25 -1.25v-8.75s0 -1.25 1.25 -1.25" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path><path d="M5.625 8.125V5a4.375 4.375 0 0 1 8.75 0v3.125" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path><path d="m10 12.5 0 2.5" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>                <!--
+             -->
+                    <span class="gh-card-author">By Casey Newton</span>
+                    <time class="gh-card-date" datetime="2026-05-14">May 14, 2026</time>
+                <!--
+         --></footer>
+        </div>
+    </a>
+</article>                    </div>
+                </div>
+            </section>
+
+    
+    <footer class="gh-footer gh-outer">
+    <div class="gh-footer-inner gh-inner">
+
+        <div class="gh-footer-bar">
+            <span class="gh-footer-logo is-title">
+                    <img src="https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2024/05/Wordmark_Transparent_Slate_NoPadding.png" alt="Platformer">
+            </span>
+            <nav class="gh-footer-menu">
+                <ul class="nav">
+    <li class="nav-sign-up"><a href="#/portal/">Sign up</a></li>
+    <li class="nav-advanced-user-settings"><a href="https://www.platformer.news/advanced-settings/">Advanced User Settings</a></li>
+</ul>
+
+            </nav>
+            <div class="gh-footer-copyright">
+                Powered by <a href="https://ghost.org/" target="_blank" rel="noopener">Ghost</a>
+            </div>
+        </div>
+
+                <section class="gh-footer-signup">
+                    <h2 class="gh-footer-signup-header is-title">
+                        Platformer
+                    </h2>
+                    <p class="gh-footer-signup-subhead is-body">
+                        News at the intersection of Silicon Valley and democracy. On Monday, Tuesday, and Thursday at 5PM Pacific.
+                    </p>
+                    <form class="gh-form" data-members-form>
+    <input class="gh-form-input" id="footer-email" type="email" placeholder="jamie@example.com" required data-members-email>
+    <button class="gh-button" type="submit" aria-label="Subscribe">
+        <span><span>Subscribe</span> <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"></path></svg></span>
+        <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24">
+    <g stroke-linecap="round" stroke-width="2" fill="currentColor" stroke="none" stroke-linejoin="round" class="nc-icon-wrapper">
+        <g class="nc-loop-dots-4-24-icon-o">
+            <circle cx="4" cy="12" r="3"></circle>
+            <circle cx="12" cy="12" r="3"></circle>
+            <circle cx="20" cy="12" r="3"></circle>
+        </g>
+        <style data-cap="butt">
+            .nc-loop-dots-4-24-icon-o{--animation-duration:0.8s}
+            .nc-loop-dots-4-24-icon-o *{opacity:.4;transform:scale(.75);animation:nc-loop-dots-4-anim var(--animation-duration) infinite}
+            .nc-loop-dots-4-24-icon-o :nth-child(1){transform-origin:4px 12px;animation-delay:-.3s;animation-delay:calc(var(--animation-duration)/-2.666)}
+            .nc-loop-dots-4-24-icon-o :nth-child(2){transform-origin:12px 12px;animation-delay:-.15s;animation-delay:calc(var(--animation-duration)/-5.333)}
+            .nc-loop-dots-4-24-icon-o :nth-child(3){transform-origin:20px 12px}
+            @keyframes nc-loop-dots-4-anim{0%,100%{opacity:.4;transform:scale(.75)}50%{opacity:1;transform:scale(1)}}
+        </style>
+    </g>
+</svg>        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+    <style>
+        .checkmark {
+            width: 40px;
+            height: 40px;
+            display: block;
+            stroke-width: 2.5;
+            stroke: currentColor;
+            stroke-miterlimit: 10;
+        }
+
+        .checkmark__check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: stroke .3s cubic-bezier(0.650, 0.000, 0.450, 1.000) forwards;
+        }
+
+        @keyframes stroke {
+            100% { stroke-dashoffset: 0; }
+        }
+    </style>
+</svg>    </button>
+    <p data-members-error></p>
+</form>                </section>
+
+    </div>
+</footer>    
+</div>
+
+    <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="pswp__bg"></div>
+
+    <div class="pswp__scroll-wrap">
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://www.platformer.news/assets/built/source.js?v=6df893527b"></script>
+
+
+<script>
+!function(w,d,id,ns,s){var c=w[ns]=w[ns]||{};if(c.ready||(c.q=[],c.ready=function(){c.q.push(arguments)}),!d.getElementById(id)){var e=d.createElement(s);e.id=id,e.defer=true,e.src="https://assets.context.ly/kit/6.latest/loader.js";var h=d.getElementsByTagName(s)[0];h.parentNode.insertBefore(e,h)}}(window,document,"ctx-loader","Contextly","script");
+</script>
+<script>
+Contextly.ready('widgets');
+</script>
+<script>
+  const OutpostPub = {
+    apiDomain: "https://platformernews.outpost.pub",
+    apiKey: "5256302e-24e7-4b08-a293-c42417ba8d25",
+    siteName: "Platformer",
+    memberId: "",
+    memberEmail: "",
+        post: {
+          id: "6a15e5dc73179d0001e501b2",
+          tags: ["Anthropic"],
+        }
+  }
+</script>
+<script defer src="https://assets.outpostpublishingcoop.com/assets/v2/js/outpost-pub.js"></script>
+
+</body>
+</html>
