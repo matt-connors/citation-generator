@@ -8,7 +8,7 @@ tags: ['journal articles', 'peer-reviewed', 'DOI', 'citations', 'APA', 'MLA', 'C
 relatedGuides: ['apa', 'vancouver', 'ieee', 'ama', 'how-to-cite-a-book', 'how-to-cite-a-pdf']
 faq:
   - question: 'Do I need a DOI in a journal article citation?'
-    answer: 'Yes, whenever the article has one. Every modern style requires the DOI in the reference list entry when it exists, formatted as a clickable URL (https://doi.org/10.xxx/yyy) in APA, MLA, Chicago, and Harvard; as the bare DOI string with a "doi:" prefix in Vancouver and AMA; and with a "doi:" prefix in IEEE. For articles too old to have a DOI, use the article''s URL on the journal''s site, with the appropriate access date for the styles that require one.'
+    answer: 'Yes, whenever the article has one. Every modern style requires the DOI in the reference list entry when it exists, formatted as a clickable URL (https://doi.org/10.xxx/yyy) in APA, MLA, Chicago, and Harvard; as the bare DOI with a "doi:" prefix and no space in Vancouver and AMA ("doi:10.xxx/yyy"); and with a "doi:" prefix and a space in IEEE ("doi: 10.xxx/yyy"). For articles too old to have a DOI, use the article''s URL on the journal''s site, with the appropriate access date for the styles that require one.'
   - question: 'How do I cite a preprint (a paper that has not yet been peer-reviewed)?'
     answer: 'Cite it as a preprint, not as a journal article. APA: identify the server in brackets after the title — "[Preprint]." — and use the preprint server URL (arXiv, bioRxiv, SSRN, etc.). MLA: add "preprint" as a descriptor and link to the server. Chicago, Vancouver, and AMA each have specific preprint formats. If the article is later published, switch the citation to the published version — but only after you''ve verified the published version says what the preprint says.'
   - question: 'How do I cite a journal article that has been retracted?'
@@ -16,7 +16,7 @@ faq:
   - question: 'Should I abbreviate the journal name?'
     answer: 'In Vancouver, AMA, and IEEE, yes — they all use Index Medicus / NLM-style abbreviations. *Journal of Cognitive Development* becomes *J Cogn Dev*. In APA, MLA, Chicago, and Harvard, no — these styles use the full journal title in italics, exactly as the journal publishes it. If your target journal''s instructions specify a different practice, follow those instructions.'
   - question: 'What is the difference between citing the print version and the online version of a journal article?'
-    answer: 'For most styles, none — the citation is the same regardless of how you read it, because the article itself is the same. The article''s DOI is the link to the canonical version, online or off. Where the styles differ on this is in their access-date policy: APA and Chicago omit access dates for stable, DOI-bearing articles; MLA, Harvard, Vancouver, AMA, and IEEE include the access date for any web-accessed article, DOI or not.'
+    answer: 'For most styles, none — the citation is the same regardless of how you read it, because the article itself is the same. The article''s DOI is the link to the canonical version, online or off. Where the styles differ on this is in their access-date policy: APA, MLA, and Chicago omit access dates for stable, DOI-bearing articles, treating the DOI as a permanent identifier; Harvard (Cite Them Right), Vancouver, AMA, and IEEE include the access date for any web-accessed article as a matter of convention.'
 ogImage: '/images/banner.png'
 ---
 
@@ -72,13 +72,15 @@ The [generator at /](/) on this site captures most of these fields from a DOI or
 | [IEEE](/guides/ieee) | A. Goldstein, P. Ramanathan, and L. O'Connor, "Sleep Consolidation Effects on Procedural Learning in Adolescents," *J. Cogn. Dev.*, vol. 19, no. 2, pp. 87–104, Mar. 2024, doi: 10.1037/cogdev0000412. |
 | [AMA 11](/guides/ama) | Goldstein A, Ramanathan P, O'Connor L. Sleep consolidation effects on procedural learning in adolescents. *J Cogn Dev*. 2024;19(2):87-104. doi:10.1037/cogdev0000412 |
 
-The structural pattern is the same in every style — authors, title, journal, year, volume, issue, pages, DOI — and the punctuation around each piece is where they diverge. APA, MLA, Chicago, and Harvard spell out the full journal name and italicize it. Vancouver, AMA, and IEEE use NLM-style abbreviations (Index Medicus): *Journal of Cognitive Development* becomes *J Cogn Dev*. IEEE abbreviates further, including the words in the article title, though American IEEE journals are less aggressive about this than older European technical journals.
+The structural pattern is the same in every style — authors, title, journal, year, volume, issue, pages, DOI — and the punctuation around each piece is where they diverge. APA, MLA, Chicago, and Harvard spell out the full journal name and italicize it. Vancouver, AMA, and IEEE use NLM-style abbreviations: *Journal of Cognitive Development* becomes J Cogn Dev in Vancouver and AMA (plain) and *J. Cogn. Dev.* in IEEE (italicized, with periods and a space after the volume abbreviation). Article titles in every style are kept in full — IEEE abbreviates journal and conference titles only.
 
 DOI formatting splits the styles cleanly. APA, MLA, Chicago, and Harvard format the DOI as a clickable URL beginning with `https://doi.org/`. Vancouver, AMA, and IEEE use the bare DOI with a `doi:` prefix. Whichever your style, the DOI is mandatory when one exists — it is the only stable identifier the article will keep through journal-name changes, server moves, and ownership transfers.
 
 The in-text citation for the same source:
 
-- **APA, Chicago author–date, Harvard:** (Goldstein et al., 2024)
+- **APA:** (Goldstein et al., 2024)
+- **Chicago author–date:** (Goldstein et al. 2024) — Chicago drops the comma between author and year
+- **Harvard (Cite Them Right):** (Goldstein, Ramanathan and O'Connor, 2024) — Harvard's *et al.* threshold is four or more, so a three-author work spells out every surname
 - **MLA:** (Goldstein et al. 92) — page-specific
 - **Vancouver, AMA:** (3) or superscript ³ in citation order
 - **IEEE:** [3]
