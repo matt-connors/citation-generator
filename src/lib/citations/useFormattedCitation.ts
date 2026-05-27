@@ -83,6 +83,9 @@ export function formatCitation(source: Args, style: SupportedStyle): Promise<Ric
   if (cached) return Promise.resolve(cached);
   const promise = inflight.get(key) ?? fetchFormatted(source.csl, style, key);
   inflight.set(key, promise);
-  promise.finally(() => inflight.delete(key));
+  // The hook-side .then/.catch absorbs the rejection on its own chain; this
+  // bookkeeping chain needs its own catch or rejections surface as uncaught
+  // when fetchFormatted fails (5xx, network) and no one else is awaiting `key`.
+  promise.finally(() => inflight.delete(key)).catch(() => { /* swallowed; caller's await sees it */ });
   return promise;
 }

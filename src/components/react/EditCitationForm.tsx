@@ -30,9 +30,14 @@ const TYPE_OPTIONS: CitationOption[] = [
 interface Props {
     source: StoredSource;
     setSources: (s: StoredSource[] | ((prev: StoredSource[]) => StoredSource[])) => void;
+    // Parent ref populated with the latest in-flight CSL on every render. The
+    // dialog/drawer reads it on close to decide empty-vs-flush before the
+    // debounced 500ms timer would have fired — otherwise typed input is lost
+    // (citation removed as "still empty") or stale (form unmount cancels timer).
+    currentRef?: React.MutableRefObject<CSLItem | null>;
 }
 
-export default function EditCitationForm({ source, setSources }: Props) {
+export default function EditCitationForm({ source, setSources, currentRef }: Props) {
     const [local, setLocal] = useState<CSLItem>(source.csl);
 
     // Read the latest `local` via ref inside the debounced flush so the 500ms
@@ -40,7 +45,10 @@ export default function EditCitationForm({ source, setSources }: Props) {
     // intervening patches happened (functional setLocal + ref instead of
     // closure-captured `local` avoids dropping characters under rapid typing).
     const localRef = useRef(local);
-    useEffect(() => { localRef.current = local; }, [local]);
+    useEffect(() => {
+        localRef.current = local;
+        if (currentRef) currentRef.current = local;
+    }, [local, currentRef]);
 
     const debouncedSet = useDebounce(() => {
         setSources((prev) => prev.map((s) => s.uuid === source.uuid ? { ...s, csl: localRef.current } : s));

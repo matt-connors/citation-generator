@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { loadSources, saveSources, type StoredSource } from './storage';
 import type { CSLItem, SupportedStyle } from '../citations/csl-types';
 
@@ -110,7 +110,10 @@ export function useReferences(): UseReferencesReturn {
     });
   }, [sources]);
 
-  return useMemo(() => ({
+  // No useMemo on the returned object: `selectAll` and `handleDelete` depend on
+  // state that changes on every meaningful update, so a memo never hits — it
+  // would only pay the shallow-compare cost without benefit.
+  return {
     sources,
     sourceCount: sources.length,
     selected,
@@ -121,5 +124,5 @@ export function useReferences(): UseReferencesReturn {
     selectAll,
     setCitationFormat,
     handleDelete,
-  }), [sources, selected, citationFormat, setSources, toggleSelected, selectAll, setCitationFormat, handleDelete]);
+  };
 }

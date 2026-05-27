@@ -10,6 +10,7 @@ import {
 import { useMediaQuery } from '@react-hook/media-query'
 import EditCitationForm from "./EditCitationForm"
 import type { StoredSource } from '../../lib/references/storage';
+import type { CSLItem } from '../../lib/citations/csl-types';
 import { ScrollArea } from "./ScrollArea";
 import { Line } from "./EditCitationFormComponents"
 import { Pencil, RefreshCw } from "lucide-react"
@@ -50,10 +51,12 @@ const Content = ({
     source,
     setSources,
     isDesktop,
+    currentRef,
 }: {
     source: StoredSource;
     setSources: SetSources;
     isDesktop: boolean;
+    currentRef: React.MutableRefObject<CSLItem | null>;
 }) => {
     // On desktop the Dialog is centered and doesn't otherwise constrain its
     // own height, so the ScrollArea caps at 65vh. On mobile the Drawer is
@@ -66,7 +69,7 @@ const Content = ({
             {/* key forces a fresh form instance when the slot is reused with a
                 different source (defense in depth — the parent <ReferenceItem
                 key={uuid}> already isolates per source, but cheap insurance). */}
-            <EditCitationForm key={source.uuid} source={source} setSources={setSources} />
+            <EditCitationForm key={source.uuid} source={source} setSources={setSources} currentRef={currentRef} />
             <Line className="my-8" />
             <div className="flex gap-2 items-center pb-8 text-muted-foreground ">
                 <RefreshCw size={16} strokeWidth={1.8} />
@@ -90,11 +93,23 @@ const EditReferenceDialogDrawer = forwardRef<HTMLButtonElement, EditReferenceDia
     const [open, setOpen] = React.useState(false);
     const isDesktop = useMediaQuery("(min-width: 900px)");
 
+    // EditCitationForm populates this on every keystroke. We read it on close
+    // to decide empty-vs-flush before the form's 500ms debounce would fire,
+    // otherwise a fast tap-outside drops the typed input (citation removed as
+    // "still empty", or last keystroke lost when the unmount cleanup cancels
+    // the pending timer).
+    const currentRef = React.useRef<CSLItem | null>(null);
+
     const handleOpenChange = (newOpen: boolean) => {
-        if (!newOpen && isEmptyCitation(source)) {
-            // Functional setter — no `sources` prop required, and safe under
-            // concurrent updates (e.g. an in-flight URL fetch resolving).
-            setSources((prev) => prev.filter((s) => s.uuid !== source.uuid));
+        if (!newOpen) {
+            const current = currentRef.current ?? source.csl;
+            if (isEmptyCitation({ ...source, csl: current })) {
+                setSources((prev) => prev.filter((s) => s.uuid !== source.uuid));
+            } else if (current !== source.csl) {
+                // Flush the in-flight edit so the typed value isn't dropped
+                // when the form unmounts (which clears the debounce timer).
+                setSources((prev) => prev.map((s) => s.uuid === source.uuid ? { ...s, csl: current } : s));
+            }
         }
         setOpen(newOpen);
     };
@@ -109,7 +124,7 @@ const EditReferenceDialogDrawer = forwardRef<HTMLButtonElement, EditReferenceDia
                 </DialogTrigger>
                 <DialogContent className="p-0">
                     <Header isDesktop />
-                    <Content source={source} setSources={setSources} isDesktop />
+                    <Content source={source} setSources={setSources} isDesktop currentRef={currentRef} />
                 </DialogContent>
             </Dialog>
         );
@@ -122,7 +137,7 @@ const EditReferenceDialogDrawer = forwardRef<HTMLButtonElement, EditReferenceDia
             </DrawerTrigger>
             <DrawerContent>
                 <Header isDesktop={false} />
-                <Content source={source} setSources={setSources} isDesktop={false} />
+                <Content source={source} setSources={setSources} isDesktop={false} currentRef={currentRef} />
             </DrawerContent>
         </Drawer>
     );

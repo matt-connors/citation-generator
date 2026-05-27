@@ -39,4 +39,41 @@ describe('runExtractionPipeline', () => {
     expect(result.csl.type).toBe('webpage');
     expect(result.csl.URL).toBe('https://example.com/p');
   });
+
+  describe('wikipedia title override', () => {
+    // Wikipedia's JSON-LD `headline` is the article description, not the title.
+    // The override prefers the heuristic <title> tag for *.wikipedia.org hosts.
+    const wikiHtml = `<html><head>
+      <title>Foo - Wikipedia</title>
+      <script type="application/ld+json">${JSON.stringify({
+        '@type': 'Article',
+        name: 'Foo',
+        headline: 'bar description not title',
+      })}</script>
+    </head></html>`;
+
+    it('prefers heuristic <title> over JSON-LD headline on en.wikipedia.org', () => {
+      const result = runExtractionPipeline(wikiHtml, 'https://en.wikipedia.org/wiki/Foo');
+      expect(result.csl.title).toBe('Foo');
+      expect(result.signals.title).toBe('heuristic');
+    });
+
+    it('applies on bare wikipedia.org host', () => {
+      const result = runExtractionPipeline(wikiHtml, 'https://wikipedia.org/wiki/Foo');
+      expect(result.csl.title).toBe('Foo');
+      expect(result.signals.title).toBe('heuristic');
+    });
+
+    it('does NOT apply on lookalike subdomain attacks', () => {
+      const result = runExtractionPipeline(wikiHtml, 'https://en.wikipedia.org.evil.com/Foo');
+      expect(result.csl.title).toBe('bar description not title');
+      expect(result.signals.title).toBe('jsonld');
+    });
+
+    it('does NOT apply on unrelated hosts', () => {
+      const result = runExtractionPipeline(wikiHtml, 'https://example.com/Foo');
+      expect(result.csl.title).toBe('bar description not title');
+      expect(result.signals.title).toBe('jsonld');
+    });
+  });
 });
