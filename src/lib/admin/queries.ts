@@ -124,37 +124,29 @@ export function buildQueries(dataset: string): QueryDef[] {
     {
       key: 'cite_website_extract',
       title: 'cite_website timing (last 24h, fresh only)',
-      description: 'Now splits fetch (double4) from extraction (double2). Cache hits skipped.',
+      description: 'fetch_ms (double4) vs extraction_ms (double2) vs html_size_kb (double1). Cache hits skipped.',
       render: 'table',
+      // One wide row instead of three rows (Analytics Engine SQL doesn't
+      // support UNION ALL, and per-metric bars wouldn't be meaningful with
+      // only a single row anyway — bars are most useful for cross-row
+      // ranking).
       columns: [
-        { key: 'metric', label: 'Metric' },
-        { key: 'p50', label: 'p50', align: 'right' },
-        { key: 'p95', label: 'p95', align: 'right', bar: true },
+        { key: 'fetch_p50_ms', label: 'Fetch p50', align: 'right' },
+        { key: 'fetch_p95_ms', label: 'Fetch p95', align: 'right' },
+        { key: 'extract_p50_ms', label: 'Extract p50', align: 'right' },
+        { key: 'extract_p95_ms', label: 'Extract p95', align: 'right' },
+        { key: 'html_p50_kb', label: 'HTML p50 kb', align: 'right' },
+        { key: 'html_p95_kb', label: 'HTML p95 kb', align: 'right' },
         { key: 'samples', label: 'Samples', align: 'right' },
       ],
       sql: `
         SELECT
-          'extraction_ms' AS metric,
-          round(quantileWeighted(0.50)(double2, _sample_interval), 1) AS p50,
-          round(quantileWeighted(0.95)(double2, _sample_interval), 1) AS p95,
-          count() AS samples
-        FROM ${dataset}
-        WHERE index1 = 'cite_website' AND double3 = 0
-          AND timestamp >= NOW() - INTERVAL '24' HOUR
-        UNION ALL
-        SELECT
-          'fetch_ms' AS metric,
-          round(quantileWeighted(0.50)(double4, _sample_interval), 1) AS p50,
-          round(quantileWeighted(0.95)(double4, _sample_interval), 1) AS p95,
-          count() AS samples
-        FROM ${dataset}
-        WHERE index1 = 'cite_website' AND double3 = 0
-          AND timestamp >= NOW() - INTERVAL '24' HOUR
-        UNION ALL
-        SELECT
-          'html_size_kb' AS metric,
-          round(quantileWeighted(0.50)(double1, _sample_interval), 1) AS p50,
-          round(quantileWeighted(0.95)(double1, _sample_interval), 1) AS p95,
+          round(quantileWeighted(0.50)(double4, _sample_interval), 1) AS fetch_p50_ms,
+          round(quantileWeighted(0.95)(double4, _sample_interval), 1) AS fetch_p95_ms,
+          round(quantileWeighted(0.50)(double2, _sample_interval), 1) AS extract_p50_ms,
+          round(quantileWeighted(0.95)(double2, _sample_interval), 1) AS extract_p95_ms,
+          round(quantileWeighted(0.50)(double1, _sample_interval), 1) AS html_p50_kb,
+          round(quantileWeighted(0.95)(double1, _sample_interval), 1) AS html_p95_kb,
           count() AS samples
         FROM ${dataset}
         WHERE index1 = 'cite_website' AND double3 = 0
