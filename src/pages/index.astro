@@ -11,19 +11,22 @@ import {
     DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 
-const title = "MLA Generator | Reliable Citations in MLA, APA, & Chicago";
+import { buildSoftwareApplication } from "../lib/schema-org";
+
+const title = "Free Citation Generator — APA, MLA, Chicago, Harvard, Vancouver, IEEE & AMA";
 const description =
-    "Effortlessly format & generate accurate citations in APA, MLA, Chicago & Harvard formats. MLA Generator: Trusted by students and researchers worldwide.";
+    "Generate accurate citations in APA 7, MLA 9, Chicago 18, Harvard, Vancouver, IEEE, and AMA formats from a URL, DOI, or ISBN. Free, fast, trusted by students worldwide.";
+
+const extraSchemas = [buildSoftwareApplication()];
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} extraSchemas={extraSchemas}>
     <section id="tool">
         <div id="text-container">
-            <h1 class="heading-1">MLA Format <br />Citation Generator</h1>
+            <h1 class="heading-1">Free Citation <br />Generator</h1>
             <p class="subtitle">
-                <!-- <a href={site}>MLA Generator</a>:  -->
-                Easy and Reliable APA, MLA, Chicago and Harvard citations, trused
-                by students worldwide.
+                Accurate APA, MLA, Chicago, Harvard, Vancouver, IEEE, and AMA
+                citations — trusted by students worldwide.
             </p>
         </div>
         <CitationSearch includeDropdown includeManualCite client:load />

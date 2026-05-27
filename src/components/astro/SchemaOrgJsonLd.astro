@@ -1,0 +1,16 @@
+---
+// src/components/astro/SchemaOrgJsonLd.astro
+// Renders one or more JSON-LD <script type="application/ld+json"> blocks.
+// Pass either a single schema object or an array. Schemas are built via
+// src/lib/schema-org.ts.
+interface Props {
+    schemas: object | object[];
+}
+
+const { schemas } = Astro.props;
+const list = Array.isArray(schemas) ? schemas : [schemas];
+---
+
+{list.map((schema) => (
+    <script type="application/ld+json" set:html={JSON.stringify(schema).replace(/</g, '\\u003c')} />
+))}

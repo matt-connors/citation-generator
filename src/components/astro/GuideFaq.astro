@@ -1,0 +1,80 @@
+---
+// src/components/astro/GuideFaq.astro
+// Renders visible FAQ markup as native <details>/<summary> elements
+// for accessibility + zero-JS expand/collapse.
+interface FaqItem {
+    question: string;
+    answer: string;
+}
+
+interface Props {
+    items: FaqItem[];
+}
+
+const { items } = Astro.props;
+---
+
+{items.length > 0 && (
+    <section class="guide-faq" aria-labelledby="guide-faq-heading">
+        <h2 id="guide-faq-heading">Frequently asked questions</h2>
+        <div class="faq-list">
+            {items.map((item) => (
+                <details>
+                    <summary>{item.question}</summary>
+                    <div class="faq-answer" set:html={item.answer} />
+                </details>
+            ))}
+        </div>
+    </section>
+)}
+
+<style>
+    .guide-faq {
+        margin-top: 3rem;
+    }
+    .guide-faq h2 {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+    }
+    .faq-list {
+        display: grid;
+        gap: 0.5rem;
+    }
+    details {
+        border: 1px solid var(--color-border);
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+    }
+    details[open] {
+        background-color: var(--color-background-2);
+    }
+    summary {
+        font-weight: 510;
+        cursor: pointer;
+        list-style: none;
+        color: var(--color-text-dark);
+    }
+    summary::-webkit-details-marker {
+        display: none;
+    }
+    summary::after {
+        content: '+';
+        float: right;
+        font-weight: 400;
+        font-size: 1.2rem;
+        color: var(--color-text-light);
+    }
+    details[open] summary::after {
+        content: '−';
+    }
+    summary:focus-visible {
+        outline: 2px solid var(--color-text-dark);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+    .faq-answer {
+        margin-top: 0.75rem;
+        color: var(--color-text-medium);
+        line-height: 1.5;
+    }
+</style>

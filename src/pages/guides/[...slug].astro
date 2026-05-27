@@ -3,50 +3,71 @@ import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import GuideLayout from "../../layouts/guide.astro";
 import Heading from "../../components/astro/Heading.astro";
+import GithubSlugger from "github-slugger";
+import {
+    buildArticle,
+    buildBreadcrumbList,
+    buildFaqPage,
+} from "../../lib/schema-org";
 
 export async function getStaticPaths() {
     const entries = await getCollection("guides");
     return entries.map(entry => ({
-        params: {
-            slug: entry.slug,
-        },
+        params: { slug: entry.slug },
         props: entry,
     }));
 }
 
 export const prerender = true;
 
-type Props = CollectionEntry<"guide">
+type Props = CollectionEntry<"guides">;
 
-const { slug } = Astro.params;
-const entries = await getCollection("guides");
-const entry = entries.filter(entry => entry.slug === slug);
+const entry = Astro.props as Props;
 
-// If the entry is undefined, redirect to 404
-if (entry === undefined) {
-    return Astro.redirect("/404");
+const { Content, components } = await entry.render();
+
+// Extract H2 headings with stable, collision-safe slugs that match the
+// ids rendered by rehype-slug + github-slugger inside MDX content.
+const slugger = new GithubSlugger();
+const headings = Array.from(entry.body.matchAll(/^(#{1,6})\s+(.+)$/gm)).map(
+    ([_, hashes, text]) => ({
+        level: hashes.length,
+        text: text.trim(),
+        slug: slugger.slug(text.trim()),
+    })
+);
+
+const site = Astro.site!.toString().replace(/\/$/, '');
+const pageUrl = `${site}/guides/${entry.slug}`;
+const articleSchema = buildArticle({
+    title: entry.data.title,
+    description: entry.data.description,
+    url: pageUrl,
+    datePublished: entry.data.pubDate,
+    dateModified: entry.data.updatedDate,
+    author: entry.data.author,
+    image: `${site}${entry.data.ogImage ?? '/images/banner.png'}`,
+    keywords: entry.data.keywords,
+    section: entry.data.category,
+});
+
+const breadcrumbSchema = buildBreadcrumbList([
+    { name: 'Home', url: `${site}/` },
+    { name: 'Guides', url: `${site}/guides` },
+    { name: entry.data.title, url: pageUrl },
+]);
+
+const extraSchemas: object[] = [articleSchema, breadcrumbSchema];
+if (entry.data.faq && entry.data.faq.length > 0) {
+    extraSchemas.push(buildFaqPage(entry.data.faq));
 }
-
-// Render the markdown content
-const { Content, components } = await entry[0].render();
-
-// Extract headings from markdown
-function extractHeadings(md) {
-    const headings = md.match(/^(#+) (.+)$/gm);
-    if (headings) {
-        return headings.map(heading => {
-            const level = heading.match(/#/g).length;
-            const text = heading.replace(/#/g, "").trim();
-            return { level, text };
-        });
-    }
-    return [];
-}
-
-const headings = extractHeadings(entry[0].body);
-
 ---
 
-<GuideLayout frontmatter={entry[0].data} headings={headings}>
-    <Content components={{...components, h2: Heading }} />
+<GuideLayout
+    frontmatter={entry.data}
+    headings={headings}
+    slug={entry.slug}
+    extraSchemas={extraSchemas}
+>
+    <Content components={{ ...components, h2: Heading }} />
 </GuideLayout>

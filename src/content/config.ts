@@ -1,21 +1,24 @@
-// Import utilities from `astro:content`
 import { z, defineCollection } from "astro:content";
-// Define a `type` and `schema` for each collection
+
 const guides = defineCollection({
     type: 'content',
     schema: z.object({
         title: z.string(),
         pubDate: z.date(),
+        updatedDate: z.date().optional(),
         description: z.string(),
-        author: z.string(),
-        // image: z.object({
-        //     url: z.string(),
-        //     alt: z.string()
-        // }),
-        tags: z.array(z.string())
+        author: z.string().default('MLA Generator Editorial Team'),
+        category: z.enum(['style-guide', 'how-to', 'concept', 'comparison', 'meta']),
+        tags: z.array(z.string()).default([]),
+        keywords: z.array(z.string()).optional(),
+        relatedGuides: z.array(z.string()).optional(),
+        faq: z
+            .array(z.object({ question: z.string(), answer: z.string() }))
+            .optional(),
+        ogImage: z.string().optional(),
     })
 });
-// Export a single `collections` object to register your collection(s)
+
 export const collections = {
     guides,
 };

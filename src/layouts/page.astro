@@ -2,18 +2,42 @@
 import BaseHead from "../components/astro/BaseHead.astro";
 import Header from "../components/astro/Header.astro";
 import Footer from "../components/astro/Footer.astro";
+import SkipToContent from "../components/astro/SkipToContent.astro";
 
-const { title, description } = Astro.props;
+interface Props {
+    title: string;
+    description: string;
+    image?: string;
+    pageType?: 'website' | 'article';
+    article?: {
+        publishedTime: Date;
+        modifiedTime?: Date;
+        author: string;
+        section?: string;
+        tags?: string[];
+    };
+    extraSchemas?: object[];
+}
+
+const { title, description, image, pageType, article, extraSchemas } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
     <head>
-        <BaseHead title={title} description={description} />
+        <BaseHead
+            title={title}
+            description={description}
+            image={image}
+            pageType={pageType}
+            article={article}
+            extraSchemas={extraSchemas}
+        />
     </head>
     <body style="margin: 0 !important;">
+        <SkipToContent />
         <Header />
-        <main>
+        <main id="main-content">
             <slot />
         </main>
         <Footer />
