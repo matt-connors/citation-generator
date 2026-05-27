@@ -3,8 +3,12 @@ import type { CSLName } from '../csl-types';
 // Anchored to end-of-string so suffix-shaped tokens only flag a name as an
 // org when they actually terminate it. A surname like "Co" in "Co, John" or a
 // middle name like "Foundation" in "Foundation House Smith" no longer
-// false-positives as a corporate author.
-const ORG_SUFFIXES = /\b(Inc\.?|LLC|Ltd\.?|Corp\.?|Corporation|Foundation|Press|University|Institute|Society|Group|Company|Co\.?|Department|Office|Agency|Bureau|Commission)\s*$/i;
+// false-positives as a corporate author. The trailing `[.\s]*` lets a stray
+// period close the match (e.g. "Wikimedia Foundation.") since several
+// alternations (Foundation, Press, University, Institute, Society, Group,
+// Company, Department, Office, Agency, Bureau, Commission) don't include an
+// optional `.` of their own.
+const ORG_SUFFIXES = /\b(Inc\.?|LLC|Ltd\.?|Corp\.?|Corporation|Foundation|Press|University|Institute|Society|Group|Company|Co\.?|Department|Office|Agency|Bureau|Commission)[.\s]*$/i;
 const PARTICLES = new Set([
   'von', 'de', 'del', 'della', 'van', 'la', 'le', 'der', 'den', 'di', 'da', 'du', 'dos', 'des',
 ]);

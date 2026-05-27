@@ -443,51 +443,88 @@ function deriveDateParts(value: CSLDate | undefined): { year: string; month: str
 
 /**
  * Shared year/month/day input grid for PublicationDate and AccessDate.
- * Year/month/day are derived from `value`; every edit emits via `onChange`
- * with a fresh CSLDate (or undefined if no year is set).
+ *
+ * Local state for year/month/day is the source of truth for what's IN the
+ * inputs. `value` is only seeded on mount and updated externally via the
+ * imperative `setToToday` (exposed through `showSetToday`). The reason for
+ * the local-state shape: buildCslDate emits `undefined` whenever year is
+ * unset, so a fully value-derived implementation silently drops partial
+ * entry (typed day without year, picked month without year) and cascades
+ * year-clear into wiping month/day too.
  */
-const DateInput = ({ value, onChange }: { value: CSLDate | undefined; onChange: (v: CSLDate | undefined) => void }) => {
-    const { year, month, day } = useMemo(() => deriveDateParts(value), [value]);
+const DateInput = ({ value, onChange, showSetToday }: {
+    value: CSLDate | undefined;
+    onChange: (v: CSLDate | undefined) => void;
+    showSetToday?: boolean;
+}) => {
+    const initial = useMemo(() => deriveDateParts(value), []);
+    const [year, setYear] = useState(initial.year);
+    const [month, setMonth] = useState(initial.month);
+    const [day, setDay] = useState(initial.day);
 
-    const handleChange = (field: 'year' | 'month' | 'day', newValue: string) => {
-        let yearStr = year;
-        let monthStr = month;
-        let dayStr = day;
-        if (field === 'year') yearStr = validateYear(newValue);
-        else if (field === 'month') monthStr = newValue;
-        else if (field === 'day') dayStr = validateDay(newValue);
+    const emit = (y: string, m: string, d: string) => {
+        onChange(buildCslDate(parseInt(y) || 0, parseInt(m) || 0, parseInt(d) || 0));
+    };
 
-        const yearVal = parseInt(yearStr) || 0;
-        const monthVal = parseInt(monthStr) || 0;
-        const dayVal = parseInt(dayStr) || 0;
-        onChange(buildCslDate(yearVal, monthVal, dayVal));
+    const handleYear = (raw: string) => {
+        const v = validateYear(raw);
+        setYear(v);
+        emit(v, month, day);
+    };
+    const handleMonth = (raw: string) => {
+        setMonth(raw);
+        emit(year, raw, day);
+    };
+    const handleDay = (raw: string) => {
+        const v = validateDay(raw);
+        setDay(v);
+        emit(year, month, v);
+    };
+
+    const handleSetToToday = () => {
+        const today = new Date();
+        const y = String(today.getFullYear());
+        const m = String(today.getMonth() + 1);
+        const d = String(today.getDate());
+        setYear(y);
+        setMonth(m);
+        setDay(d);
+        emit(y, m, d);
     };
 
     return (
-        <div className="grid grid-cols-[minmax(0,3.5rem)_minmax(0,1fr)_minmax(0,3.5rem)] items-center gap-2 sm:gap-4">
-            <Input
-                placeholder="Year"
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={year}
-                onChange={(e) => handleChange('year', e.target.value.replace(/\D/g, ''))}
-            />
-            <SimpleDropdown
-                options={months}
-                value={month ? months[parseInt(month) - 1] : undefined}
-                onChange={(option) => handleChange('month', option.value)}
-                placeholder="Month"
-                className="min-w-0"
-            />
-            <Input
-                placeholder="Day"
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={day}
-                onChange={(e) => handleChange('day', e.target.value.replace(/\D/g, ''))}
-            />
+        <div>
+            <div className="grid grid-cols-[minmax(0,3.5rem)_minmax(0,1fr)_minmax(0,3.5rem)] items-center gap-2 sm:gap-4">
+                <Input
+                    placeholder="Year"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={year}
+                    onChange={(e) => handleYear(e.target.value.replace(/\D/g, ''))}
+                />
+                <SimpleDropdown
+                    options={months}
+                    value={month ? months[parseInt(month) - 1] : undefined}
+                    onChange={(option) => handleMonth(option.value)}
+                    placeholder="Month"
+                    className="min-w-0"
+                />
+                <Input
+                    placeholder="Day"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={day}
+                    onChange={(e) => handleDay(e.target.value.replace(/\D/g, ''))}
+                />
+            </div>
+            {showSetToday && (
+                <Button variant="secondary" className="gap-2 mt-4" onClick={handleSetToToday}>
+                    <Calendar size={17} strokeWidth={1.5} />
+                    <span className="leading-none">Set to Today</span>
+                </Button>
+            )}
         </div>
     );
 };
@@ -509,26 +546,13 @@ export const PublicationDate = ({ value, onChange, isRequired, isRecommended }: 
 /**
  * Access Date component — emits CSL-JSON `date-parts` shape.
  */
-export const AccessDate = ({ value, onChange, isRequired, isRecommended }: DateComponentProps) => {
-    const handleSetToToday = () => {
-        const today = new Date();
-        onChange(buildCslDate(today.getFullYear(), today.getMonth() + 1, today.getDate()));
-    };
-
-    return (
-        <div className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:gap-4">
-            <span className="flex flex-col leading-4 text-sm h-9 justify-center">
-                Access Date
-                {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
-                {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
-            </span>
-            <div>
-                <DateInput value={value} onChange={onChange} />
-                <Button variant="secondary" className="gap-2 mt-4" onClick={handleSetToToday}>
-                    <Calendar size={17} strokeWidth={1.5} />
-                    <span className="leading-none">Set to Today</span>
-                </Button>
-            </div>
-        </div>
-    );
-};
+export const AccessDate = ({ value, onChange, isRequired, isRecommended }: DateComponentProps) => (
+    <div className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:gap-4">
+        <span className="flex flex-col leading-4 text-sm h-9 justify-center">
+            Access Date
+            {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
+            {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
+        </span>
+        <DateInput value={value} onChange={onChange} showSetToday />
+    </div>
+);

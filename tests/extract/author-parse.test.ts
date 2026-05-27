@@ -40,6 +40,15 @@ describe('parseAuthorName', () => {
       family: 'Smith', given: 'Foundation House',
     });
   });
+  it('still flags orgs that end in a period (Foundation., Press., etc.)', () => {
+    // Regression: a first attempt anchored ORG_SUFFIXES with `\s*$`, which
+    // only allowed trailing whitespace. Org-suffix tokens without a built-in
+    // optional period (Foundation, Press, University, Institute, Society,
+    // Group, Company, Department, Office, Agency, Bureau, Commission) would
+    // no longer match if the source HTML had a trailing dot.
+    expect(parseAuthorName('Wikimedia Foundation.')).toEqual({ literal: 'Wikimedia Foundation.' });
+    expect(parseAuthorName('Stanford University.')).toEqual({ literal: 'Stanford University.' });
+  });
   it('passes through pre-structured input', () => {
     expect(parseAuthorName({ family: 'X', given: 'Y' })).toEqual({ family: 'X', given: 'Y' });
   });
