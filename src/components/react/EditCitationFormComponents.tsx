@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { Input } from "./Input";
-import type { Author, CorporateAuthor, PersonAuthor, Source, BookSource, WebsiteSource } from "../../lib/citations/definitions";
 import { cn } from "./utils";
 import { Button } from "./Button";
 import { Building2, Calendar, ChevronDown, Trash2, UserRound } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./Tabs";
-import type { Date } from "../../lib/citations/types";
-import Dropdown from './Dropdown';
+import type { CSLDate, CSLName } from "../../lib/citations/csl-types";
+import type { StoredSource } from "../../lib/references/storage";
 import type { Option } from './Dropdown';
 import SimpleDropdown from './SimpleDropdown';
 
@@ -18,8 +17,8 @@ interface TextComponentProps {
 }
 
 interface DateComponentProps {
-    value: Date;
-    onChange: (value: Date) => void;
+    value: CSLDate | undefined;
+    onChange: (value: CSLDate | undefined) => void;
     isRequired?: boolean;
     isRecommended?: boolean;
 }
@@ -46,78 +45,50 @@ const months: Option[] = [
  */
 export const Line = ({ className }: { className?: string }) => <div className={cn("h-[1px] w-full bg-border", className)} />
 
-/**
- * Contributors component
- * @param source - The source to edit
- * @param setSources - The function to set the sources
- */
-export const Contributors = ({ source, setSources }: { source: Source, setSources: React.Dispatch<React.SetStateAction<Source[]>> }) => {
-    const [lastOpenedAuthorId, setLastOpenedAuthorId] = useState<number | null>(null);
+interface ContributorsProps {
+    source: StoredSource;
+    setSources: (s: StoredSource[] | ((prev: StoredSource[]) => StoredSource[])) => void;
+}
 
-    const handleAuthorChange = (authors: Author[]) => {
-        setSources((prevSources: Source[]) => {
-            const updatedSources = prevSources.map(s => {
-                if (s.uuid === source.uuid) {
-                    const updatedSource = {
-                        ...s,
-                        citationInfo: {
-                            ...s.citationInfo,
-                            authors
-                        }
-                    };
-                    // Preserve the original source type
-                    if (s.citationType === 'book') {
-                        return updatedSource as BookSource;
-                    } else {
-                        return updatedSource as WebsiteSource;
-                    }
-                }
-                return s;
-            });
-            localStorage.setItem('sources', JSON.stringify(updatedSources));
-            return updatedSources;
-        });
+const isPerson = (n: CSLName): n is Exclude<CSLName, { literal: string }> => !('literal' in n);
+
+/**
+ * Contributors component — operates on CSL-JSON `author` arrays.
+ */
+export const Contributors = ({ source, setSources }: ContributorsProps) => {
+    const authors = source.csl.author ?? [];
+    const [lastOpenedIdx, setLastOpenedIdx] = useState<number | null>(null);
+
+    const update = (next: CSLName[]) => {
+        setSources((prev) => prev.map((s) =>
+            s.uuid === source.uuid ? { ...s, csl: { ...s.csl, author: next } } : s,
+        ));
     };
 
-    /**
-     * Delete an author from the source
-     * @param author - The author to delete
-     */
-    const handleDelete = (author: Author) => {
-        handleAuthorChange(source.citationInfo.authors.filter((_author) => _author !== author));
-    }
-
-    const handleAddContributor = (type: "person" | "organization") => {
-
-        let newAuthorId = source.citationInfo.authors.length + 1;
-
-        // Update the source to initialize a new contributor
-        handleAuthorChange([...source.citationInfo.authors, { type, id: newAuthorId } as Author]);
-        setLastOpenedAuthorId(newAuthorId);
-    }
-
-    const handleEditAuthor = (authorId: number, field: string, value: string) => {
-        handleAuthorChange(source.citationInfo.authors.map((author) => {
-            if (author.id === authorId) {
-                return {
-                    ...author,
-                    [field]: value
-                }
-            }
-            return author;
-        }));
-    }
-
-    const AuthorPreviewName = (author: Author) => {
-        if (author.type === "person") {
-            return author.firstName || author.lastName
-                ? <span>{author.firstName} {author.lastName}</span>
-                : <span>{author.initials}</span>
+    const previewName = (n: CSLName) => {
+        if (isPerson(n)) {
+            return (n.given || n.family) ? <span>{n.given} {n.family}</span> : <span>—</span>;
         }
-        else {
-            return <span>{author.name}</span>
-        }
-    }
+        return <span>{n.literal || '—'}</span>;
+    };
+
+    const handleEdit = (idx: number, patch: Partial<CSLName>) => {
+        update(authors.map((a, i) => i === idx ? ({ ...a, ...patch } as CSLName) : a));
+    };
+
+    const handleAddPerson = () => {
+        const next = [...authors, { family: '', given: '' } as CSLName];
+        update(next);
+        setLastOpenedIdx(next.length - 1);
+    };
+
+    const handleAddOrganization = () => {
+        const next = [...authors, { literal: '' } as CSLName];
+        update(next);
+        setLastOpenedIdx(next.length - 1);
+    };
+
+    const handleDelete = (idx: number) => update(authors.filter((_, i) => i !== idx));
 
     return (
         <div className="grid grid-cols-[130px_1fr] gap-4">
@@ -126,110 +97,79 @@ export const Contributors = ({ source, setSources }: { source: Source, setSource
                 <span className="text-xs text-muted-foreground">Recommended</span>
             </span>
             <div className="flex flex-col gap-4">
-                {source.citationInfo.authors.map((author) => (
-                    <details className="border border-border rounded-md shadow-sm [&[open]_summary_[data-chevron]]:rotate-180" open={author.id === lastOpenedAuthorId}>
+                {authors.map((author, idx) => (
+                    <details key={idx} className="border border-border rounded-md shadow-sm [&[open]_summary_[data-chevron]]:rotate-180" open={idx === lastOpenedIdx}>
                         <summary className="pl-3 cursor-pointer w-full h-9 flex justify-between items-center">
-                            <span className="leading-none">{AuthorPreviewName(author)}</span>
+                            <span className="leading-none">{previewName(author)}</span>
                             <div className="flex gap-2 items-center">
                                 <ChevronDown size={16} strokeWidth={1.5} className="transform transition-transform duration-100" data-chevron />
-                                <Button variant="ghost" size="icon" className="p-0" onClick={() => handleDelete(author)}>
+                                <Button variant="ghost" size="icon" className="p-0" onClick={() => handleDelete(idx)}>
                                     <Trash2 size={16} strokeWidth={1.5} />
                                 </Button>
                             </div>
                         </summary>
                         <Line />
                         <div className="p-4 pb-5 pt-3">
-                            <Tabs defaultValue={author.type}>
+                            <Tabs defaultValue={isPerson(author) ? 'person' : 'organization'}>
                                 <TabsList className="mt-1 mb-4">
                                     <TabsTrigger value="person">Person</TabsTrigger>
                                     <TabsTrigger value="organization">Organization</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="person" className="flex flex-col gap-4">
-                                    {/* Title */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-4">
-                                        <span className="flex flex-col leading-4 text-sm">
-                                            Title
-                                        </span>
-                                        <Input
-                                            placeholder="Title"
-                                            type="text"
-                                            value={(author as PersonAuthor).title}
-                                            onChange={(e) => handleEditAuthor(author.id, "title", e.target.value)}
-                                        />
-                                    </label>
-                                    {/* Initials */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-4">
-                                        <span className="flex flex-col leading-4 text-sm">
-                                            Initials
-                                        </span>
-                                        <Input
-                                            placeholder="Initials"
-                                            type="text"
-                                            value={(author as PersonAuthor).initials}
-                                            onChange={(e) => handleEditAuthor(author.id, "initials", e.target.value)}
-                                        />
-                                    </label>
-                                    {/* First Name */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-4">
-                                        <span className="flex flex-col leading-4 text-sm">
-                                            First Name
-                                            <span className="text-xs text-muted-foreground">Recommended</span>
-                                        </span>
-                                        <Input
-                                            placeholder="First Name"
-                                            type="text"
-                                            value={(author as PersonAuthor).firstName}
-                                            onChange={(e) => handleEditAuthor(author.id, "firstName", e.target.value)}
-                                        />
-                                    </label>
-                                    {/* Last Name */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-4">
-                                        <span className="flex flex-col leading-4 text-sm">
-                                            Last Name
-                                            <span className="text-xs text-muted-foreground">Recommended</span>
-                                        </span>
-                                        <Input
-                                            placeholder="Last Name"
-                                            type="text"
-                                            value={(author as PersonAuthor).lastName}
-                                            onChange={(e) => handleEditAuthor(author.id, "lastName", e.target.value)}
-                                        />
-                                    </label>
+                                    <LabelledInput
+                                        label="First Name"
+                                        recommended
+                                        value={isPerson(author) ? (author.given || '') : ''}
+                                        onChange={(v) => handleEdit(idx, { given: v } as any)}
+                                    />
+                                    <LabelledInput
+                                        label="Last Name"
+                                        recommended
+                                        value={isPerson(author) ? author.family : ''}
+                                        onChange={(v) => handleEdit(idx, { family: v } as any)}
+                                    />
+                                    <LabelledInput
+                                        label="Suffix"
+                                        value={isPerson(author) ? (author.suffix || '') : ''}
+                                        onChange={(v) => handleEdit(idx, { suffix: v } as any)}
+                                    />
                                 </TabsContent>
                                 <TabsContent value="organization" className="flex flex-col gap-4">
-                                    {/* Name */}
-                                    <label className="grid grid-cols-[110px_1fr] items-center gap-4">
-                                        <span className="flex flex-col leading-4 text-sm">
-                                            Name
-                                            <span className="text-xs text-muted-foreground">Recommended</span>
-                                        </span>
-                                        <Input
-                                            placeholder="Name"
-                                            type="text"
-                                            value={(author as CorporateAuthor).name}
-                                            onChange={(e) => handleEditAuthor(author.id, "name", e.target.value)}
-                                        />
-                                    </label>
+                                    <LabelledInput
+                                        label="Name"
+                                        recommended
+                                        value={!isPerson(author) ? author.literal : ''}
+                                        onChange={(v) => handleEdit(idx, { literal: v } as any)}
+                                    />
                                 </TabsContent>
                             </Tabs>
                         </div>
                     </details>
                 ))}
                 <div className="flex gap-4 items-center">
-                    <Button variant="secondary" className="gap-2" onClick={() => handleAddContributor("person")}>
+                    <Button variant="secondary" className="gap-2" onClick={handleAddPerson}>
                         <UserRound size={17} strokeWidth={1.5} />
                         <span className="leading-none">Add Person</span>
                     </Button>
-                    <Button variant="secondary" className="gap-2" onClick={() => handleAddContributor("organization")}>
+                    <Button variant="secondary" className="gap-2" onClick={handleAddOrganization}>
                         <Building2 size={17} strokeWidth={1.5} />
                         <span className="leading-none">Add Organization</span>
                     </Button>
                 </div>
             </div>
-
         </div>
-    )
-}
+    );
+};
+
+const LabelledInput = ({ label, value, onChange, recommended }: { label: string; value: string; onChange: (v: string) => void; recommended?: boolean }) => (
+    <label className="grid grid-cols-[110px_1fr] items-center gap-4">
+        <span className="flex flex-col leading-4 text-sm">
+            {label}
+            {recommended && <span className="text-xs text-muted-foreground">Recommended</span>}
+        </span>
+        <Input placeholder={label} type="text" value={value} onChange={(e) => onChange(e.target.value)} />
+    </label>
+);
 
 /**
  * Title component
@@ -358,6 +298,7 @@ export const VolumeNumber = ({ value, onChange, isRequired, isRecommended }: Tex
 
 /**
  * Publsiher component
+ * TODO(typo): rename export from `Publsiher` to `Publisher` and update consumers in a follow-up.
  * @param value - The value to display
  * @param onChange - The function to call when the value changes
  * @param isRequired - Whether the field is required
@@ -457,21 +398,37 @@ export const URL = ({ value, onChange, isRequired, isRecommended }: TextComponen
 }
 
 /**
- * Publication Date component
- * @param value - The date to display
- * @param onChange - The function to call when the value changes
- * @param isRequired - Whether the field is required
- * @param isRecommended - Whether the field is recommended
+ * Build a CSLDate from year/month/day input values. Returns undefined if nothing is set.
+ */
+function buildCslDate(year: number, month: number, day: number): CSLDate | undefined {
+    if (year > 0 && month > 0 && day > 0) {
+        return { 'date-parts': [[year, month, day]] };
+    }
+    if (year > 0 && month > 0) {
+        return { 'date-parts': [[year, month]] };
+    }
+    if (year > 0) {
+        return { 'date-parts': [[year]] };
+    }
+    return undefined;
+}
+
+/**
+ * Publication Date component — emits CSL-JSON `date-parts` shape.
  */
 export const PublicationDate = ({ value, onChange, isRequired, isRecommended }: DateComponentProps) => {
-    const [year, setYear] = useState(value?.year ? value.year.toString() : '');
-    const [month, setMonth] = useState(value?.month ? value.month.toString() : '');
-    const [day, setDay] = useState(value?.day ? value.day.toString() : '');
+    const parts = value?.['date-parts']?.[0];
+    const initialYear = parts?.[0] ? String(parts[0]) : '';
+    const initialMonth = parts?.[1] ? String(parts[1]) : '';
+    const initialDay = parts?.[2] ? String(parts[2]) : '';
+
+    const [year, setYear] = useState(initialYear);
+    const [month, setMonth] = useState(initialMonth);
+    const [day, setDay] = useState(initialDay);
 
     const validateYear = (value: string) => {
         const yearNum = parseInt(value);
         const currentYear = new Date().getFullYear();
-        // Only validate if we have a complete year
         if (value.length >= 4) {
             if (yearNum > currentYear + 1 || yearNum < 1000) {
                 return '';
@@ -494,25 +451,18 @@ export const PublicationDate = ({ value, onChange, isRequired, isRecommended }: 
         if (field === 'year') {
             validatedValue = validateYear(newValue);
             setYear(validatedValue);
-        }
-        else if (field === 'month') {
+        } else if (field === 'month') {
             setMonth(newValue);
-        }
-        else if (field === 'day') {
+        } else if (field === 'day') {
             validatedValue = validateDay(newValue);
             setDay(validatedValue);
         }
 
-        const updatedValue: Partial<Date> = {};
         const yearVal = field === 'year' ? parseInt(validatedValue) || 0 : parseInt(year) || 0;
         const monthVal = field === 'month' ? parseInt(newValue) || 0 : parseInt(month) || 0;
         const dayVal = field === 'day' ? parseInt(validatedValue) || 0 : parseInt(day) || 0;
 
-        if (yearVal > 0) updatedValue.year = yearVal;
-        if (monthVal > 0) updatedValue.month = monthVal;
-        if (dayVal > 0) updatedValue.day = dayVal;
-
-        onChange(updatedValue as Date);
+        onChange(buildCslDate(yearVal, monthVal, dayVal));
     };
 
     return (
@@ -552,21 +502,21 @@ export const PublicationDate = ({ value, onChange, isRequired, isRecommended }: 
 };
 
 /**
- * Access Date component
- * @param value - The date to display
- * @param onChange - The function to call when the value changes
- * @param isRequired - Whether the field is required
- * @param isRecommended - Whether the field is recommended
+ * Access Date component — emits CSL-JSON `date-parts` shape.
  */
 export const AccessDate = ({ value, onChange, isRequired, isRecommended }: DateComponentProps) => {
-    const [year, setYear] = useState(value?.year ? value.year.toString() : '');
-    const [month, setMonth] = useState(value?.month ? value.month.toString() : '');
-    const [day, setDay] = useState(value?.day ? value.day.toString() : '');
+    const parts = value?.['date-parts']?.[0];
+    const initialYear = parts?.[0] ? String(parts[0]) : '';
+    const initialMonth = parts?.[1] ? String(parts[1]) : '';
+    const initialDay = parts?.[2] ? String(parts[2]) : '';
+
+    const [year, setYear] = useState(initialYear);
+    const [month, setMonth] = useState(initialMonth);
+    const [day, setDay] = useState(initialDay);
 
     const validateYear = (value: string) => {
         const yearNum = parseInt(value);
         const currentYear = new Date().getFullYear();
-        // Only validate if we have a complete year
         if (value.length >= 4) {
             if (yearNum > currentYear + 1 || yearNum < 1000) {
                 return '';
@@ -589,37 +539,30 @@ export const AccessDate = ({ value, onChange, isRequired, isRecommended }: DateC
         if (field === 'year') {
             validatedValue = validateYear(newValue);
             setYear(validatedValue);
-        }
-        else if (field === 'month') {
+        } else if (field === 'month') {
             setMonth(newValue);
-        }
-        else if (field === 'day') {
+        } else if (field === 'day') {
             validatedValue = validateDay(newValue);
             setDay(validatedValue);
         }
 
-        const updatedValue: Partial<Date> = {};
         const yearVal = field === 'year' ? parseInt(validatedValue) || 0 : parseInt(year) || 0;
         const monthVal = field === 'month' ? parseInt(newValue) || 0 : parseInt(month) || 0;
         const dayVal = field === 'day' ? parseInt(validatedValue) || 0 : parseInt(day) || 0;
 
-        if (yearVal > 0) updatedValue.year = yearVal;
-        if (monthVal > 0) updatedValue.month = monthVal;
-        if (dayVal > 0) updatedValue.day = dayVal;
-
-        onChange(updatedValue as Date);
+        onChange(buildCslDate(yearVal, monthVal, dayVal));
     };
 
     const handleSetToToday = () => {
         const today = new Date();
+        const y = today.getFullYear();
+        const m = today.getMonth() + 1;
+        const d = today.getDate();
 
-        const year = today.getFullYear();
-        const month = today.getMonth() + 1;
-        const day = today.getDate();
-
-        handleChange('year', year.toString());
-        handleChange('month', month.toString());
-        handleChange('day', day.toString());
+        setYear(String(y));
+        setMonth(String(m));
+        setDay(String(d));
+        onChange(buildCslDate(y, m, d));
     };
 
     return (
