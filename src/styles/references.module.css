@@ -316,11 +316,24 @@
     .citationSourceContainer {
         padding-inline: 10px;
     }
+    /* Stack header rows on mobile: "X sources" line, then action buttons,
+       then Add Manually. The default 1fr/auto/auto grid squeezes the source
+       count until it line-wraps when Add Manually is wide. */
+    .referenceTitle {
+        grid-template-columns: 1fr auto;
+        row-gap: 14px;
+    }
+    /* The Add Manually button (always last child) spans the full mobile row. */
+    .referenceTitle > :last-child {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+        margin-left: 0 !important;
+    }
     .citationSourceWrapper {
         margin-left: 36px;
     }
     .citationSource {
-        text-indent: -36px; 
+        text-indent: -36px;
     }
 }
 

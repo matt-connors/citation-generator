@@ -91,7 +91,7 @@ export const Contributors = ({ source, setSources }: ContributorsProps) => {
     const handleDelete = (idx: number) => update(authors.filter((_, i) => i !== idx));
 
     return (
-        <div className="grid grid-cols-[130px_1fr] gap-4">
+        <div className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:gap-4">
             <span className="flex flex-col leading-4 text-sm h-9 justify-center">
                 Contributors
                 <span className="text-xs text-muted-foreground">Recommended</span>
@@ -162,7 +162,7 @@ export const Contributors = ({ source, setSources }: ContributorsProps) => {
 };
 
 const LabelledInput = ({ label, value, onChange, recommended }: { label: string; value: string; onChange: (v: string) => void; recommended?: boolean }) => (
-    <label className="grid grid-cols-[110px_1fr] items-center gap-4">
+    <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[110px_1fr] sm:items-center sm:gap-4">
         <span className="flex flex-col leading-4 text-sm">
             {label}
             {recommended && <span className="text-xs text-muted-foreground">Recommended</span>}
@@ -180,7 +180,7 @@ const LabelledInput = ({ label, value, onChange, recommended }: { label: string;
  */
 export const Title = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
     return (
-        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+        <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 Title
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
@@ -205,7 +205,7 @@ export const Title = ({ value, onChange, isRequired, isRecommended }: TextCompon
  */
 export const Name = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
     return (
-        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+        <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 Name
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
@@ -230,7 +230,7 @@ export const Name = ({ value, onChange, isRequired, isRecommended }: TextCompone
  */
 export const WebsiteName = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
     return (
-        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+        <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 Website Name
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
@@ -255,7 +255,7 @@ export const WebsiteName = ({ value, onChange, isRequired, isRecommended }: Text
  */
 export const Edition = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
     return (
-        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+        <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 Edition
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
@@ -280,7 +280,7 @@ export const Edition = ({ value, onChange, isRequired, isRecommended }: TextComp
  */
 export const VolumeNumber = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
     return (
-        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+        <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 Volume Number
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
@@ -306,7 +306,7 @@ export const VolumeNumber = ({ value, onChange, isRequired, isRecommended }: Tex
  */
 export const Publsiher = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
     return (
-        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+        <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 Publisher
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
@@ -331,7 +331,7 @@ export const Publsiher = ({ value, onChange, isRequired, isRecommended }: TextCo
  */
 export const Medium = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
     return (
-        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+        <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 Medium
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
@@ -356,7 +356,7 @@ export const Medium = ({ value, onChange, isRequired, isRecommended }: TextCompo
  */
 export const DOI = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
     return (
-        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+        <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 DOI
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
@@ -381,7 +381,7 @@ export const DOI = ({ value, onChange, isRequired, isRecommended }: TextComponen
  */
 export const URL = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
     return (
-        <label className="grid grid-cols-[130px_1fr] items-center gap-4">
+        <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 URL
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
@@ -466,13 +466,13 @@ export const PublicationDate = ({ value, onChange, isRequired, isRecommended }: 
     };
 
     return (
-        <div className="grid grid-cols-[130px_1fr] items-center gap-4">
+        <div className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
                 Publication Date
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
-            <div className="grid grid-cols-[1fr_1fr_1fr] items-center gap-4">
+            <div className="grid grid-cols-[minmax(0,3.5rem)_minmax(0,1fr)_minmax(0,3.5rem)] items-center gap-2 sm:gap-4">
                 <Input
                     placeholder="Year"
                     type="text"
@@ -486,7 +486,7 @@ export const PublicationDate = ({ value, onChange, isRequired, isRecommended }: 
                     value={month ? months[parseInt(month) - 1] : undefined}
                     onChange={(option) => handleChange('month', option.value)}
                     placeholder="Month"
-                    className="min-w-[7rem]"
+                    className="min-w-0"
                 />
                 <Input
                     placeholder="Day"
@@ -566,14 +566,14 @@ export const AccessDate = ({ value, onChange, isRequired, isRecommended }: DateC
     };
 
     return (
-        <div className="grid grid-cols-[130px_1fr] gap-4">
+        <div className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:gap-4">
             <span className="flex flex-col leading-4 text-sm h-9 justify-center">
                 Access Date
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
             <div className="">
-                <div className="grid grid-cols-[1fr_1fr_1fr] items-center gap-4">
+                <div className="grid grid-cols-[minmax(0,3.5rem)_minmax(0,1fr)_minmax(0,3.5rem)] items-center gap-2 sm:gap-4">
                     <Input
                         placeholder="Year"
                         type="text"
@@ -587,7 +587,7 @@ export const AccessDate = ({ value, onChange, isRequired, isRecommended }: DateC
                         value={month ? months[parseInt(month) - 1] : undefined}
                         onChange={(option) => handleChange('month', option.value)}
                         placeholder="Month"
-                        className="min-w-[7rem]"
+                        className="min-w-0"
                     />
                     <Input
                         placeholder="Day"
