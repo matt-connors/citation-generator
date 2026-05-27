@@ -132,17 +132,15 @@ const EditReferenceDialogDrawer = forwardRef<HTMLButtonElement, EditReferenceDia
 
     return (
         // shouldScaleBackground=false: vaul's default scales the page wrapper on
-        // open which causes visible CLS underneath the drawer. We don't use the
-        // iOS-style stack effect, so disable it for a stable opening animation.
+        // open via `[data-vaul-drawer-wrapper]`. We don't render that wrapper
+        // (so it's a no-op today) but disabling explicitly prevents a future
+        // regression if someone adds it and gets surprised by the scale animation.
         //
-        // repositionInputs=false: on iOS Safari, vaul's default does
-        // `window.scrollTo(0, 0)` when the drawer opens — visibly jumping the
-        // page to top if the user had scrolled down to see the References. The
-        // accompanying negative-margin compensation promised in vaul's source
-        // comment isn't actually implemented, so the jump is visible. Disabling
-        // also opts out of vaul's input transform-and-focus trick; native iOS
-        // keyboard handling takes over (fine for our form).
-        <Drawer open={open} onOpenChange={handleOpenChange} shouldScaleBackground={false} repositionInputs={false}>
+        // repositionInputs stays at default true so vaul's iOS visualViewport
+        // listener can shrink the drawer height and lift it above the keyboard.
+        // Disabling it left a visible gap between the keyboard and the drawer
+        // when an input is focused (vaul stops adjusting drawer position/height).
+        <Drawer open={open} onOpenChange={handleOpenChange} shouldScaleBackground={false}>
             <DrawerTrigger asChild>
                 <TriggerButton ref={ref} onClick={openDrawer} />
             </DrawerTrigger>
