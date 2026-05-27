@@ -17,7 +17,7 @@ faq:
   - question: 'When do I use a block quote in MLA?'
     answer: 'Prose quotations that run more than four lines in your paper become block quotes — indented half an inch from the left margin, with no quotation marks, double-spaced like the rest of the paper. For poetry, three or more lines of verse become a block quote. Place the parenthetical citation after the closing punctuation of the block quote, with no period following the parenthetical.'
   - question: 'Do I include the URL in MLA Works Cited entries?'
-    answer: 'Yes. Include URLs for online sources, and prefer DOIs (formatted as full links such as "https://doi.org/10.1037/cogdev0000412") when both exist. MLA 9 accepts the full URL including the "https://" protocol. Add an access date for sources without a stable publication date — live web pages, social media posts, and frequently revised reference articles. Access dates are optional but recommended whenever the source could change after you read it.'
+    answer: 'Yes. Include URLs for online sources, and prefer DOIs (formatted as full links such as "https://doi.org/10.1037/cogdev0000412") when both exist. MLA 9 strips the "http://" or "https://" prefix from URLs in the Works Cited entry; DOIs are the exception — they keep the "https://doi.org/" prefix because the prefix is part of the identifier. Add an access date for sources without a stable publication date — live web pages, social media posts, and frequently revised reference articles. Access dates are optional but recommended whenever the source could change after you read it.'
 ogImage: '/images/banner.png'
 ---
 
@@ -57,7 +57,7 @@ Narrative: Lin and Patel argue that cross-modal attention appears earlier than d
 
 ### Three or more authors
 
-Use the first author's surname followed by *et al.* (roman, not italicized in MLA) on every citation, including the first. There is no "spell them all out the first time" phase the way some older style guides require.
+Use the first author's surname followed by et al. (set in roman in MLA — no italics) on every citation, including the first. There is no "spell them all out the first time" phase the way some older style guides require.
 
 Every citation: (Goldstein et al. 88)
 
@@ -67,7 +67,7 @@ If the source is by Goldstein, Ramanathan, and O'Connor, the in-text citation is
 
 Treat a corporate or government author like a personal one. Use the full organization name on first mention; if the name is long, introduce a short form and use it thereafter.
 
-First: (United States Department of Education, Institute of Education Sciences 12)
+First: (United States, Department of Education, Institute of Education Sciences 12)
 
 Subsequent: (Inst. of Education Sciences 12)
 
@@ -135,7 +135,7 @@ Read the punctuation marks at the end of each element as carefully as the words.
 
 The container concept is the part that catches people off guard. A *container* is the larger work that holds the thing you're citing. A book is its own container (the entry has one). A journal article sits inside the journal (container 1) and, if you accessed it through a database, also inside the database (container 2). Drop container 2 from a database-retrieved article and you've half-cited the source.
 
-For the author element, invert the first author's name (surname first); present subsequent authors in normal order. For three or more authors, name only the first and add *et al.* For online sources, the *MLA Handbook* (Modern Language Association, 2021) accepts the full URL including the `https://` protocol; use a DOI in place of a URL whenever a DOI exists. Add an access date for sources without a stable publication date — live web pages, social media posts, frequently updated reference articles — by appending `Accessed 20 May 2026.` after the URL. Access dates are optional but recommended whenever the source could change after you read it.
+For the author element, invert the first author's name (surname first); present subsequent authors in normal order. For three or more authors, name only the first and add et al. For online sources, the *MLA Handbook* (Modern Language Association, 2021) strips the `http://` or `https://` prefix from URLs in the Works Cited entry. DOIs are the exception — they keep the `https://doi.org/` prefix because the prefix is part of the canonical identifier. Use a DOI in place of a URL whenever a DOI exists. Add an access date for sources without a stable publication date — live web pages, social media posts, frequently updated reference articles — by appending `Accessed 20 May 2026.` after the URL. Access dates are optional but recommended whenever the source could change after you read it.
 
 Capitalization is title case across the board: article titles, book titles, journal titles, container titles. This is the cleanest difference from APA, which mixes sentence case and title case across the same reference. In MLA you only need to remember one rule.
 
@@ -153,7 +153,7 @@ The entries below use the fixture sources referenced throughout this guide and s
 | Conference paper (in proceedings) | Tanaka, Yuki, and Marcus Hoffmann. "A Unified Model of Attention in Dual-Task Performance." *Proceedings of the 63rd Annual Meeting of the Psychonomic Society*, 4–6 Nov. 2022, pp. 412–419. |
 | Doctoral dissertation | Kowalski, Elena R. *Memory Consolidation in Bilingual Speakers: An fMRI Investigation*. 2020. University of Michigan, PhD dissertation. |
 
-A few details to notice. Book and journal titles are italicized; article and chapter titles take quotation marks. The journal entry collapses three authors to `Goldstein, et al.` on the Works Cited page just as it does in the in-text citation — MLA 9 applies the rule to both. The edited-volume chapter names the editor in normal order with `edited by`, not the parenthetical `(Ed.)` APA uses. The website entry includes an access date because the page is on a live publication; the journal article doesn't because its publication date is fixed. The government report inverts the corporate author so the larger entity comes first, making the entry sortable under *U*. If you're entering one of these into the generator at /, the tool will assemble the punctuation, italics, and hanging indent for you, but the underlying logic is what's shown above.
+A few details to notice. Book and journal titles are italicized; article and chapter titles take quotation marks. The journal entry collapses three authors to `Goldstein, Aaron, et al.` on the Works Cited page — the first author inverted as surname-then-given-name, followed by `et al.` — just as the in-text citation uses `Goldstein et al.` MLA 9 applies the rule to both. The edited-volume chapter names the editor in normal order with `edited by`, not the parenthetical `(Ed.)` APA uses. The website entry includes an access date because the page is on a live publication; the journal article doesn't because its publication date is fixed. The government report inverts the corporate author so the larger entity comes first, making the entry sortable under *U*. If you're entering one of these into the generator at /, the tool will assemble the punctuation, italics, and hanging indent for you, but the underlying logic is what's shown above.
 
 ## Common mistakes
 
@@ -203,6 +203,6 @@ The ninth edition is a refinement of the eighth, not a reinvention. The eighth e
 
 **Explicit treatment of in-class materials.** A guest lecture, a class discussion, a slide deck, a handout — MLA 9 has a worked example for each. Earlier editions treated these as personal communications and offered little detail.
 
-**DOIs preferred over URLs.** MLA 8 accepted either; MLA 9 makes the preference explicit. When both exist, use the DOI. When only a URL exists, include it with the `https://` protocol.
+**DOIs preferred over URLs.** MLA 8 accepted either; MLA 9 makes the preference explicit. When both exist, use the DOI. When only a URL exists, strip the `http://` or `https://` prefix — the MLA 9 convention is to omit the protocol on plain URLs but keep `https://doi.org/` on DOIs.
 
 The remaining mechanics — author–page in-text citations, the nine core elements in fixed order, alphabetized Works Cited entries with hanging indents, double-spacing, title case throughout — are unchanged from MLA 8. The ninth edition deepens and clarifies; it does not rebuild.
