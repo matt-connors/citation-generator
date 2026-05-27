@@ -20,12 +20,26 @@ export function _resetCacheForTests() {
   inflight.clear();
 }
 
+// Stably sort object keys at every nesting level so two CSL items with
+// identical content but different insertion order produce the same string.
+// JSON.stringify's array-replacer would have been tempting here but is an
+// allow-list applied at every depth — it drops nested keys not in the
+// top-level list (author[].family, etc.), producing identical fingerprints
+// for distinct citations. Hence the recursive copy.
+function sortKeysDeep(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sortKeysDeep);
+  if (value && typeof value === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const k of Object.keys(value as Record<string, unknown>).sort()) {
+      out[k] = sortKeysDeep((value as Record<string, unknown>)[k]);
+    }
+    return out;
+  }
+  return value;
+}
+
 function cslFingerprint(csl: CSLItem): string {
-  // Stable JSON serialization. CSL-JSON's authors/dates are arrays — JSON.stringify
-  // preserves order, so the same logical citation produces the same fingerprint.
-  // This is needed so edits to a source's csl invalidate the cached render
-  // (otherwise the hook would return stale pre-edit output for an unchanged uuid).
-  return JSON.stringify(csl);
+  return JSON.stringify(sortKeysDeep(csl));
 }
 
 export function useFormattedCitation(source: Args, style: SupportedStyle): State {

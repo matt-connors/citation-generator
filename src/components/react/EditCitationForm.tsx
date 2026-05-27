@@ -11,9 +11,7 @@ import {
     AccessDate,
     Edition,
     VolumeNumber,
-    // TODO(typo): the named export below is misspelled `Publsiher` in EditCitationFormComponents.tsx.
-    // Aliased as Publisher here; rename the export in a follow-up PR.
-    Publsiher as Publisher,
+    Publisher,
     DOI,
 } from './EditCitationFormComponents';
 import { useDebounce } from '../../hooks/useDebounce';

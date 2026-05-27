@@ -60,6 +60,72 @@ describe('useFormattedCitation', () => {
     expect(callCount).toBe(2);
   });
 
+  it('cache distinguishes citations whose only difference is in a nested field', async () => {
+    // Regression: a first attempt at the fingerprint sort used
+    // `JSON.stringify(csl, Object.keys(csl).sort())`. The array-replacer
+    // form of JSON.stringify is an allow-list applied at every nesting
+    // level, so nested keys (author[].family, author[].given,
+    // issued.date-parts) were dropped from the fingerprint and edits
+    // to nested fields silently hit the stale cache.
+    let callCount = 0;
+    const responses = ['Smith citation', 'Jones citation'];
+    globalThis.fetch = vi.fn(async () => {
+      const body = JSON.stringify({ formatted: [{ text: responses[callCount] }] });
+      callCount += 1;
+      return new Response(body, { status: 200 });
+    }) as any;
+
+    const initial = {
+      id: 'u1', type: 'webpage' as const, title: 'T',
+      author: [{ family: 'Smith', given: 'John' }],
+    };
+    const edited = {
+      id: 'u1', type: 'webpage' as const, title: 'T',
+      author: [{ family: 'Jones', given: 'John' }],
+    };
+
+    const { result, rerender } = renderHook(
+      ({ csl }) => useFormattedCitation({ uuid: 'u1', csl }, 'mla-9'),
+      { initialProps: { csl: initial } },
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.formatted.map((r) => r.text).join('')).toBe('Smith citation');
+
+    rerender({ csl: edited });
+    await waitFor(() =>
+      expect(result.current.formatted.map((r) => r.text).join('')).toBe('Jones citation'),
+    );
+    expect(callCount).toBe(2);
+  });
+
+  it('cache is insensitive to CSL key insertion order', async () => {
+    // Regression: cslFingerprint used JSON.stringify(csl) without sorting
+    // keys, so two CSL items with identical content but different insertion
+    // order produced different cache keys, causing cache misses when an
+    // edit-and-respread reordered fields.
+    let callCount = 0;
+    globalThis.fetch = vi.fn(async () => {
+      callCount += 1;
+      return new Response(JSON.stringify({
+        formatted: [{ text: 'ok' }],
+      }), { status: 200 });
+    }) as any;
+
+    const initial = { id: 'u1', type: 'webpage' as const, title: 'T', URL: 'https://x.com' };
+    const reordered = { URL: 'https://x.com', title: 'T', type: 'webpage' as const, id: 'u1' };
+
+    const { result, rerender } = renderHook(
+      ({ csl }) => useFormattedCitation({ uuid: 'u1', csl }, 'mla-9'),
+      { initialProps: { csl: initial } },
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(callCount).toBe(1);
+
+    rerender({ csl: reordered });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(callCount).toBe(1);
+  });
+
   it('surfaces an error when /api/format returns non-200', async () => {
     globalThis.fetch = vi.fn(async () => new Response('boom', { status: 500 })) as any;
     const csl = { id: 'u2', type: 'webpage' as const, title: 'X' };
