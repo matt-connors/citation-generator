@@ -192,9 +192,10 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
     }
   }
   @media (max-width: 650px) {
-    header {
-      grid-template-columns: 1fr auto !important;
-    }
+    /* Keep the default 3-column grid (1fr auto auto) — overriding to 2 columns
+       caused the hamburger button to wrap to a new row at narrow widths even
+       with #primary-nav using display:contents. The button-primary is still
+       hidden so the third column ends up zero-width auto. */
     header .button-primary {
       display: none;
     }
