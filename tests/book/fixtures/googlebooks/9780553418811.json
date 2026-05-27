@@ -1,0 +1,79 @@
+{
+ "kind": "books#volumes",
+ "totalItems": 1,
+ "items": [
+  {
+   "kind": "books#volume",
+   "id": "1q-7BAAAQBAJ",
+   "etag": "MfvLpA5pXa4",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/1q-7BAAAQBAJ",
+   "volumeInfo": {
+    "title": "Sapiens",
+    "subtitle": "A Brief History of Humankind",
+    "authors": [
+     "Yuval Noah Harari"
+    ],
+    "publisher": "Harper",
+    "publishedDate": "2015-02-10",
+    "description": "From a renowned historian comes a groundbreaking narrative of humanity's creation and evolution that explores the ways in which biology and history have defined us.",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_13",
+      "identifier": "9780553418811"
+     },
+     {
+      "type": "ISBN_10",
+      "identifier": "0553418815"
+     }
+    ],
+    "readingModes": {
+     "text": true,
+     "image": true
+    },
+    "pageCount": 464,
+    "printType": "BOOK",
+    "categories": [
+     "History / World"
+    ],
+    "averageRating": 4.5,
+    "ratingsCount": 312,
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": true,
+    "contentVersion": "0.13.4.0.preview.3",
+    "language": "en",
+    "previewLink": "http://books.google.com/books?id=1q-7BAAAQBAJ&printsec=frontcover&dq=isbn:9780553418811&hl=&cd=1&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=1q-7BAAAQBAJ&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=1q-7BAAAQBAJ"
+   },
+   "saleInfo": {
+    "country": "US",
+    "saleability": "FOR_SALE",
+    "isEbook": true,
+    "listPrice": {
+     "amount": 14.99,
+     "currencyCode": "USD"
+    },
+    "retailPrice": {
+     "amount": 11.99,
+     "currencyCode": "USD"
+    }
+   },
+   "accessInfo": {
+    "country": "US",
+    "viewability": "PARTIAL",
+    "embeddable": true,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+     "isAvailable": true
+    },
+    "pdf": {
+     "isAvailable": true
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=1q-7BAAAQBAJ&hl=&source=gbs_api",
+    "accessViewStatus": "SAMPLE",
+    "quoteSharingAllowed": false
+   }
+  }
+ ]
+}

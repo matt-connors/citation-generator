@@ -1,0 +1,79 @@
+{
+ "kind": "books#volumes",
+ "totalItems": 1,
+ "items": [
+  {
+   "kind": "books#volume",
+   "id": "FmyBAwAAQBAJ",
+   "etag": "7tDuQk6f1Tg",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/FmyBAwAAQBAJ",
+   "volumeInfo": {
+    "title": "The Alchemist",
+    "subtitle": "A Fable About Following Your Dream",
+    "authors": [
+     "Paulo Coelho"
+    ],
+    "publisher": "HarperOne",
+    "publishedDate": "2014-04-15",
+    "description": "Paulo Coelho's masterpiece tells the mystical story of Santiago, an Andalusian shepherd boy who yearns to travel in search of a worldly treasure.",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_13",
+      "identifier": "9780062315007"
+     },
+     {
+      "type": "ISBN_10",
+      "identifier": "0062315005"
+     }
+    ],
+    "readingModes": {
+     "text": true,
+     "image": true
+    },
+    "pageCount": 197,
+    "printType": "BOOK",
+    "categories": [
+     "Fiction / Literary"
+    ],
+    "averageRating": 4.0,
+    "ratingsCount": 256,
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": true,
+    "contentVersion": "1.5.4.0.preview.3",
+    "language": "en",
+    "previewLink": "http://books.google.com/books?id=FmyBAwAAQBAJ&printsec=frontcover&dq=isbn:9780062315007&hl=&cd=1&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=FmyBAwAAQBAJ&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=FmyBAwAAQBAJ"
+   },
+   "saleInfo": {
+    "country": "US",
+    "saleability": "FOR_SALE",
+    "isEbook": true,
+    "listPrice": {
+     "amount": 9.99,
+     "currencyCode": "USD"
+    },
+    "retailPrice": {
+     "amount": 8.99,
+     "currencyCode": "USD"
+    }
+   },
+   "accessInfo": {
+    "country": "US",
+    "viewability": "PARTIAL",
+    "embeddable": true,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+     "isAvailable": true
+    },
+    "pdf": {
+     "isAvailable": true
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=FmyBAwAAQBAJ&hl=&source=gbs_api",
+    "accessViewStatus": "SAMPLE",
+    "quoteSharingAllowed": false
+   }
+  }
+ ]
+}

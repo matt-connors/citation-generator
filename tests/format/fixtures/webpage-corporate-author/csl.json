@@ -1,0 +1,10 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "Official Statement on Privacy",
+  "author": [{ "literal": "Wikimedia Foundation" }],
+  "issued": { "date-parts": [[2025, 8, 1]] },
+  "accessed": { "date-parts": [[2026, 5, 26]] },
+  "container-title": "Wikimedia",
+  "URL": "https://example.org/privacy"
+}

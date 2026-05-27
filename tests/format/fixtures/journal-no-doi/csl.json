@@ -1,0 +1,11 @@
+{
+  "id": "fixture",
+  "type": "article-journal",
+  "title": "Historical Perspectives on Education",
+  "author": [{ "family": "Lee", "given": "Anna" }],
+  "container-title": "Education Quarterly",
+  "volume": "18",
+  "issue": "2",
+  "page": "45-67",
+  "issued": { "date-parts": [[2023, 6]] }
+}

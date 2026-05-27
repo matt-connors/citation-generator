@@ -1,0 +1,13 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "Climate Change Update",
+  "author": [
+    { "family": "Doe", "given": "Jane" },
+    { "family": "Smith", "given": "John" }
+  ],
+  "issued": { "date-parts": [[2024, 11, 5]] },
+  "accessed": { "date-parts": [[2026, 5, 26]] },
+  "container-title": "Science Daily",
+  "URL": "https://example.com/climate"
+}

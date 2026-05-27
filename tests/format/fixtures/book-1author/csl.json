@@ -1,0 +1,10 @@
+{
+  "id": "fixture",
+  "type": "book",
+  "title": "A Brief History of Time",
+  "author": [{ "family": "Hawking", "given": "Stephen" }],
+  "issued": { "date-parts": [[1998, 9, 1]] },
+  "publisher": "Bantam",
+  "publisher-place": "New York",
+  "ISBN": "9780553418811"
+}

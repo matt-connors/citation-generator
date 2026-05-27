@@ -1,0 +1,10 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "Why Coffee Is Good for You",
+  "author": [{ "family": "Doe", "given": "Jane" }],
+  "issued": { "date-parts": [[2025, 3, 14]] },
+  "accessed": { "date-parts": [[2026, 5, 26]] },
+  "container-title": "Example News",
+  "URL": "https://example.com/coffee"
+}

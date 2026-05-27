@@ -1,0 +1,8 @@
+{
+  "type": "webpage",
+  "title": "Diabetes Basics",
+  "author": [{ "family": "CDC" }],
+  "issued": { "date-parts": [[2026, 1, 26]] },
+  "container-title": "Diabetes",
+  "URL": "https://www.cdc.gov/diabetes/about/index.html"
+}

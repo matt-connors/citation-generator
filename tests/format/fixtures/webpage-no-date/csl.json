@@ -1,0 +1,9 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "Undated Reference Page",
+  "author": [{ "family": "Doe", "given": "Jane" }],
+  "accessed": { "date-parts": [[2026, 5, 26]] },
+  "container-title": "Reference Site",
+  "URL": "https://example.com/undated"
+}

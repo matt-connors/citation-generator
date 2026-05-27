@@ -1,0 +1,70 @@
+{
+ "kind": "books#volumes",
+ "totalItems": 1,
+ "items": [
+  {
+   "kind": "books#volume",
+   "id": "8aPMNQEACAAJ",
+   "etag": "WzM5OdR9p3w",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/8aPMNQEACAAJ",
+   "volumeInfo": {
+    "title": "Crime and Punishment",
+    "authors": [
+     "Fyodor Dostoyevsky"
+    ],
+    "publisher": "Penguin Classics",
+    "publishedDate": "2003-01-30",
+    "description": "Raskolnikov, a destitute and desperate former student, wanders through the slums of St Petersburg and commits a random murder without remorse or regret.",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_13",
+      "identifier": "9780140449136"
+     },
+     {
+      "type": "ISBN_10",
+      "identifier": "0140449132"
+     }
+    ],
+    "readingModes": {
+     "text": false,
+     "image": false
+    },
+    "pageCount": 720,
+    "printType": "BOOK",
+    "categories": [
+     "Fiction / Classics"
+    ],
+    "averageRating": 4.5,
+    "ratingsCount": 12,
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "preview-1.0.0",
+    "language": "en",
+    "previewLink": "http://books.google.com/books?id=8aPMNQEACAAJ&dq=isbn:9780140449136&hl=&cd=1&source=gbs_api",
+    "infoLink": "http://books.google.com/books?id=8aPMNQEACAAJ&dq=isbn:9780140449136&hl=&source=gbs_api",
+    "canonicalVolumeLink": "https://books.google.com/books/about/Crime_and_Punishment.html?hl=&id=8aPMNQEACAAJ"
+   },
+   "saleInfo": {
+    "country": "US",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+   },
+   "accessInfo": {
+    "country": "US",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+     "isAvailable": false
+    },
+    "pdf": {
+     "isAvailable": false
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=8aPMNQEACAAJ&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+   }
+  }
+ ]
+}

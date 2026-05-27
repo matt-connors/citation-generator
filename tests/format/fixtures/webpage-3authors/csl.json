@@ -1,0 +1,14 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "AI Breakthrough Discovery",
+  "author": [
+    { "family": "Doe", "given": "Jane" },
+    { "family": "Smith", "given": "John" },
+    { "family": "Lee", "given": "Anna" }
+  ],
+  "issued": { "date-parts": [[2025, 1, 20]] },
+  "accessed": { "date-parts": [[2026, 5, 26]] },
+  "container-title": "Tech Crunch",
+  "URL": "https://example.com/ai"
+}
