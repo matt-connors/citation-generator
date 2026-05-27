@@ -21,11 +21,11 @@ export function _resetCacheForTests() {
 }
 
 function cslFingerprint(csl: CSLItem): string {
-  // Stable JSON serialization. CSL-JSON's authors/dates are arrays — JSON.stringify
-  // preserves order, so the same logical citation produces the same fingerprint.
-  // This is needed so edits to a source's csl invalidate the cached render
-  // (otherwise the hook would return stale pre-edit output for an unchanged uuid).
-  return JSON.stringify(csl);
+  // Sort top-level keys so two CSL items with identical content but different
+  // insertion order (e.g., after `{ ...prev, title }` respreads) produce the
+  // same fingerprint and hit the cache. Shallow sort is enough — CSL nested
+  // values are arrays/strings/numbers, all of which serialize order-stably.
+  return JSON.stringify(csl, Object.keys(csl).sort());
 }
 
 export function useFormattedCitation(source: Args, style: SupportedStyle): State {

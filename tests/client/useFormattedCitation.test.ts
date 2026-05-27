@@ -60,6 +60,34 @@ describe('useFormattedCitation', () => {
     expect(callCount).toBe(2);
   });
 
+  it('cache is insensitive to CSL key insertion order', async () => {
+    // Regression: cslFingerprint used JSON.stringify(csl) without sorting
+    // keys, so two CSL items with identical content but different insertion
+    // order produced different cache keys, causing cache misses when an
+    // edit-and-respread reordered fields.
+    let callCount = 0;
+    globalThis.fetch = vi.fn(async () => {
+      callCount += 1;
+      return new Response(JSON.stringify({
+        formatted: [{ text: 'ok' }],
+      }), { status: 200 });
+    }) as any;
+
+    const initial = { id: 'u1', type: 'webpage' as const, title: 'T', URL: 'https://x.com' };
+    const reordered = { URL: 'https://x.com', title: 'T', type: 'webpage' as const, id: 'u1' };
+
+    const { result, rerender } = renderHook(
+      ({ csl }) => useFormattedCitation({ uuid: 'u1', csl }, 'mla-9'),
+      { initialProps: { csl: initial } },
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(callCount).toBe(1);
+
+    rerender({ csl: reordered });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(callCount).toBe(1);
+  });
+
   it('surfaces an error when /api/format returns non-200', async () => {
     globalThis.fetch = vi.fn(async () => new Response('boom', { status: 500 })) as any;
     const csl = { id: 'u2', type: 'webpage' as const, title: 'X' };

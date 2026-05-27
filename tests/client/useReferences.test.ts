@@ -105,6 +105,27 @@ describe('useReferences', () => {
       expect(result.current.selectedCount).toBe(0);
     });
 
+    it('selectAll captured before sources arrive still selects the new sources', async () => {
+      // Regression: selectAll was useCallback([sources]) — a render that captured
+      // the callback before a fetch added new uuids would operate on the stale
+      // snapshot and miss the in-flight source. Now reads sources via a ref so
+      // the captured reference always sees the latest list.
+      localStorage.clear();
+      const { result } = renderHook(() => useReferences());
+      await waitFor(() => expect(result.current.sourceCount).toBe(0));
+
+      const staleSelectAll = result.current.selectAll;
+      act(() => result.current.setSources([
+        { uuid: 'x', csl: { id: 'x', type: 'webpage', title: 'X' } },
+        { uuid: 'y', csl: { id: 'y', type: 'webpage', title: 'Y' } },
+      ]));
+
+      act(() => staleSelectAll(true));
+      expect(result.current.selectedCount).toBe(2);
+      expect(result.current.selected.has('x')).toBe(true);
+      expect(result.current.selected.has('y')).toBe(true);
+    });
+
     it('selection survives list reordering by uuid (not index)', async () => {
       const { result } = renderHook(() => useReferences());
       await waitFor(() => expect(result.current.sourceCount).toBe(3));

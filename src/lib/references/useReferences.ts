@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { loadSources, saveSources, type StoredSource } from './storage';
 import type { CSLItem, SupportedStyle } from '../citations/csl-types';
 
@@ -32,6 +32,12 @@ export function useReferences(): UseReferencesReturn {
   const [selected, setSelected] = useState<ReadonlySet<string>>(() => new Set());
   const [citationFormat, setCitationFormatState] = useState<SupportedStyle>('mla-9');
 
+  // Mirror sources into a ref so callbacks with stable identities (e.g.
+  // selectAll, captured before an in-flight fetch resolves) still read the
+  // latest list, not the snapshot from the render that created the closure.
+  const sourcesRef = useRef(sources);
+  useEffect(() => { sourcesRef.current = sources; }, [sources]);
+
   const setSources = useCallback((next: StoredSource[] | ((prev: StoredSource[]) => StoredSource[])) => {
     setSourcesState((prev) => {
       const computed = typeof next === 'function' ? (next as any)(prev) : next;
@@ -54,8 +60,8 @@ export function useReferences(): UseReferencesReturn {
   }, []);
 
   const selectAll = useCallback((checked: boolean) => {
-    setSelected(checked ? new Set(sources.map((s) => s.uuid)) : new Set());
-  }, [sources]);
+    setSelected(checked ? new Set(sourcesRef.current.map((s) => s.uuid)) : new Set());
+  }, []);
 
   const handleDelete = useCallback(() => {
     setSources((prev) => prev.filter((s) => !selected.has(s.uuid)));
