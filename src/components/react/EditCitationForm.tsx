@@ -63,7 +63,7 @@ export default function EditCitationForm({ source, setSources, currentRef }: Pro
 
     return (
         <div className="flex flex-col gap-4 w-full pt-8">
-            <div className="grid grid-cols-[130px_1fr] items-center gap-4">
+            <div className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
                 <span className="flex flex-col leading-4 text-sm">
                     Source Type
                     <span className="text-xs text-muted-foreground">Required</span>
@@ -73,7 +73,7 @@ export default function EditCitationForm({ source, setSources, currentRef }: Pro
                     value={TYPE_OPTIONS.find((o) => o.value === local.type)}
                     onChange={(o: CitationOption) => handleTypeChange(o.value)}
                     placeholder="Source Type"
-                    className="min-w-[7rem]"
+                    className="min-w-0 sm:min-w-[7rem]"
                 />
             </div>
             <Line className="my-4" />

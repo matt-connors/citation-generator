@@ -65,7 +65,7 @@ const Content = ({
     // the long form scrolls off the bottom of the viewport unreachable.
     const sizing = isDesktop ? 'max-h-[65vh]' : 'min-h-0 flex-1';
     return (
-        <ScrollArea className={`mx-auto w-full ${sizing} p-8 pt-0 pb-0`}>
+        <ScrollArea className={`mx-auto w-full ${sizing} px-4 sm:px-8 pt-0 pb-0`}>
             {/* key forces a fresh form instance when the slot is reused with a
                 different source (defense in depth — the parent <ReferenceItem
                 key={uuid}> already isolates per source, but cheap insurance). */}
