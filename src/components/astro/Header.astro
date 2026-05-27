@@ -18,22 +18,23 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
       <img src={Logo.src} alt="MLA Generator" title="MLA Generator" width="213" height="35" />
     </a>
   </div>
-  <ul id="menu-content">
-    <li><a href={`${site}`}>Citation Generator</a></li>
-    <li><a href={`${site}my-references`}>My References</a></li>
-    <li class="sub-menu-trigger"><span>Citation Guides</span></li>
-    <ul class="sub-menu">
-      <li>
-        <a href={`${site}guides/research-and-works-cited`}
-          >Mastering Your Sources</a
-        >
+  <nav aria-label="Primary" id="primary-nav">
+    <ul id="menu-content">
+      <li><a href={`${site}`}>Citation Generator</a></li>
+      <li><a href={`${site}my-references`}>My References</a></li>
+      <li class="sub-menu-trigger">
+        <button type="button" aria-haspopup="true" aria-expanded="false" aria-controls="guides-submenu">Citation Guides</button>
       </li>
-      <li><a href={`${site}guides/mla`}>MLA Format Guide</a></li>
-      <li><a href={`${site}guides/apa`}>APA Format Guide</a></li>
-      <li><a href={`${site}guides/chicago`}>Chicago Format Guide</a></li>
-      <li><a href={`${site}guides/harvard`}>Harvard Format Guide</a></li>
+      <ul class="sub-menu" id="guides-submenu" role="menu">
+        <li role="none"><a role="menuitem" href={`${site}guides`}>All Guides</a></li>
+        <li role="none"><a role="menuitem" href={`${site}guides/research-and-works-cited`}>Mastering Your Sources</a></li>
+        <li role="none"><a role="menuitem" href={`${site}guides/mla`}>MLA Format Guide</a></li>
+        <li role="none"><a role="menuitem" href={`${site}guides/apa`}>APA Format Guide</a></li>
+        <li role="none"><a role="menuitem" href={`${site}guides/chicago`}>Chicago Format Guide</a></li>
+        <li role="none"><a role="menuitem" href={`${site}guides/harvard`}>Harvard Format Guide</a></li>
+      </ul>
     </ul>
-  </ul>
+  </nav>
   <div id="obscure"></div>
   <button id="mobile-menu-toggle">
     <div class="menu-bar"></div>
@@ -127,7 +128,9 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
       background-color: var(--color-background-2);
     }
     .sub-menu-trigger:hover + .sub-menu,
-    .sub-menu:hover {
+    .sub-menu-trigger:focus-within + .sub-menu,
+    .sub-menu:hover,
+    .sub-menu.open {
       display: flex !important;
     }
   }
@@ -227,6 +230,19 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
     height: 100%;
     image-rendering: -webkit-optimize-contrast;
   }
+  .sub-menu-trigger button {
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 10px;
+  }
+  .sub-menu-trigger button:focus-visible {
+    outline: 2px solid var(--color-text-dark);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 </style>
 
 <script>
@@ -240,5 +256,21 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
 
   obscure!.addEventListener("click", (e) => {
     header!.removeAttribute("open");
+  });
+
+  // Sub-menu trigger: toggle aria-expanded on the button so screen readers
+  // know the popover state. Visual show/hide remains driven by CSS.
+  const subMenuTriggerBtn = document.querySelector('.sub-menu-trigger button');
+  const subMenu = document.getElementById('guides-submenu');
+  subMenuTriggerBtn?.addEventListener('click', () => {
+    const expanded = subMenuTriggerBtn.getAttribute('aria-expanded') === 'true';
+    subMenuTriggerBtn.setAttribute('aria-expanded', String(!expanded));
+    subMenu?.classList.toggle('open');
+  });
+  document.addEventListener('click', (e) => {
+    if (!subMenuTriggerBtn?.contains(e.target as Node) && !subMenu?.contains(e.target as Node)) {
+      subMenuTriggerBtn?.setAttribute('aria-expanded', 'false');
+      subMenu?.classList.remove('open');
+    }
   });
 </script>
