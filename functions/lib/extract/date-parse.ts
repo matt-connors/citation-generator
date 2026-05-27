@@ -17,7 +17,9 @@ const MONTHS: Record<string, number> = {
 
 export function parseIsoDate(s: string | null | undefined): CSLDateParts | null {
   if (!s) return null;
-  const m = s.match(/^(\d{4})(?:-(\d{1,2})(?:-(\d{1,2}))?)?/);
+  // Accept both `-` and `/` as separators — arxiv (and others) emit dates like
+  // `2021/04/21` in citation_date meta tags.
+  const m = s.match(/^(\d{4})(?:[-\/](\d{1,2})(?:[-\/](\d{1,2}))?)?/);
   if (!m) return null;
   const y = parseInt(m[1], 10);
   if (!Number.isFinite(y) || y < 1000 || y > 9999) return null;

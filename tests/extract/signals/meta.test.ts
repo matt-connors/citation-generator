@@ -45,4 +45,18 @@ describe('metaSignal', () => {
   it('returns empty when no relevant meta', () => {
     expect(metaSignal(cheerio.load(`<meta name="viewport" content="x" />`)).fields).toEqual({});
   });
+
+  it('collects multiple citation_author / DC.creator entries into an author array', () => {
+    const $ = cheerio.load(`
+      <meta name="DC.creator" content="Smith, John" />
+      <meta name="DC.creator" content="Doe, Jane" />
+      <meta name="DC.creator" content="Garcia, Carlos" />
+    `);
+    const r = metaSignal($);
+    expect(r.fields.author).toEqual([
+      { family: 'Smith', given: 'John' },
+      { family: 'Doe', given: 'Jane' },
+      { family: 'Garcia', given: 'Carlos' },
+    ]);
+  });
 });

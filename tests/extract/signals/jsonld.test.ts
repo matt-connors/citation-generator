@@ -76,4 +76,30 @@ describe('jsonldSignal', () => {
     const r = jsonldSignal($);
     expect(r.fields).toEqual({});
   });
+
+  it('decodes HTML entities in script-tag JSON-LD content', () => {
+    // Real sites emit entity-escaped script content; HTML5 says script content is not
+    // entity-decoded, but the JSON inside should still be valid post-decode.
+    const html = `<html><head><script type="application/ld+json">${JSON.stringify({
+      '@type': 'Article',
+      headline: 'Test',
+      author: { '@type': 'Person', name: 'O&#x27;Brien' },
+    })}</script></head></html>`;
+    const $ = cheerio.load(html);
+    const r = jsonldSignal($);
+    expect(r.fields.author).toEqual([{ family: "O'Brien" }]);
+  });
+
+  it('prefers an article URL over a non-article URL in @graph', () => {
+    const html = `<html><head><script type="application/ld+json">${JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        { '@type': 'Organization', name: 'My Site', url: 'https://mysite.com/' },
+        { '@type': 'Article', headline: 'The Article', url: 'https://mysite.com/2026/article/' },
+      ],
+    })}</script></head></html>`;
+    const $ = cheerio.load(html);
+    const r = jsonldSignal($);
+    expect(r.fields.URL).toBe('https://mysite.com/2026/article/');
+  });
 });

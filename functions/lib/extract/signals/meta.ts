@@ -13,6 +13,19 @@ function meta($: CheerioAPI, sel: string): string | null {
   return v ? v.trim() || null : null;
 }
 
+// Returns the `content` of every meta tag matching `sel` (trimmed, non-empty).
+// `meta()` only returns the first match — for repeated meta tags like
+// citation_author or DC.creator (Nature publishes 24 dc.creator entries for
+// some papers), we need every value.
+function metaAll($: CheerioAPI, sel: string): string[] {
+  const out: string[] = [];
+  $(sel).each((_, el) => {
+    const v = $(el).attr('content');
+    if (v && v.trim()) out.push(v.trim());
+  });
+  return out;
+}
+
 export function metaSignal($: CheerioAPI): SignalResult {
   const fields: Partial<CSLItem> = {};
   const confidence: SignalResult['confidence'] = {};
@@ -29,10 +42,20 @@ export function metaSignal($: CheerioAPI): SignalResult {
   const cTitle = meta($, 'meta[name="citation_title" i]');
   if (cTitle) { fields.title = cTitle; confidence.title = CONF_CITATION; }
 
-  const cAuthor = meta($, 'meta[name="citation_author" i]') || meta($, 'meta[name="DC.creator" i]') || meta($, 'meta[name="dc.creator" i]');
-  if (cAuthor && !fields.author) {
-    const split = cAuthor.split(/;/).map((s) => parseAuthorName(s.trim())).filter(Boolean) as CSLName[];
-    if (split.length) { fields.author = split; confidence.author = CONF_CITATION; }
+  // NOTE: cheerio's `i` flag already makes attribute-value matching
+  // case-insensitive, so a single `DC.creator` selector matches both
+  // `DC.creator` and `dc.creator`. Listing both selectors here would double
+  // every entry.
+  const cAuthors = [
+    ...metaAll($, 'meta[name="citation_author" i]'),
+    ...metaAll($, 'meta[name="DC.creator" i]'),
+  ];
+  if (cAuthors.length && !fields.author) {
+    const parsed = cAuthors.map((s) => parseAuthorName(s)).filter(Boolean) as CSLName[];
+    if (parsed.length) {
+      fields.author = parsed;
+      confidence.author = CONF_CITATION;
+    }
   }
 
   const dateRaw =

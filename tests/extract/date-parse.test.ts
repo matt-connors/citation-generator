@@ -18,6 +18,12 @@ describe('parseIsoDate', () => {
     expect(parseIsoDate('notadate')).toBeNull();
     expect(parseIsoDate('')).toBeNull();
   });
+  it('parses YYYY/MM/DD (slash separator)', () => {
+    expect(parseIsoDate('2021/04/21')).toEqual([2021, 4, 21]);
+  });
+  it('parses YYYY/MM', () => {
+    expect(parseIsoDate('2021/04')).toEqual([2021, 4]);
+  });
 });
 
 describe('parseFreeformDate', () => {
