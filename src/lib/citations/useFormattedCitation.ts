@@ -20,8 +20,16 @@ export function _resetCacheForTests() {
   inflight.clear();
 }
 
+function cslFingerprint(csl: CSLItem): string {
+  // Stable JSON serialization. CSL-JSON's authors/dates are arrays — JSON.stringify
+  // preserves order, so the same logical citation produces the same fingerprint.
+  // This is needed so edits to a source's csl invalidate the cached render
+  // (otherwise the hook would return stale pre-edit output for an unchanged uuid).
+  return JSON.stringify(csl);
+}
+
 export function useFormattedCitation(source: Args, style: SupportedStyle): State {
-  const key = `${source.uuid}::${style}`;
+  const key = `${source.uuid}::${style}::${cslFingerprint(source.csl)}`;
   const [state, setState] = useState<State>(() => {
     const hit = cache.get(key);
     return hit

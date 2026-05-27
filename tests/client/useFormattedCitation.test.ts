@@ -34,6 +34,32 @@ describe('useFormattedCitation', () => {
     expect((globalThis.fetch as any).mock.calls.length).toBe(callsAfterFirst);
   });
 
+  it('refetches when the same uuid has different csl content (edit flow)', async () => {
+    // Bug regression: cache was keyed by (uuid, style) only, so editing a citation
+    // returned stale formatted output. Cache now must include CSL content.
+    let callCount = 0;
+    globalThis.fetch = vi.fn(async () => {
+      callCount += 1;
+      return new Response(JSON.stringify({
+        formatted: [{ text: callCount === 1 ? 'first' : 'second' }],
+      }), { status: 200 });
+    }) as any;
+
+    const initial = { id: 'u1', type: 'webpage' as const, title: 'Title A' };
+    const edited = { id: 'u1', type: 'webpage' as const, title: 'Title B' };
+
+    const { result, rerender } = renderHook(
+      ({ csl }) => useFormattedCitation({ uuid: 'u1', csl }, 'mla-9'),
+      { initialProps: { csl: initial } },
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.formatted.map(r => r.text).join('')).toBe('first');
+
+    rerender({ csl: edited });
+    await waitFor(() => expect(result.current.formatted.map(r => r.text).join('')).toBe('second'));
+    expect(callCount).toBe(2);
+  });
+
   it('surfaces an error when /api/format returns non-200', async () => {
     globalThis.fetch = vi.fn(async () => new Response('boom', { status: 500 })) as any;
     const csl = { id: 'u2', type: 'webpage' as const, title: 'X' };

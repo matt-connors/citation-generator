@@ -79,6 +79,42 @@ describe('formatCitation', () => {
     expect(a).not.toBe(b);
   });
 
+  it('produces a space between csl-left-margin and csl-right-inline divs (IEEE/Vancouver)', () => {
+    // Bug regression: parseRichText used to strip <div> tags without inserting any
+    // separator, so IEEE bibliography output emitted "[1]J. Doe" with no space.
+    const item: CSLItem = {
+      id: 'ieee-test', type: 'webpage', title: 'A Paper',
+      author: [{ family: 'Doe', given: 'Jane' }],
+      issued: { 'date-parts': [[2024]] },
+      URL: 'https://example.com',
+    };
+    const out = formatCitation(item, 'ieee');
+    const text = out.map((r) => r.text).join('');
+    // The IEEE bibliography emits "[1]" then the author — they must be separated by a space.
+    expect(text).toMatch(/\[1\]\s+[A-Z]/);
+  });
+
+  it('preserves italics on <i> tags, drops other formatting markers cleanly', () => {
+    // Verify that an MLA bibliography (which always italicizes the container)
+    // produces italic segments for the container, plus non-italic text — and
+    // crucially, that no raw HTML tag fragments leak through the parser.
+    const item: CSLItem = {
+      id: 'rich-test', type: 'webpage', title: 'T',
+      author: [{ family: 'Doe', given: 'Jane' }],
+      issued: { 'date-parts': [[2024]] },
+      URL: 'https://example.com',
+      'container-title': 'MyContainer',
+    };
+    const out = formatCitation(item, 'mla-9');
+    const italic = out.filter((r) => r.italic);
+    expect(italic.length).toBeGreaterThan(0);
+    expect(italic.map((r) => r.text).join('')).toContain('MyContainer');
+    // And no leftover HTML in any segment
+    for (const seg of out) {
+      expect(seg.text).not.toMatch(/<\/?[a-z]/i);
+    }
+  });
+
   it('decodes numeric HTML entities in rendered output', () => {
     // Bug regression: citeproc-js emits &#38; for &amp;, our decoder dropped this on the floor.
     const item: CSLItem = {

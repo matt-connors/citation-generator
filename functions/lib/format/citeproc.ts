@@ -1,5 +1,6 @@
 // @ts-ignore — citeproc has no types
 import CSL from 'citeproc';
+import { Parser } from 'htmlparser2';
 import type { CSLItem, RichText, SupportedStyle } from '../csl-types';
 
 const styles: Map<string, string> = new Map();
@@ -54,36 +55,65 @@ export function formatCitation(item: CSLItem, style: SupportedStyle): RichText[]
   return parseRichText(raw);
 }
 
+// Parses citeproc-js's HTML output into RichText[]. Earlier versions used a
+// regex that only recognized <i>; this missed <div class="csl-left-margin">
+// (used by IEEE/Vancouver), <span class="nocase">, <sup>, <sub>, <b>, etc.,
+// and produced glued-together text at div boundaries (e.g. "[1]J. Doe").
+//
+// htmlparser2 (already in the cheerio tree, no new dep) decodes HTML entities
+// natively — including numeric refs like &#38; and &#x2014; — so the previous
+// manual decode pass is no longer required.
 function parseRichText(html: string): RichText[] {
-  const stripped = html
-    .replace(/<div[^>]*>/g, '')
-    .replace(/<\/div>/g, '')
-    .replace(/^\s+|\s+$/g, '');
   const segments: RichText[] = [];
-  const re = /<i>([\s\S]*?)<\/i>|([^<]+)/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(stripped)) !== null) {
-    if (m[1] !== undefined) {
-      if (m[1]) segments.push({ text: decode(m[1]), italic: true });
-    } else if (m[2] !== undefined) {
-      const text = decode(m[2].replace(/<[^>]+>/g, ''));
-      if (text) segments.push({ text });
+  let italicDepth = 0;
+  // When we exit a <div>, insert a separator before the next text run so that
+  // sibling divs (csl-left-margin / csl-right-inline) don't collapse together.
+  let pendingSpace = false;
+
+  const flush = (text: string): void => {
+    if (!text) return;
+    if (pendingSpace) {
+      text = ' ' + text;
+      pendingSpace = false;
+    }
+    segments.push(italicDepth > 0 ? { text, italic: true } : { text });
+  };
+
+  const parser = new Parser({
+    onopentag(name) {
+      const n = name.toLowerCase();
+      if (n === 'i' || n === 'em') italicDepth += 1;
+    },
+    onclosetag(name) {
+      const n = name.toLowerCase();
+      if (n === 'i' || n === 'em') italicDepth = Math.max(0, italicDepth - 1);
+      else if (n === 'div' && segments.length > 0) pendingSpace = true;
+    },
+    ontext(text) {
+      flush(text);
+    },
+  }, { decodeEntities: true });
+  parser.write(html);
+  parser.end();
+
+  // Merge adjacent same-formatting segments (cosmetic; keeps RichText[] tidy
+  // and avoids fragmenting JSX render output).
+  const merged: RichText[] = [];
+  for (const seg of segments) {
+    const prev = merged[merged.length - 1];
+    if (prev && !!prev.italic === !!seg.italic) {
+      prev.text += seg.text;
+    } else {
+      merged.push({ ...seg });
     }
   }
-  return segments;
-}
 
-function decode(s: string): string {
-  return s
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&nbsp;/g, ' ')
-    // Generic numeric character references emitted by citeproc-js (e.g. &#38;
-    // for &, &#x2014; for em-dash). The named-entity list above doesn't cover
-    // these, so without this they leak through to user-visible output.
-    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)))
-    .replace(/&#x([0-9a-fA-F]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)));
+  // Trim leading/trailing whitespace on the whole bibliography string by
+  // stripping it off the first/last segment only. Internal whitespace is
+  // preserved verbatim because citeproc already lays it out correctly.
+  if (merged.length > 0) {
+    merged[0].text = merged[0].text.replace(/^\s+/, '');
+    merged[merged.length - 1].text = merged[merged.length - 1].text.replace(/\s+$/, '');
+  }
+  return merged.filter((s) => s.text);
 }
