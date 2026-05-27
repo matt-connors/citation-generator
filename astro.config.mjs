@@ -45,7 +45,7 @@ export default defineConfig({
         // Generates a sitemap file
         sitemap({
             serialize(item) {
-                const pathname = new URL(item.url).pathname;
+                const pathname = new URL(item.url).pathname.replace(/\/$/, '') || '/';
                 if (pathname === '/') {
                     item.priority = 1.0;
                     item.changefreq = 'weekly';
