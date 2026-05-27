@@ -1,144 +1,199 @@
 ---
-title: 'Chicago Citation Guide: Mastering Notes and Bibliography Style'
+title: 'Chicago Citation Guide: Chicago Manual of Style 18th Edition Made Clear'
 pubDate: 2025-01-18
 updatedDate: 2026-05-27
-description: 'This comprehensive guide explains the Chicago citation style, focusing on the Notes and Bibliography system. Learn how to create footnotes or endnotes, format your bibliography, and cite sources accurately. Commonly used in history, art history, and other humanities disciplines.'
+description: 'Complete Chicago 18 guide focused on the author–date system (what this tool generates), with notes–bibliography also covered. In-text citations, reference list, worked examples, and what changed in the 18th edition. Written and reviewed by the MLA Generator Editorial Team against the 2024 Chicago Manual.'
 category: 'style-guide'
-tags: ['Chicago', 'citations', 'notes', 'bibliography', 'footnotes', 'endnotes', 'research', 'writing', 'formatting', 'history', 'humanities']
+keywords: ['Chicago citation', 'Chicago 18th edition', 'Chicago Manual of Style', 'author-date Chicago', 'notes bibliography Chicago', 'Chicago footnotes', 'Chicago references', 'how to cite in Chicago']
+tags: ['Chicago', 'citations', 'author-date', 'notes-bibliography', 'footnotes', 'bibliography', 'history', 'humanities', 'social sciences']
+relatedGuides: ['apa', 'mla', 'harvard', 'how-to-cite-a-book', 'chicago-notes-vs-author-date', 'mla-vs-apa']
+faq:
+  - question: 'What is the difference between Chicago author–date and notes–bibliography?'
+    answer: 'Chicago supports two parallel citation systems. Author–date uses parenthetical "(Author Year)" citations in the text and a "References" list at the end — common in the sciences and social sciences. Notes–bibliography uses superscript footnote or endnote numbers in the text and a "Bibliography" at the end — preferred in history, art history, and most humanities. The same source can be cited correctly in either system; you pick one based on your discipline or your professor''s preference and use it consistently throughout the paper.'
+  - question: 'Which Chicago system does this tool generate?'
+    answer: 'This generator produces Chicago 18 author–date citations. The engine ships the author–date variant of the official Chicago CSL style. If your assignment requires notes–bibliography (most history papers, for example), you can use the author–date output as a reference list and adapt the footnotes manually using the notes–bibliography rules in this guide.'
+  - question: 'How do I cite an AI-generated source like ChatGPT in Chicago 18?'
+    answer: 'The 18th edition added explicit guidance for citing AI-generated content. Treat the AI service as the author and include the prompt (or a short description) plus the date you used the tool. Example (author–date in-text): (OpenAI 2024). Reference list: OpenAI. 2024. ChatGPT. AI language model. Accessed July 12, 2024. https://chat.openai.com/. Many journals additionally require disclosure of AI use in a separate methods or acknowledgments section — check your venue''s policy.'
+  - question: 'Does Chicago use footnotes or endnotes?'
+    answer: 'Either is acceptable in notes–bibliography. Footnotes appear at the bottom of the page where the citation occurs; endnotes are collected at the end of the chapter or paper. Footnotes are easier for readers (no flipping back and forth); endnotes are visually cleaner for the page. Use whichever your professor or journal prefers, and use the same kind throughout the paper. The first reference to a source uses the full citation; subsequent references can be shortened.'
+  - question: 'Is a DOI required in Chicago references?'
+    answer: 'Chicago 18 prefers DOIs for journal articles and any source where one is available. Format DOIs as full URLs ("https://doi.org/10.xxxx/...") at the end of the reference. When no DOI is available, include the URL; Chicago does not require an access date for stable web sources but recommends one for material that may change. Plain URLs in Chicago retain the "https://" protocol prefix (unlike MLA, which strips it).'
+ogImage: '/images/banner.png'
 ---
 
-import TryMe from '../../components/astro/TryMe.astro';
+Chicago is the style of historians, art historians, musicologists, and a long list of humanities and social-science fields that the *Chicago Manual of Style* has shaped since 1906. The current edition is the eighteenth, released in 2024, and it documents two parallel citation systems rather than one. Pick the right system for your discipline and the mechanics below tell you everything else.
 
-The Chicago Manual of Style (CMOS) offers two distinct citation systems: **Notes and Bibliography** and **Author-Date**. This guide focuses on the **Notes and Bibliography** style, which is widely preferred in the humanities, particularly history, art history, literature, and related fields. This system uses footnotes or endnotes for in-text citations and a comprehensive bibliography at the end of the paper.
+> The shortest version of Chicago: two systems share one manual. Author–date uses `(Author Year)` in the text with a "References" list at the back. Notes–bibliography uses superscript footnotes with a "Bibliography" at the back. This tool generates author–date.
 
-## Why Use Chicago Style (Notes and Bibliography)?
+## What Chicago is and when you'll use it
 
-The Chicago Notes and Bibliography style offers several advantages for scholarly writing:
+Chicago has been the in-house style of the University of Chicago Press since *Manual of Style: Being a Compilation of the Typographical Rules in Force at the University of Chicago Press* first appeared in 1906. The eighteenth edition, published in 2024, runs over a thousand pages and is the version this guide tracks. Where a rule below is keyed to a specific edition, the edition is Chicago 18.
 
-*   **Detailed Source Information:** Footnotes or endnotes provide comprehensive bibliographic information at the point of citation, allowing readers to immediately assess the source.
-*   **Flexibility for Commentary:** Notes allow for additional commentary, explanations, or tangential information without disrupting the flow of the main text.
-*   **Emphasis on Primary Sources:** The system is well-suited for citing a wide range of sources, including archival documents, manuscripts, and other primary materials often used in historical research.
-*   **Comprehensive Bibliography:** The bibliography provides a complete record of all sources consulted, offering a valuable resource for further research.
-*   **Avoids Plagiarism:** Accurate and thorough citations are crucial for avoiding plagiarism and giving proper credit to the original authors.
+What makes Chicago unusual among the major academic styles is that the *Chicago Manual of Style* (University of Chicago Press, 2024) documents two complete and parallel citation systems. **Notes–bibliography** uses superscript footnote or endnote numbers in the body of the text and a "Bibliography" at the end; it is the default in history, art history, religion, music, philosophy, and most humanities. **Author–date** uses parenthetical `(Author Year)` citations in the text and a "References" list at the end; it is the default in economics, political science, and most natural and social sciences that follow Chicago rather than APA. Same manual, same source data, two valid presentations. You pick one based on your discipline or your professor's preference and you use it consistently throughout the paper.
 
-## Notes: Footnotes and Endnotes
+This tool generates Chicago 18 author–date citations. The engine ships the author–date variant of the official Chicago CSL style, so everything in the long in-text and reference-list sections below describes exactly what the generator produces. Notes–bibliography appears further down in its own section; if your assignment requires footnotes, you can still use the generated reference list as a starting point and adapt the in-text footnotes by hand using the rules in that section.
 
-In the Notes and Bibliography system, you use numbered footnotes or endnotes to cite your sources.
+## Author–date in-text citations
 
-*   **Footnotes:** Appear at the bottom of the page where the source is cited.
-*   **Endnotes:** Appear in a separate section titled "Notes" at the end of the paper, before the Bibliography.
+Chicago author–date is, on the surface, the same shape as APA: surname and year in parentheses at the end of the sentence. The differences live in the punctuation. Chicago drops the comma between author and year (`(Chen 2021)`, not `(Chen, 2021)`) and writes the page number after a comma with no `p.` abbreviation (`(Chen 2021, 47)`). The author and year in the parenthetical must match the first author and year in the reference-list entry exactly.
 
-**Formatting Notes:**
+### One author
 
-*   **Numbering:** Use superscript numbers (e.g., ¹, ², ³) in the text, corresponding to the numbered notes.
-*   **Placement:** In the text, place the superscript number at the end of the sentence or clause containing the information being cited, after any punctuation except a dash.
-*   **Content:** The first time you cite a source, provide full bibliographic information in the note. Subsequent citations of the same source can be shortened.
-*   **Indentation:** Indent the first line of each note.
-*   **Spacing:** Single-space individual notes, but double-space between them.
+Cite the surname and the year. If the author's name appears in the sentence, the year goes in parentheses immediately after the name and the rest of the citation does not repeat.
 
-## First Note vs. Subsequent (Shortened) Notes
+Parenthetical: Working memory capacity correlates with reading comprehension across age groups (Chen 2021).
 
-**First Note (Full Citation):**
+Narrative: Chen (2021) found that working memory capacity correlates with reading comprehension across age groups.
 
-<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
-    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">1. John Doe, *The Art of Writing* (New York: Example Press, 2023), 45.</p>
-</div>
+### Two authors
 
-**Subsequent (Shortened) Note:**
+Name both authors in the parenthetical, joined by the word *and* (not an ampersand — Chicago is unambiguous on this). Order matches the reference-list entry.
 
-<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
-    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">2. Doe, *The Art of Writing*, 60.</p>
-</div>
+Example: (Lin and Patel 2022)
 
-**If you cite the same source consecutively, you can use "Ibid."**
+If the names appear in the sentence, omit the parenthetical authors and keep the year: Lin and Patel (2022) argue that cross-modal attention emerges earlier than developmental psychology has typically allowed.
 
-<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
-    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">
-        <span style="display: block;">3. Ibid.</span>
-        <span style="display: block;">4. Ibid., 75.</span>
-    </p>
-</div>
+### Three or more authors
 
-```
+Use the first author's surname followed by *et al.* (set in roman, no italics) from the very first citation, including for three-author works. Chicago 18 collapses three-author in-text citations the same way it collapses larger groups; there is no "spell them all out the first time" phase the way some older style guides require.
 
-```
+First and every subsequent citation: (Goldstein et al. 2024)
 
-## Creating a Bibliography in Chicago
+The full author list appears only in the reference-list entry, up to six authors. For seven or more authors, list only the first three followed by *et al.* — Chicago 18 eliminated the older ellipsis convention.
 
-The Bibliography lists all the sources cited in your paper (and sometimes other relevant sources you consulted). It's arranged alphabetically by the author's last name.
+### Organization as author
 
-*   **Heading:** Center the title "Bibliography" at the top of the page.
-*   **Alphabetical Order:** List entries alphabetically by the author's last name. If no author, alphabetize by the first significant word in the title.
-*   **Hanging Indent:** Indent the second and subsequent lines of each entry by 0.5 inches.
-*   **Spacing:** Single-space individual entries, but double-space between them.
+Spell out the organization the first time and use the same form thereafter. Unlike APA, Chicago does not encourage acronym substitution in the parenthetical unless the abbreviation is genuinely standard in the discipline.
 
-## Key Differences Between Notes and Bibliography Entries
+Example: (U.S. Department of Education 2023)
 
-| Feature        | Note                                    | Bibliography                               |
-| -------------- | --------------------------------------- | ------------------------------------------ |
-| Author         | First name first                        | Last name first                           |
-| Punctuation    | Commas between elements                 | Periods between elements                  |
-| Page Numbers   | Specific page numbers cited             | No page numbers (except for journal articles) |
-| Parentheses    | Publication details in parentheses       | Publication year not in parentheses       |
-| Indentation    | First line indented                     | Hanging indent                             |
+If you cite the same agency repeatedly and the full name becomes unwieldy, you may introduce a short form in prose ("hereafter ED") and use it in subsequent parentheticals, but document the choice on first use.
 
-## Common Source Types and Their Chicago Citations
+### No named author
 
-Here's how to cite common source types in Chicago style (Notes and Bibliography):
+When a work has no identified author, move the title into the author slot. Use a shortened form of the title in the parenthetical: italicized for standalone works (books, reports) and in quotation marks for shorter pieces (articles, web pages).
 
-### Book
+Web article with no author: ("Cognitive Load" 2023)
 
-**Note:**
+Book or report with no author: (*Reading Proficiency and Learning Loss* 2023)
 
-<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
-    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">1. John Doe, *The Art of Writing* (New York: Example Press, 2023), 45.</p>
-</div>
+When the source genuinely has no date, use *n.d.* (lowercase, with periods, no spaces). The same abbreviation appears in the reference list.
 
-**Bibliography:**
+### Direct quotes
 
-<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
-    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">Doe, John. *The Art of Writing*. New York: Example Press, 2023.</p>
-</div>
+Direct quotations require a locator — usually a page number, occasionally a paragraph or section number for unpaginated digital sources. The locator follows the year, separated by a comma, with no `p.` abbreviation.
 
-### Journal Article
+Short quote: Working memory is "a flexible mental workspace, not a fixed bin of slots" (Chen 2021, 47).
 
-**Note:**
+For a website without page numbers, point the reader to whatever locator the source provides: a paragraph number (`par. 4`), a section heading, or a video timestamp. If nothing is available, the parenthetical is just the surname and year — do not invent a page number by counting screens.
 
-<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
-    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">2. Jane Smith and Alice Brown, "The Future of Technology," *Journal of Innovation* 10, no. 2 (2022): 50, doi.org/10.1234/xyz.</p>
-</div>
+Quotations of five or more lines (or more than one hundred words) become block quotations: indented from the left margin, no quotation marks, with the citation after the closing punctuation.
 
+### Citing multiple sources at once
 
-**Bibliography:**
+When a single parenthetical points to multiple sources, separate them with semicolons. Chicago does not insist on alphabetical order the way APA does; the conventional choice is alphabetical or chronological, whichever serves the passage.
 
-<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
-    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">Smith, Jane, and Alice Brown. "The Future of Technology." *Journal of Innovation* 10, no. 2 (2022): 45-60. doi.org/10.1234/xyz.</p>
-</div>
+Example: Three studies converge on this pattern (Chen 2021; Lin and Patel 2022; Goldstein et al. 2024).
 
-### Website
+Two works by the same first author published in the same year are distinguished with lowercase letters appended to the year (`2024a`, `2024b`) in both the in-text citation and the reference list.
 
-**Note:**
+## Author–date reference list
 
-<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
-    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">3. Leslie M. Johnson, "Chicago Citation Guide," MLA Generator (blog), March 15, 2024, mlagenerator.com/guides/chicago.</p>
-</div>
+The reference list goes on its own page at the end of the paper, with the word **References** centered at the top in the same font as the rest of the paper. Chicago does not bold the heading — that is APA's convention. Every source cited in the body must appear here, and every entry here must be cited at least once in the body.
 
-**Bibliography:**
+Entries are alphabetized by the first author's surname. The page is double-spaced and each entry uses a hanging indent of half an inch, so the first line is flush left and any continuation lines are indented. Most word processors apply hanging indents through the paragraph formatting menu rather than through manual tabs.
 
-<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
-    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">Johnson, Leslie M. "Chicago Citation Guide." MLA Generator (blog). March 15, 2024. mlagenerator.com/guideschicago.</p>
-</div>
+The first author of each entry is inverted — surname first, then given name or initials. Subsequent authors appear in normal order. The year follows the author block immediately, with a period after each: `Chen, Margaret S. 2021.` This author-then-year placement is one of the visible cues that distinguishes a Chicago reference list from APA's, which puts the year in parentheses: `Chen, M. S. (2021).`
 
-<TryMe />
+Capitalization is **title case** across the board — for book titles, journal titles, article titles, chapter titles, and report titles alike. (Chicago 18 renamed the convention from "headline-style" to "title case".) This is one of the cleaner differences between Chicago and APA: APA uses sentence case for article and chapter titles, while Chicago uses title case everywhere. The *Chicago Manual of Style* (University of Chicago Press, 2024) defines title case specifically: capitalize the first and last words, all nouns, pronouns, verbs, adjectives, adverbs, and subordinating conjunctions; lowercase articles, coordinating conjunctions, and prepositions of four or fewer letters unless they are the first or last word of the title. Prepositions of five or more letters are now capitalized — a change from Chicago 17, which lowercased prepositions of any length.
 
-## Tips for Mastering Chicago Style
+Chicago 18 prefers DOIs for journal articles and any other source where one exists. Format DOIs as full URLs (`https://doi.org/10.1037/cogdev0000412`) at the end of the entry. When no DOI is available, include the URL; Chicago retains the `https://` protocol prefix on plain URLs — different from MLA, which strips it. Access dates are optional for sources with stable publication dates and recommended for sources that might change (live web pages, frequently revised reference articles, social media posts).
 
-*   **Consult the official *Chicago Manual of Style* (17th edition):** This is the definitive guide to Chicago style.
-*   **Use a citation generator:** While mlagenerator.com is named after MLA, it can still help you generate Chicago-style citations. However, always double-check them against the official manual.
-*   **Pay close attention to details:** Chicago style is known for its meticulous attention to punctuation and formatting.
-*   **Be consistent:** Consistency is crucial in Chicago style. Follow the guidelines meticulously throughout your paper.
-*   **Practice:** The more you practice creating Chicago citations, the more proficient you'll become.
+## Source-type examples (author–date)
 
-## Conclusion
+The references below use the fixture data referenced throughout this guide and show each common source type formatted as Chicago 18 author–date prescribes. Render them double-spaced with a half-inch hanging indent in your own document.
 
-The Chicago Manual of Style's Notes and Bibliography system is a comprehensive and flexible citation method favored in many humanities disciplines. By mastering the guidelines presented in this guide, you can accurately cite your sources, format your notes and bibliography correctly, and avoid plagiarism. Proper citation practices demonstrate your respect for the work of others, enhance your credibility as a researcher, and contribute to the scholarly conversation in your field. Using Chicago style correctly will ensure that your work is both well-researched and ethically sound.
+| Source type | Reference list entry |
+| --- | --- |
+| Book (single author) | Chen, Margaret S. 2021. *The Architecture of Working Memory*. Cambridge: Cambridge University Press. |
+| Chapter in edited book | Lin, David K., and Hannah J. Patel. 2022. "Cross-Modal Attention in Early Development." In *Handbook of Developmental Cognition*, edited by Rachel T. Morrison, 142–68. London: Routledge. |
+| Journal article with DOI | Goldstein, Aaron, Priya Ramanathan, and Liam O'Connor. 2024. "Sleep Consolidation Effects on Procedural Learning in Adolescents." *Journal of Cognitive Development* 19 (2): 87–104. https://doi.org/10.1037/cogdev0000412. |
+| Web article (no DOI) | Alvarez, Sofia. 2023. "How Working Memory Predicts Reading Comprehension." *Psychology Today*, March 12, 2023. https://www.psychologytoday.com/intl/blog/working-memory-reading-comprehension. |
+| Government report | U.S. Department of Education, Institute of Education Sciences. 2023. *Reading Proficiency and Learning Loss in U.S. Fourth-Graders, 2019–2022*. NCES 2023-145. Washington, DC: National Center for Education Statistics. https://nces.ed.gov/pubsearch/pubsinfo.asp?pubid=2023145. |
+| Conference paper | Tanaka, Yuki, and Marcus Hoffmann. 2022. "A Unified Model of Attention in Dual-Task Performance." Paper presented at the 63rd Annual Meeting of the Psychonomic Society, Boston, MA, November 4–6, 2022. |
+| Doctoral dissertation | Kowalski, Elena R. 2020. "Memory Consolidation in Bilingual Speakers: An fMRI Investigation." PhD diss., University of Michigan. |
+
+A few details to notice across the table. Chicago 18 made place of publication *optional*. Earlier editions required it, and the convention of including it (`Cambridge: Cambridge University Press`) is still common in humanities work, though it can now be omitted. This is a change from Chicago 17 — and another point where Chicago and APA have converged (APA 7 dropped place of publication outright). The chapter entry inverts the chapter authors but presents the editor in normal order with the `edited by` phrase, similar to MLA. The journal entry writes the volume and issue as `19 (2)` with no italics on either; the page range follows after a colon. Page ranges use elided form per Chicago convention (`142–68`, not `142–168`) and an en dash, not a hyphen. The dissertation puts the title in quotation marks rather than italics because Chicago treats unpublished theses as articles rather than as standalone works. If you're entering one of these into the generator at /, the tool assembles the punctuation, italics, and hanging indent for you; the underlying logic is what's shown above.
+
+## Notes–bibliography alternative
+
+History, art history, religion, and most humanities default to notes–bibliography rather than author–date. The reference-list rules above mostly translate, but the in-text mechanics are different and the punctuation in the back matter changes.
+
+In notes–bibliography, every citation in the body is keyed to a superscript number that points to a footnote (at the bottom of the page) or an endnote (collected at the end of the chapter or paper). The first time you cite a source, the note carries the full bibliographic information; subsequent citations of the same source use a shortened form. Whether you use footnotes or endnotes is a matter of preference — use whichever your professor or journal expects, and use the same kind throughout. The *Chicago Manual of Style* (University of Chicago Press, 2024) treats both as equally valid.
+
+The two contrasting formats below show the same book — the Chen monograph from the fixture set — in both author–date and notes–bibliography. Compare them side by side and the punctuation differences become visible at a glance.
+
+| Format | Entry |
+| --- | --- |
+| Author–date (reference list) | Chen, Margaret S. 2021. *The Architecture of Working Memory*. Cambridge: Cambridge University Press. |
+| Notes–bibliography (bibliography) | Chen, Margaret S. *The Architecture of Working Memory*. Cambridge: Cambridge University Press, 2021. |
+| Notes–bibliography (first footnote) | 1. Margaret S. Chen, *The Architecture of Working Memory* (Cambridge: Cambridge University Press, 2021), 47. |
+| Notes–bibliography (subsequent footnote) | 8. Chen, *Architecture of Working Memory*, 89. |
+
+Three differences carry most of the work. First, the year moves: the author–date reference list places the year right after the author, while the notes–bibliography bibliography places the year at the end of the entry. Second, the punctuation between elements differs: the bibliography entry uses periods to separate author, title, and publication info, while the first footnote uses commas and wraps the publication info in parentheses. Third, the author's name is inverted in both the reference list and the bibliography (`Chen, Margaret S.`) but stays in normal order in the footnote (`Margaret S. Chen`). The subsequent shortened note uses just the surname, a short title, and the page number — and the *Chicago Manual* (2024) discourages the old `Ibid.` shortcut in favor of this short-form approach.
+
+## Common mistakes
+
+These five errors account for most of the marks students lose on Chicago assignments. Each shows the wrong version above the right one.
+
+**Comma between the author and the year.**
+Wrong: (Chen, 2021)
+Right: (Chen 2021)
+
+The comma is APA's convention. Chicago author–date drops it. If you've taken classes in both styles, the muscle memory will fight you.
+
+**Ampersand between authors in the parenthetical.**
+Wrong: (Lin & Patel 2022)
+Right: (Lin and Patel 2022)
+
+Chicago spells out *and* in both the in-text citation and the reference list — no ampersand in either. APA uses an ampersand in parentheticals, which is the source of the confusion.
+
+**Sentence case in a title.**
+Wrong: Chen, Margaret S. 2021. *The architecture of working memory.*
+Right: Chen, Margaret S. 2021. *The Architecture of Working Memory.*
+
+Chicago uses title case for every title — book, journal, article, chapter. Sentence case is APA's habit, not Chicago's, and using it makes a Chicago reference list look amateur at a glance.
+
+**Stripping the protocol prefix from URLs.**
+Wrong: www.psychologytoday.com/intl/blog/working-memory-reading-comprehension
+Right: https://www.psychologytoday.com/intl/blog/working-memory-reading-comprehension
+
+This one trips writers coming from MLA. MLA 9 strips `http://` and `https://` from plain URLs; Chicago retains the protocol prefix. DOIs keep the `https://doi.org/` prefix in both styles because the prefix is part of the canonical identifier.
+
+**Using `Ibid.` for repeated footnote citations.**
+Wrong: 7. Ibid., 92.
+Right: 7. Chen, *Architecture of Working Memory*, 92.
+
+The *Chicago Manual of Style* (University of Chicago Press, 2024) discourages `Ibid.` in favor of the shortened-citation form. The shortened form is easier for readers because it stays informative even when the previous note has scrolled off the page or has been moved during revision.
+
+## What's new in Chicago 18
+
+The eighteenth edition is the first major revision of the manual since 2017, and the changes mostly run in the direction of expanded coverage for digital sources and inclusive language. If you've worked with Chicago 17, these are the differences that matter.
+
+**Explicit guidance on AI-generated content.** Chicago 18 added formal rules for citing AI-generated text, images, and other outputs. Treat the AI service as the author, include the prompt or a short description of what you asked for, and record the date you used the tool. The seventeenth edition predated the explosion of generative AI in academic workflows; the eighteenth catches the manual up.
+
+**Expanded digital-source treatment.** Chicago 18 added or revised worked examples for preprints (arXiv, SSRN, bioRxiv), social-media posts across platforms, podcast episodes, streaming video, and dataset citations. Earlier editions handled some of these in scattered notes; the eighteenth treats them as first-class source types.
+
+**Author–date as a more visible default.** Chicago 17 already documented both systems, but the eighteenth edition surfaces author–date earlier and more prominently and notes its growing adoption outside the social sciences. The manual no longer treats notes–bibliography as the "real" Chicago and author–date as an alternative; both are equal first-class citizens.
+
+**Inclusive-language updates.** Chicago 18 expanded its guidance on singular *they*, on identity-first versus person-first language for disability and neurodivergence, on bias-free language for race and ethnicity, and on the treatment of pronouns in author bylines. These changes parallel similar updates in APA 7 and MLA 9 but go further in places.
+
+**Shortened-citation preference over `Ibid.`** Chicago 17 already preferred shortened citations to `Ibid.`; the eighteenth makes the preference firmer. `Ibid.` is still permitted but is no longer recommended.
+
+**`Et al.` threshold lowered for in-text citations.** Chicago 17 spelled out two- and three-author works in full in the in-text citation and reserved `et al.` for four or more authors. Chicago 18 lowers the threshold: three or more authors now collapse to `First et al.` from the very first citation. The reference-list cutoff also moved — Chicago 17 listed up to ten authors before switching to an ellipsis convention; Chicago 18 lists up to six authors and uses `First three et al.` for seven or more, eliminating the ellipsis entirely.
+
+**Place of publication is now optional.** Chicago 17 required the publisher's city in book and report entries. Chicago 18 makes it optional (§14.30). Including the city is still common in humanities work, but you may now omit it — bringing Chicago closer to APA, which dropped place of publication outright in APA 7.
+
+**Title case capitalizes longer prepositions.** Chicago 17 lowercased prepositions of any length in titles. Chicago 18 capitalizes prepositions of five or more letters and lowercases only those of four or fewer. The manual also renamed the convention from "headline-style" to "title case."
+
+The mechanics most readers care about — author–date parentheticals, alphabetized reference lists with hanging indents, title case across the board, the bibliography-versus-footnote distinction in notes–bibliography — are broadly continuous with Chicago 17. The eighteenth edition refines and expands; it does not rebuild.
