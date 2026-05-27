@@ -1,0 +1,62 @@
+---
+// src/components/astro/TryGenerator.astro
+// Contextual call-to-action that links to the citation tool.
+// Pass a custom heading/blurb per guide so it reads as part of the
+// page's flow rather than a generic promo.
+interface Props {
+    heading?: string;
+    blurb?: string;
+    cta?: string;
+}
+
+const {
+    heading = 'Try the citation generator',
+    blurb = 'Paste a URL, DOI, or ISBN — we format the reference instantly in your chosen style.',
+    cta = 'Open the generator',
+} = Astro.props;
+---
+
+<aside class="try-generator" aria-labelledby="try-generator-heading">
+    <h2 id="try-generator-heading">{heading}</h2>
+    <p>{blurb}</p>
+    <a href="/" class="try-generator-cta">{cta} →</a>
+</aside>
+
+<style>
+    .try-generator {
+        margin: 2.5rem 0;
+        padding: 1.5rem 1.75rem;
+        background-color: var(--color-background-2);
+        border-radius: 12px;
+        border: 1px solid var(--color-border);
+    }
+    .try-generator h2 {
+        font-size: 1.25rem;
+        margin: 0 0 0.5rem;
+        color: var(--color-text-dark);
+    }
+    .try-generator p {
+        margin: 0 0 1rem;
+        color: var(--color-text-medium);
+        line-height: 1.5;
+    }
+    .try-generator-cta {
+        display: inline-block;
+        font-weight: 510;
+        color: var(--color-text-dark);
+        text-decoration: none;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid currentColor;
+    }
+    .try-generator-cta:hover,
+    .try-generator-cta:focus-visible {
+        color: var(--color-text-dark);
+        opacity: 0.8;
+        outline: none;
+    }
+    .try-generator-cta:focus-visible {
+        outline: 2px solid var(--color-text-dark);
+        outline-offset: 4px;
+        border-radius: 4px;
+    }
+</style>
