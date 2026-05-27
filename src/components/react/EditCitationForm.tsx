@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import type { StoredSource } from '../../lib/references/storage';
 import type { CSLItem } from '../../lib/citations/csl-types';
 import {
@@ -30,20 +30,34 @@ const TYPE_OPTIONS: CitationOption[] = [
 interface Props {
     source: StoredSource;
     setSources: (s: StoredSource[] | ((prev: StoredSource[]) => StoredSource[])) => void;
+    // Parent ref populated with the latest in-flight CSL on every render. The
+    // dialog/drawer reads it on close to decide empty-vs-flush before the
+    // debounced 500ms timer would have fired — otherwise typed input is lost
+    // (citation removed as "still empty") or stale (form unmount cancels timer).
+    currentRef?: React.MutableRefObject<CSLItem | null>;
 }
 
-export default function EditCitationForm({ source, setSources }: Props) {
+export default function EditCitationForm({ source, setSources, currentRef }: Props) {
     const [local, setLocal] = useState<CSLItem>(source.csl);
 
-    const debouncedSet = useDebounce((next: CSLItem) => {
-        setSources((prev) => prev.map((s) => s.uuid === source.uuid ? { ...s, csl: next } : s));
+    // Read the latest `local` via ref inside the debounced flush so the 500ms
+    // timer always writes the most recent state, regardless of how many
+    // intervening patches happened (functional setLocal + ref instead of
+    // closure-captured `local` avoids dropping characters under rapid typing).
+    const localRef = useRef(local);
+    useEffect(() => {
+        localRef.current = local;
+        if (currentRef) currentRef.current = local;
+    }, [local, currentRef]);
+
+    const debouncedSet = useDebounce(() => {
+        setSources((prev) => prev.map((s) => s.uuid === source.uuid ? { ...s, csl: localRef.current } : s));
     }, 500);
 
     const patch = useCallback((p: Partial<CSLItem>) => {
-        const next = { ...local, ...p } as CSLItem;
-        setLocal(next);
-        debouncedSet(next);
-    }, [local, debouncedSet]);
+        setLocal((prev) => ({ ...prev, ...p } as CSLItem));
+        debouncedSet();
+    }, [debouncedSet]);
 
     const handleTypeChange = (t: CSLItem['type']) => patch({ type: t });
 

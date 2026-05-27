@@ -35,10 +35,9 @@ describe('ReferenceItem', () => {
     const { container } = render(
       <ReferenceItem
         source={source}
-        sources={[source]}
-        index={0}
+        checked={false}
+        onToggle={() => {}}
         citationFormat="mla-9"
-        onCheckChange={() => {}}
         setSources={() => {}}
       />,
     );

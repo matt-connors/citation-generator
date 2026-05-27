@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { CSLItem, RichText, SupportedStyle } from './csl-types';
 
 interface Args {
@@ -29,7 +29,13 @@ function cslFingerprint(csl: CSLItem): string {
 }
 
 export function useFormattedCitation(source: Args, style: SupportedStyle): State {
-  const key = `${source.uuid}::${style}::${cslFingerprint(source.csl)}`;
+  // Fingerprint the CSL once per content change so render-loop callers don't
+  // re-stringify on every render. `key` already encodes uuid+style+content,
+  // so it's the only effect dependency we need.
+  const key = useMemo(
+    () => `${source.uuid}::${style}::${cslFingerprint(source.csl)}`,
+    [source.uuid, source.csl, style],
+  );
   const [state, setState] = useState<State>(() => {
     const hit = cache.get(key);
     return hit
@@ -45,24 +51,41 @@ export function useFormattedCitation(source: Args, style: SupportedStyle): State
       return;
     }
     setState((s) => ({ ...s, loading: true, error: null }));
-    const promise = inflight.get(key) ?? (async () => {
-      const res = await fetch('/api/format', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ csl: source.csl, style }),
-      });
-      if (!res.ok) throw new Error(`Format failed: HTTP ${res.status}`);
-      const body = await res.json() as { formatted: RichText[] };
-      cache.set(key, body.formatted);
-      return body.formatted;
-    })();
+    const promise = inflight.get(key) ?? fetchFormatted(source.csl, style, key);
     inflight.set(key, promise);
     promise
       .then((rt) => { if (!cancelled) setState({ formatted: rt, loading: false, error: null }); })
       .catch((e: Error) => { if (!cancelled) setState({ formatted: [], loading: false, error: e.message }); })
       .finally(() => inflight.delete(key));
     return () => { cancelled = true; };
-  }, [key, source.csl, style]);
+  }, [key]);
 
   return state;
+}
+
+// Cache-aware fetch used by the hook and exported for callers (e.g. Copy
+// Selected) that need the same memoization but outside the React tree.
+async function fetchFormatted(csl: CSLItem, style: SupportedStyle, key: string): Promise<RichText[]> {
+  const res = await fetch('/api/format', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ csl, style }),
+  });
+  if (!res.ok) throw new Error(`Format failed: HTTP ${res.status}`);
+  const body = await res.json() as { formatted: RichText[] };
+  cache.set(key, body.formatted);
+  return body.formatted;
+}
+
+export function formatCitation(source: Args, style: SupportedStyle): Promise<RichText[]> {
+  const key = `${source.uuid}::${style}::${cslFingerprint(source.csl)}`;
+  const cached = cache.get(key);
+  if (cached) return Promise.resolve(cached);
+  const promise = inflight.get(key) ?? fetchFormatted(source.csl, style, key);
+  inflight.set(key, promise);
+  // The hook-side .then/.catch absorbs the rejection on its own chain; this
+  // bookkeeping chain needs its own catch or rejections surface as uncaught
+  // when fetchFormatted fails (5xx, network) and no one else is awaiting `key`.
+  promise.finally(() => inflight.delete(key)).catch(() => { /* swallowed; caller's await sees it */ });
+  return promise;
 }
