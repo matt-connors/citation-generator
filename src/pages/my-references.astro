@@ -7,17 +7,218 @@ const description = "View and manage your saved citations and references. Easily
 ---
 
 <Layout title={title} description={description}>
-    <main>
-        <h1 class="sr-only">My References</h1>
+    <div class="references-page">
+        <header class="references-intro">
+            <h1 class="heading-1">My References</h1>
+            <p class="lede">
+                Every citation you generate is saved here in your browser
+                — no account required. Copy them one at a time, switch
+                styles to see the same source rendered in <a
+                    href="/guides/apa">APA</a
+                >, <a href="/guides/mla">MLA</a>, <a href="/guides/chicago"
+                    >Chicago</a
+                >, or any of the seven supported styles, and edit any
+                field if the auto-extraction got a detail wrong.
+            </p>
+        </header>
+
         <References client:load />
-    </main>
+
+        <section
+            class="references-tips"
+            aria-labelledby="references-tips-heading"
+        >
+            <h2 id="references-tips-heading" class="heading-2">
+                How to use My References
+            </h2>
+            <p class="references-tips-lede">
+                A short tour of the controls — click any item to expand it.
+            </p>
+            <div class="references-tips-list">
+                <details>
+                    <summary>Copy with formatting preserved</summary>
+                    <div class="references-tip-body">
+                        <p>
+                            Use the copy button next to any citation to
+                            grab it with italics, hanging indent, and
+                            special characters intact. When you paste
+                            into Microsoft Word or Google Docs, the
+                            formatting carries over. If you paste into a
+                            plain-text editor, the markup is stripped —
+                            that's expected.
+                        </p>
+                    </div>
+                </details>
+                <details>
+                    <summary
+                        >Switch citation styles without re-entering data</summary
+                    >
+                    <div class="references-tip-body">
+                        <p>
+                            Use the citation style dropdown to re-render
+                            every saved reference in a different style.
+                            The underlying data stays the same; only the
+                            formatting changes. This is useful when an
+                            assignment changes styles mid-semester, or
+                            when you're submitting the same research to
+                            different journals.
+                        </p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Edit any field</summary>
+                    <div class="references-tip-body">
+                        <p>
+                            Auto-extraction handles the bulk of the work,
+                            but it isn't perfect — especially on subtitles,
+                            edited-volume editors, and organization
+                            authors. Click any reference's edit button to
+                            fix author names, dates, page numbers, or any
+                            other detail. Edits save automatically.
+                        </p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Delete or clear references</summary>
+                    <div class="references-tip-body">
+                        <p>
+                            Use the delete button on any reference to
+                            remove it from your bibliography. Use "Select
+                            all" + delete to clear everything at once.
+                            Deletions are not recoverable — copy what you
+                            need before clearing.
+                        </p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Where references are stored</summary>
+                    <div class="references-tip-body">
+                        <p>
+                            This site stores your references in your
+                            browser's <code>localStorage</code>. They
+                            persist across visits as long as you use the
+                            same browser on the same device. Clearing
+                            your browser data — or switching to a
+                            private/incognito session — will lose them.
+                            If you need a backup, copy your entire
+                            bibliography into a document.
+                        </p>
+                    </div>
+                </details>
+            </div>
+        </section>
+    </div>
 </Layout>
 
 <style>
-    main {
+    .references-page {
         width: 100%;
-        max-width: var(--max-width);
+        box-sizing: border-box;
+    }
+    .references-intro {
+        text-align: center;
+        margin: 3rem auto 0;
+        padding: 0 var(--page-inline-padding);
+        max-width: 60ch;
+    }
+    .references-intro .heading-1 {
+        margin-bottom: 1rem;
+    }
+    .references-intro .lede {
+        max-width: 60ch;
         margin: 0 auto;
-        padding: var(--spacing-6);
+        color: var(--color-text-light);
+        line-height: 1.4;
+    }
+    .references-intro a {
+        color: inherit;
+        text-decoration: underline;
+    }
+    .references-intro a:hover {
+        color: var(--color-text-dark);
+    }
+
+    .references-tips {
+        margin: 5rem auto 6rem;
+        max-width: 950px;
+        border-top: 1px solid var(--color-border);
+        padding: 3rem var(--page-inline-padding) 0;
+        box-sizing: border-box;
+    }
+    .references-tips .heading-2 {
+        text-align: center;
+        margin-bottom: 0.6rem;
+    }
+    .references-tips-lede {
+        text-align: center;
+        color: var(--color-text-light);
+        margin: 0 auto 2rem;
+        max-width: 50ch;
+    }
+    .references-tips-list {
+        display: grid;
+        gap: 0.6rem;
+    }
+    .references-tips-list details {
+        border: 1px solid var(--color-border);
+        border-radius: 14px;
+        padding: 1rem 1.3rem;
+        background-color: var(--color-background-1);
+    }
+    .references-tips-list details[open] {
+        background-color: var(--color-background-2);
+    }
+    .references-tips-list summary {
+        cursor: pointer;
+        font-weight: 510;
+        color: var(--color-text-dark);
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        line-height: 1.3;
+    }
+    .references-tips-list summary::-webkit-details-marker {
+        display: none;
+    }
+    .references-tips-list summary::after {
+        content: "+";
+        font-weight: 400;
+        font-size: 1.4rem;
+        color: var(--color-text-light);
+        line-height: 1;
+    }
+    .references-tips-list details[open] summary::after {
+        content: "−";
+    }
+    .references-tips-list summary:focus-visible {
+        outline: 2px solid var(--color-text-dark);
+        outline-offset: 4px;
+        border-radius: 4px;
+    }
+    .references-tip-body {
+        margin-top: 0.85rem;
+        color: var(--color-text-medium);
+        line-height: 1.5;
+    }
+    .references-tip-body p {
+        margin: 0;
+    }
+    .references-tip-body code {
+        background-color: var(--color-background-3);
+        padding: 1px 6px;
+        border-radius: 5px;
+        font-size: 0.9em;
+    }
+
+    @media (max-width: 800px) {
+        .references-intro {
+            margin: 2rem 0 1.5rem;
+        }
+        .references-tips {
+            margin: 3.5rem auto 4rem;
+            padding-top: 2.5rem;
+        }
     }
 </style>
