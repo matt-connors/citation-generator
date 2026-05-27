@@ -1,156 +1,98 @@
-import { useState, useEffect } from 'react';
-import type { Source } from '../citations/definitions';
-import formatSource from '../citations/formatSource';
+import { useState, useEffect, useCallback } from 'react';
+import { loadSources, saveSources, type StoredSource } from './storage';
+import type { CSLItem, SupportedStyle } from '../citations/csl-types';
 
 export interface UseReferencesReturn {
-    sources: Source[];
-    sourceCount: number;
-    checkedCount: number;
-    citationFormat: string;
-    setSources: (sources: Source[]) => void;
-    setCheckedCount: (count: number) => void;
-    setCitationFormat: (format: string) => void;
-    handleDelete: () => void;
-    copySelected: (onCopy: () => void) => void;
-    loadInitialSources: () => void;
+  sources: StoredSource[];
+  sourceCount: number;
+  checkedCount: number;
+  citationFormat: SupportedStyle;
+  setSources: (sources: StoredSource[] | ((prev: StoredSource[]) => StoredSource[])) => void;
+  setCheckedCount: (count: number) => void;
+  setCitationFormat: (format: SupportedStyle) => void;
+  handleDelete: () => void;
+}
+
+const STYLES: SupportedStyle[] = ['mla-9', 'apa-7', 'chicago-18', 'ama-11', 'harvard', 'ieee', 'vancouver'];
+
+function isSupportedStyle(s: string | null): s is SupportedStyle {
+  return !!s && (STYLES as string[]).includes(s);
+}
+
+interface ApiEnvelope {
+  uuid: string;
+  type: CSLItem['type'];
+  csl: CSLItem;
 }
 
 export function useReferences(): UseReferencesReturn {
-    const [sources, setSources] = useState<Source[]>([]);
-    const [sourceCount, setSourceCount] = useState<number>(0);
-    const [checkedCount, setCheckedCount] = useState<number>(0);
-    const [citationFormat, setCitationFormat] = useState<string>('mla-9th-edition');
+  const [sources, setSourcesState] = useState<StoredSource[]>([]);
+  const [checkedCount, setCheckedCount] = useState(0);
+  const [citationFormat, setCitationFormatState] = useState<SupportedStyle>('mla-9');
 
-    const getExistingSources = (): Source[] => {
-        const existingSources = localStorage.getItem("sources");
-        return existingSources ? JSON.parse(existingSources) : [];
-    };
+  const setSources = useCallback((next: StoredSource[] | ((prev: StoredSource[]) => StoredSource[])) => {
+    setSourcesState((prev) => {
+      const computed = typeof next === 'function' ? (next as any)(prev) : next;
+      saveSources(computed);
+      return computed;
+    });
+  }, []);
 
-    const isCitationInLocalStorage = (existingSources: Source[]): boolean => {
-        const url = new URL(window.location.href);
-        const website = url.searchParams.get('website')
-            ?.replace('https://', '')
-            ?.replace('http://', '');
-        return existingSources.some((source: Source) => source.citationInfo.url === website);
-    };
+  const setCitationFormat = useCallback((s: SupportedStyle) => {
+    setCitationFormatState(s);
+  }, []);
 
-    const getRequestUrl = (): string => {
-        const url = new URL(window.location.href);
-        const website = url.searchParams.get('website');
-        const book = url.searchParams.get('book');
-        if (website) return `/cite-website?url=${website}`;
-        if (book) return `/cite-book?isbn=${book}`;
-        return '';
-    };
+  const handleDelete = useCallback(() => {
+    const remaining: StoredSource[] = [];
+    sources.forEach((s, i) => {
+      const cb = document.querySelector(`#source-${i}`) as HTMLInputElement | null;
+      if (!cb?.checked) remaining.push(s);
+    });
+    setSources(remaining);
+    setCheckedCount(0);
+  }, [sources, setSources]);
 
-    const handleDelete = () => {
-        const updatedSources = sources.filter((_, index) => {
-            const checkbox = document.querySelector(`#source-${index}`) as HTMLInputElement;
-            return !checkbox?.checked;
-        });
-        setSources(updatedSources);
-        setSourceCount(updatedSources.length);
-        setCheckedCount(0);
-        localStorage.setItem('sources', JSON.stringify(updatedSources));
-    };
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const styleParam = params.get('citationStyle');
+    if (isSupportedStyle(styleParam)) setCitationFormatState(styleParam);
 
-    const copySelected = (onCopy: () => void) => {
-        const selectedSources = sources.filter((_, index) => {
-            const checkbox = document.querySelector(`#source-${index}`) as HTMLInputElement;
-            return checkbox?.checked;
-        });
+    const existing = loadSources();
+    setSourcesState(existing);
 
-        // Create a temporary div for copying
-        const tempDiv = document.createElement('div');
-        tempDiv.style.cssText = `
-            position: fixed;
-            left: -9999px;
-            font-family: "Times New Roman", Times, serif;
-            font-size: 12pt;
-            line-height: 2;
-        `;
-        document.body.appendChild(tempDiv);
+    const website = params.get('website');
+    const book = params.get('book');
+    const journal = params.get('journal') || params.get('doi');
+    let requestUrl: string | null = null;
+    if (website) requestUrl = `/api/cite-website?url=${encodeURIComponent(website)}`;
+    else if (book) requestUrl = `/api/cite-book?isbn=${encodeURIComponent(book)}`;
+    else if (journal) requestUrl = `/api/cite-journal?doi=${encodeURIComponent(journal)}`;
+    if (!requestUrl) return;
 
-        // Add each selected source's formatted HTML
-        selectedSources.forEach((source, index) => {
-            const formattedHtml = formatSource(source, citationFormat);
-            const sourceDiv = document.createElement('div');
-            sourceDiv.style.cssText = `
-                font-family: "Times New Roman", Times, serif;
-                font-size: 12pt;
-                line-height: 2;
-            `;
-            sourceDiv.innerHTML = formattedHtml;
-            if (index > 0) {
-                tempDiv.appendChild(document.createElement('br'));
-                tempDiv.appendChild(document.createElement('br'));
-            }
-            tempDiv.appendChild(sourceDiv);
-        });
+    let cancelled = false;
+    fetch(requestUrl)
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json() as Promise<ApiEnvelope>;
+      })
+      .then((env) => {
+        if (cancelled || !env?.csl) return;
+        if (existing.some((s) => s.uuid === env.uuid)) return;
+        const merged = [...existing, { uuid: env.uuid, csl: env.csl }];
+        setSources(merged);
+      })
+      .catch((err) => console.error('Citation fetch failed', err));
+    return () => { cancelled = true; };
+  }, [setSources]);
 
-        // Select and copy the content
-        const range = document.createRange();
-        range.selectNodeContents(tempDiv);
-        const selection = window.getSelection();
-        selection?.removeAllRanges();
-        selection?.addRange(range);
-        document.execCommand('copy');
-        
-        // Clean up
-        document.body.removeChild(tempDiv);
-        selection?.removeAllRanges();
-
-        onCopy();
-    };
-    
-    const loadInitialSources = async () => {
-        try {
-            const requestUrl = getRequestUrl();
-            const existingSources = getExistingSources();
-            setSources(existingSources);
-            setSourceCount(existingSources.length);
-
-            if (requestUrl === '' || isCitationInLocalStorage(existingSources)) {
-                return;
-            }
-
-            const response = await fetch('https://mlagenerator.com/api' + requestUrl);
-            const data = await response.json();
-
-            if (data.error) throw new Error('API Error: ' + data.error);
-
-            const mergedSources = [...existingSources, data].filter(
-                (source, index, self) =>
-                    index === self.findIndex(element => element.uuid === source.uuid)
-            );
-
-            setSources(mergedSources);
-            setSourceCount(mergedSources.length);
-            localStorage.setItem('sources', JSON.stringify(mergedSources));
-        } catch (error) {
-            console.error('Error loading sources:', error);
-            const existingSources = getExistingSources();
-            setSources(existingSources);
-            setSourceCount(existingSources.length);
-        }
-    };
-
-    useEffect(() => {
-        const citationStyle = new URLSearchParams(window.location.search).get('citationStyle');
-        setCitationFormat(citationStyle || 'mla-9th-edition');
-        loadInitialSources();
-    }, []);
-
-    return {
-        sources,
-        sourceCount,
-        checkedCount,
-        citationFormat,
-        setSources,
-        setCheckedCount,
-        setCitationFormat,
-        handleDelete,
-        copySelected,
-        loadInitialSources
-    };
-} 
+  return {
+    sources,
+    sourceCount: sources.length,
+    checkedCount,
+    citationFormat,
+    setSources,
+    setCheckedCount,
+    setCitationFormat,
+    handleDelete,
+  };
+}
