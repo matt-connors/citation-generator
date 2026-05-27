@@ -26,9 +26,6 @@ describe('formatting (fixture corpus)', () => {
       if (!existsSync(goldPath)) continue;
       it(`${name} → ${style}`, () => {
         const csl = JSON.parse(readFileSync(join(FIX_ROOT, name, 'csl.json'), 'utf-8'));
-        // Override id with the fixture directory name so citeproc's per-item
-        // bibliography cache treats each fixture as a distinct entry.
-        csl.id = name;
         const expected = readFileSync(goldPath, 'utf-8').replace(/\r?\n$/, '');
         const rt = formatCitation(csl, style);
         const actual = rt.map((seg) => (seg.italic ? `<i>${seg.text}</i>` : seg.text)).join('');

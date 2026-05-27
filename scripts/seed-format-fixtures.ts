@@ -21,9 +21,6 @@ for (const name of dirs) {
   const cslPath = join(FIX_ROOT, name, 'csl.json');
   if (!existsSync(cslPath)) continue;
   const csl = JSON.parse(readFileSync(cslPath, 'utf-8'));
-  // Override id with the fixture directory name so citeproc's per-item
-  // bibliography cache treats each fixture as a distinct entry.
-  csl.id = name;
   for (const style of STYLES) {
     const out = join(FIX_ROOT, name, `${style}.txt`);
     if (existsSync(out)) continue;

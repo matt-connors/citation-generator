@@ -54,4 +54,45 @@ describe('formatCitation', () => {
   it('throws on unknown style', () => {
     expect(() => formatCitation(SAMPLE, 'made-up' as any)).toThrow();
   });
+
+  it('returns distinct output for distinct items sharing the same id (or distinct ids in sequence)', () => {
+    // Bug regression: with engine caching, calling formatCitation twice in a row
+    // with the same id but different content used to return the first item's output.
+    const itemA: CSLItem = {
+      id: 'X', type: 'webpage', title: 'AAA',
+      author: [{ family: 'AlphaLast', given: 'AlphaFirst' }],
+      issued: { 'date-parts': [[2020]] },
+      URL: 'https://a.example.com',
+    };
+    const itemB: CSLItem = {
+      id: 'X', type: 'webpage', title: 'BBB',
+      author: [{ family: 'BetaLast', given: 'BetaFirst' }],
+      issued: { 'date-parts': [[2021]] },
+      URL: 'https://b.example.com',
+    };
+    const a = formatCitation(itemA, 'mla-9').map((r) => r.text).join('');
+    const b = formatCitation(itemB, 'mla-9').map((r) => r.text).join('');
+    expect(a).toContain('AAA');
+    expect(a).toContain('AlphaLast');
+    expect(b).toContain('BBB');
+    expect(b).toContain('BetaLast');
+    expect(a).not.toBe(b);
+  });
+
+  it('decodes numeric HTML entities in rendered output', () => {
+    // Bug regression: citeproc-js emits &#38; for &amp;, our decoder dropped this on the floor.
+    const item: CSLItem = {
+      id: 'multi-author', type: 'webpage', title: 'X',
+      author: [
+        { family: 'Doe', given: 'Jane' },
+        { family: 'Smith', given: 'John' },
+      ],
+      issued: { 'date-parts': [[2024]] },
+      URL: 'https://x.com',
+    };
+    const rendered = formatCitation(item, 'apa-7').map((r) => r.text).join('');
+    expect(rendered).not.toMatch(/&#\d+;/);
+    expect(rendered).not.toMatch(/&#x[0-9a-f]+;/i);
+    expect(rendered).toContain('&'); // APA uses & between final two authors
+  });
 });

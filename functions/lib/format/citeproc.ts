@@ -4,39 +4,49 @@ import type { CSLItem, RichText, SupportedStyle } from '../csl-types';
 
 const styles: Map<string, string> = new Map();
 const locales: Map<string, string> = new Map();
-const engines: Map<string, any> = new Map();
 
 export function registerStyle(name: SupportedStyle, csl: string): void {
   styles.set(name, csl);
-  engines.delete(name);
 }
 
 export function registerLocale(name: string, xml: string): void {
   locales.set(name, xml);
-  engines.clear();
 }
 
-function getEngine(style: SupportedStyle, item: CSLItem): any {
-  const cached = engines.get(style);
-  if (cached) {
-    cached.sys.__currentItem = item;
-    return cached;
-  }
+// We deliberately do NOT cache CSL.Engine instances across calls.
+//
+// Strategy chosen: Option B — fresh engine per formatCitation call.
+//
+// Why: citeproc's bibliography registry is keyed by item id. Once an id is
+// inserted (via updateItems([id])), subsequent updateItems([id]) calls are
+// no-ops in CSL.Registry.doinserts (`if (!this.registry[item])` guard at
+// citeproc_commonjs.js:23137). That means a cached engine returns the FIRST
+// item's rendered output for any later call that reuses the id — even if the
+// underlying CSLItem content differs. This is a real correctness bug for any
+// caller that reuses ids within a single Worker isolate (or any test that
+// uses a fixed id like 'fixture').
+//
+// Option A (updateItems([]) to clear, then updateItems([id])) does work in
+// the current citeproc version (init([]) resets myhash to {}, dodeletes
+// purges everything not in myhash, doinserts then re-adds the new id). But
+// the contract is undocumented and fragile across citeproc versions. Since
+// engine construction is only ~5-20ms and these calls happen server-side
+// (Cloudflare Worker), correctness > microbenchmark.
+//
+// We still cache parsed style XML and locale XML strings — those are pure
+// data and safe to share.
+function buildEngine(style: SupportedStyle, item: CSLItem): any {
   const csl = styles.get(style);
   if (!csl) throw new Error(`Unknown style: ${style}`);
   const sys: any = {
-    __currentItem: item as CSLItem,
     retrieveLocale: (lang: string) => locales.get(lang) || locales.get('en-US') || '',
-    retrieveItem: (_id: string) => sys.__currentItem,
+    retrieveItem: (_id: string) => item,
   };
-  const engine = new CSL.Engine(sys, csl, 'en-US');
-  engines.set(style, engine);
-  return engine;
+  return new CSL.Engine(sys, csl, 'en-US');
 }
 
 export function formatCitation(item: CSLItem, style: SupportedStyle): RichText[] {
-  const engine = getEngine(style, item);
-  engine.sys.__currentItem = item;
+  const engine = buildEngine(style, item);
   engine.updateItems([item.id]);
   const bib = engine.makeBibliography();
   if (!bib || !bib[1] || !bib[1].length) return [];
@@ -71,5 +81,9 @@ function decode(s: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, ' ')
-    .replace(/&#x2009;/g, ' ');
+    // Generic numeric character references emitted by citeproc-js (e.g. &#38;
+    // for &, &#x2014; for em-dash). The named-entity list above doesn't cover
+    // these, so without this they leak through to user-visible output.
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)))
+    .replace(/&#x([0-9a-fA-F]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)));
 }
