@@ -12,5 +12,5 @@ const list = Array.isArray(schemas) ? schemas : [schemas];
 ---
 
 {list.map((schema) => (
-    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(schema).replace(/</g, '\\u003c')} />
 ))}

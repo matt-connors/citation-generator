@@ -65,7 +65,7 @@ const dateLabel = frontmatter.updatedDate ? 'Updated' : 'Published';
             <p class="byline">
                 By {frontmatter.author} ·
                 <time datetime={displayDate.toISOString()}>
-                    {dateLabel} {new Date(displayDate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                    {dateLabel} {new Date(displayDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
                 </time>
             </p>
             <slot />

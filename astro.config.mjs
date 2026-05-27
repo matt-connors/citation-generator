@@ -46,6 +46,7 @@ export default defineConfig({
         sitemap({
             serialize(item) {
                 const pathname = new URL(item.url).pathname.replace(/\/$/, '') || '/';
+                if (pathname.startsWith('/admin')) return undefined;
                 if (pathname === '/') {
                     item.priority = 1.0;
                     item.changefreq = 'weekly';
