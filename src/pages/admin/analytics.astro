@@ -1,0 +1,220 @@
+---
+import { makeSqlClient, SqlError } from '../../lib/admin/sql';
+import { buildQueries, type QueryDef } from '../../lib/admin/queries';
+
+// Astro/Cloudflare runtime env. `as any` because the Astro types here
+// don't know about our Pages secrets — the basic-auth middleware in
+// functions/_middleware.ts has already gated the request.
+const env = (Astro.locals as any).runtime?.env ?? {};
+const accountId: string | undefined = env.CF_ACCOUNT_ID;
+const token: string | undefined = env.CF_API_TOKEN;
+const rawDataset: string = env.ANALYTICS_DATASET || 'citation_generator_events';
+
+// Dataset name is interpolated raw into SQL strings. The value is operator-
+// controlled (Pages env var), not user-controlled — but a typo like
+// "foo; DROP …" or a value with spaces would produce cryptic AE errors.
+// Restrict to the conservative identifier shape Cloudflare actually accepts.
+const DATASET_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
+const dataset = DATASET_RE.test(rawDataset) ? rawDataset : '';
+const datasetInvalid = !dataset;
+
+const queries = dataset ? buildQueries(dataset) : [];
+
+interface PanelResult {
+  def: QueryDef;
+  rows?: Array<Record<string, unknown>>;
+  error?: string;
+}
+
+let panels: PanelResult[] = [];
+let configError: string | null = null;
+
+if (datasetInvalid) {
+  configError = `ANALYTICS_DATASET env var is invalid: ${JSON.stringify(rawDataset)}. `
+    + 'Allowed: letters, digits, underscore; must start with a letter or underscore.';
+  panels = [];
+} else if (!accountId || !token) {
+  configError = 'Server is missing CF_ACCOUNT_ID and/or CF_API_TOKEN secret(s). '
+    + 'Set both in Cloudflare Pages → Settings → Environment variables (encrypt as secrets).';
+  panels = queries.map((def) => ({ def }));
+} else {
+  const client = makeSqlClient({ accountId, token });
+  panels = await Promise.all(
+    queries.map(async (def) => {
+      try {
+        const r = await client.query(def.sql);
+        return { def, rows: r.data as Array<Record<string, unknown>> };
+      } catch (e) {
+        const msg = e instanceof SqlError
+          ? `${e.status}: ${e.message}`
+          : (e as Error).message;
+        return { def, error: msg };
+      }
+    }),
+  );
+}
+
+function fmt(v: unknown): string {
+  if (v === null || v === undefined) return '—';
+  if (typeof v === 'number') return Number.isInteger(v) ? String(v) : v.toFixed(2);
+  return String(v);
+}
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Analytics · Citation Generator</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #161922;
+      --panel-border: #232838;
+      --ink: #e7e9ee;
+      --muted: #8b93a7;
+      --accent: #7aa2f7;
+      --error: #f7768e;
+      --row-alt: #1a1e2a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 14px/1.45 ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      padding: 32px 24px;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    header { margin-bottom: 32px; }
+    header h1 { margin: 0 0 4px; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+    header .meta { color: var(--muted); font-size: 12px; }
+    header .meta code {
+      background: var(--panel);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--panel-border);
+    }
+    .config-error {
+      background: rgba(247, 118, 142, 0.1);
+      border: 1px solid var(--error);
+      color: var(--error);
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 16px;
+    }
+    section.panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 16px;
+      min-width: 0;
+    }
+    section.panel h2 {
+      margin: 0 0 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    section.panel p.desc {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th, td {
+      padding: 6px 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--panel-border);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    th { color: var(--muted); font-weight: 500; }
+    tr:nth-child(even) td { background: var(--row-alt); }
+    td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+    .empty { color: var(--muted); font-style: italic; padding: 8px 0; }
+    .err {
+      color: var(--error);
+      font-size: 11px;
+      padding: 8px;
+      background: rgba(247, 118, 142, 0.08);
+      border-radius: 4px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    footer {
+      margin-top: 32px;
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+    }
+    footer a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Citation Generator · Analytics</h1>
+      <div class="meta">
+        Dataset <code>{dataset}</code> · {new Date().toISOString()}
+      </div>
+    </header>
+
+    {configError && (
+      <div class="config-error">{configError}</div>
+    )}
+
+    <div class="grid">
+      {panels.map(({ def, rows, error }) => (
+        <section class="panel">
+          <h2>{def.title}</h2>
+          <p class="desc">{def.description}</p>
+          {error ? (
+            <div class="err">{error}</div>
+          ) : !rows || rows.length === 0 ? (
+            <div class="empty">No data in window.</div>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  {def.columns.map((c) => (
+                    <th class={c.align === 'right' ? 'r' : ''}>{c.label}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr>
+                    {def.columns.map((c) => (
+                      <td class={c.align === 'right' ? 'r' : ''} title={fmt(row[c.key])}>
+                        {fmt(row[c.key])}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
+      ))}
+    </div>
+
+    <footer>
+      Rendered server-side at request time. Auth via HTTP basic. <br/>
+      No JS, no client-side data — close the tab to log out.
+    </footer>
+  </div>
+</body>
+</html>

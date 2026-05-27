@@ -2,7 +2,25 @@
 
 This project emits per-request events to **Cloudflare Analytics Engine** via the `ANALYTICS` binding. The writer in `functions/lib/analytics.ts` is a no-op when the binding is absent, so the code is deploy-safe before the binding is configured — instrumentation lights up the moment you add the binding and redeploy.
 
-## One-time Cloudflare setup
+## Dashboard
+
+A read-only browser dashboard lives at **`/admin/analytics`** on the deployed site. It server-renders all the queries below and presents them as panels — no SQL knowledge required for day-to-day use.
+
+The dashboard is gated by HTTP basic auth and needs three Pages secrets to be useful:
+
+| Secret name           | What it is                                       | Where to get it                                                                 |
+| --------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------- |
+| `DASHBOARD_PASSWORD`  | The password you'll type at the basic-auth prompt | You choose. Any non-empty string. Username field is ignored.                    |
+| `CF_ACCOUNT_ID`       | Your Cloudflare account ID                       | Cloudflare dashboard → top-right "Copy Account ID", or visible in the URL bar.  |
+| `CF_API_TOKEN`        | An API token with `Account Analytics: Read`      | Cloudflare dashboard → My Profile → API Tokens → Create Token → custom template, set `Account → Account Analytics → Read` (you can scope to a specific account). Save the token immediately; it's shown once. |
+
+Add all three under Pages project → Settings → Environment variables. Encrypt each as a secret (the lock icon). Redeploy for the bindings to take effect.
+
+If `DASHBOARD_PASSWORD` is unset, `/admin/*` returns 503 (fail-closed; no accidental exposure). If `CF_ACCOUNT_ID` or `CF_API_TOKEN` is unset, the dashboard loads but every panel shows a configuration-missing banner so you know what to add.
+
+The dataset name in the dashboard's queries defaults to `citation_generator_events`; override with `ANALYTICS_DATASET` if you used a different name in the binding step below.
+
+## One-time Cloudflare setup (for the binding itself)
 
 1. Open the Cloudflare dashboard → **Workers & Pages** → **citation-generator** (the Pages project).
 2. **Settings** → **Functions** → **Analytics Engine Bindings** → **Add binding**.
