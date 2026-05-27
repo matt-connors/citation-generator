@@ -21,11 +21,6 @@ export function buildWebSite(): JsonLd {
     '@type': 'WebSite',
     name: ORG_NAME,
     url: ORG_URL,
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${ORG_URL}/guides?q={search_term_string}`,
-      'query-input': 'required name=search_term_string',
-    },
   };
 }
 

@@ -24,11 +24,11 @@ describe('buildOrganization', () => {
 });
 
 describe('buildWebSite', () => {
-  it('includes a SearchAction targeting /guides', () => {
+  it('returns a WebSite anchored to the canonical site URL', () => {
     const site = buildWebSite();
     expect(site['@type']).toBe('WebSite');
-    expect(site.potentialAction['@type']).toBe('SearchAction');
-    expect(site.potentialAction.target).toContain('{search_term_string}');
+    expect(site.name).toBe(ORG_NAME);
+    expect(site.url).toBe(ORG_URL);
   });
 });
 
@@ -68,12 +68,12 @@ describe('buildArticle', () => {
 
   it('falls back dateModified to datePublished when missing', () => {
     const a = buildArticle({
-      title: 't',
-      description: 'd',
-      url: 'u',
+      title: 'Test Article',
+      description: 'Test description',
+      url: 'https://mlagenerator.com/guides/test',
       datePublished: new Date('2026-01-01'),
-      author: 'x',
-      image: 'i',
+      author: 'MLA Generator Editorial Team',
+      image: 'https://mlagenerator.com/images/banner.png',
     });
     expect(a.dateModified).toBe('2026-01-01T00:00:00.000Z');
   });
