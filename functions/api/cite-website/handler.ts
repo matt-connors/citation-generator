@@ -44,7 +44,7 @@ export async function handleCiteWebsite(
           signal_winner_url: body._signals?.URL ?? '',
           host,
         },
-        { html_size_kb: 0, extraction_ms: 0, cache_hit: 1 },
+        { html_size_kb: 0, extraction_ms: 0, cache_hit: 1, fetch_ms: 0 },
       );
       return jsonResponse(body);
     }
@@ -52,6 +52,7 @@ export async function handleCiteWebsite(
 
   let html: string;
   let finalUrl: string;
+  const fetchStart = Date.now();
   try {
     ({ html, finalUrl } = await fetchHtml(target));
   } catch (err) {
@@ -62,6 +63,7 @@ export async function handleCiteWebsite(
     writeEvent(analytics, 'error', { endpoint: 'cite_website', code: 'internal' }, { count: 1 });
     return errorResponse(500, 'internal', String((err as Error).message), false);
   }
+  const fetchMs = Date.now() - fetchStart;
 
   const extractStart = Date.now();
   const { csl, signals } = runExtractionPipeline(html, finalUrl);
@@ -90,6 +92,7 @@ export async function handleCiteWebsite(
       html_size_kb: Math.round(html.length / 1024),
       extraction_ms: extractionMs,
       cache_hit: 0,
+      fetch_ms: fetchMs,
     },
   );
 
