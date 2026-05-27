@@ -1,0 +1,15 @@
+{
+  "id": "fixture",
+  "type": "article-journal",
+  "title": "Effects of Sleep on Memory Consolidation",
+  "author": [
+    { "family": "Patel", "given": "Priya" },
+    { "family": "Garcia", "given": "Carlos" }
+  ],
+  "container-title": "Journal of Neuroscience",
+  "volume": "45",
+  "issue": "12",
+  "page": "1234-1245",
+  "issued": { "date-parts": [[2024, 12, 1]] },
+  "DOI": "10.1234/jneuro.2024.045"
+}

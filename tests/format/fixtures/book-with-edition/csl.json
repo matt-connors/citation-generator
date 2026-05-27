@@ -1,0 +1,16 @@
+{
+  "id": "fixture",
+  "type": "book",
+  "title": "Introduction to Algorithms",
+  "author": [
+    { "family": "Cormen", "given": "Thomas H." },
+    { "family": "Leiserson", "given": "Charles E." },
+    { "family": "Rivest", "given": "Ronald L." },
+    { "family": "Stein", "given": "Clifford" }
+  ],
+  "issued": { "date-parts": [[2009]] },
+  "publisher": "MIT Press",
+  "publisher-place": "Cambridge",
+  "edition": "3",
+  "ISBN": "9780262032933"
+}

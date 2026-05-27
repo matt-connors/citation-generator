@@ -1,0 +1,16 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "Quantum Computing Advances",
+  "author": [
+    { "family": "Doe", "given": "Jane" },
+    { "family": "Smith", "given": "John" },
+    { "family": "Lee", "given": "Anna" },
+    { "family": "Garcia", "given": "Carlos" },
+    { "family": "Patel", "given": "Priya" }
+  ],
+  "issued": { "date-parts": [[2025, 6, 15]] },
+  "accessed": { "date-parts": [[2026, 5, 26]] },
+  "container-title": "Nature Tech",
+  "URL": "https://example.com/quantum"
+}
