@@ -1,28 +1,19 @@
-import React, { useEffect, useRef } from 'react';
+import React, { memo, useEffect, useRef } from 'react';
 import EditReferenceDialogDrawer from './EditReferenceDialogDrawer';
 import { useFormattedCitation } from '../../lib/citations/useFormattedCitation';
 import type { StoredSource } from '../../lib/references/storage';
 import type { SupportedStyle, RichText } from '../../lib/citations/csl-types';
 import styles from '../../styles/references.module.css';
 import { Clipboard, Globe } from 'lucide-react';
+import { escapeHtml, richTextToHtml } from './richText';
 
 interface Props {
     source: StoredSource;
-    sources: StoredSource[];
-    index: number;
+    checked: boolean;
+    onToggle: (uuid: string, checked: boolean) => void;
     citationFormat: SupportedStyle;
-    onCheckChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     setSources: (s: StoredSource[] | ((prev: StoredSource[]) => StoredSource[])) => void;
     autoOpenEdit?: boolean;
-}
-
-function richTextToHtml(rt: RichText[]): string {
-    return rt.map((seg) => seg.italic ? `<i>${escapeHtml(seg.text)}</i>` : escapeHtml(seg.text)).join('');
-}
-
-function escapeHtml(s: string): string {
-    return s.replace(/[&<>"']/g, (c) =>
-        c === '&' ? '&amp;' : c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '"' ? '&quot;' : '&#39;');
 }
 
 function copyRichText(rt: RichText[]) {
@@ -41,7 +32,7 @@ function copyRichText(rt: RichText[]) {
     sel?.removeAllRanges();
 }
 
-export default function ReferenceItem({ source, sources, index, citationFormat, onCheckChange, setSources, autoOpenEdit }: Props) {
+function ReferenceItem({ source, checked, onToggle, citationFormat, setSources, autoOpenEdit }: Props) {
     const editButtonRef = useRef<HTMLButtonElement>(null);
     const { formatted, loading, error } = useFormattedCitation(source, citationFormat);
 
@@ -63,11 +54,13 @@ export default function ReferenceItem({ source, sources, index, citationFormat, 
             <label className={styles.citation}>
                 <input
                     type="checkbox"
-                    id={`source-${index}`}
+                    id={`source-${source.uuid}`}
                     className={styles.checkboxElement}
-                    onChange={onCheckChange}
+                    checked={checked}
+                    onChange={(e) => onToggle(source.uuid, e.target.checked)}
+                    aria-label="Select this reference"
                 />
-                <div className={styles.checkbox}></div>
+                <div className={styles.checkbox} aria-hidden="true"></div>
                 <div className={styles.citationSourceWrapper}>
                     <pre
                         className={styles.citationSource}
@@ -90,7 +83,7 @@ export default function ReferenceItem({ source, sources, index, citationFormat, 
                     <Clipboard className={styles.icon} />
                     <span>Copy</span>
                 </button>
-                <EditReferenceDialogDrawer source={source} sources={sources} setSources={setSources} ref={editButtonRef} />
+                <EditReferenceDialogDrawer source={source} setSources={setSources} ref={editButtonRef} />
                 {source.csl.URL && (
                     <a
                         className={styles.button}
@@ -107,3 +100,8 @@ export default function ReferenceItem({ source, sources, index, citationFormat, 
         </li>
     );
 }
+
+// Memoized so editing one citation doesn't re-render every row. `source`,
+// `setSources`, and `onToggle` identities are stable per uuid; `checked` and
+// `autoOpenEdit` are primitives that only change for the affected row.
+export default memo(ReferenceItem);

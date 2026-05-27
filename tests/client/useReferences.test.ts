@@ -55,4 +55,67 @@ describe('useReferences', () => {
     act(() => result.current.setCitationFormat('apa-7'));
     expect(result.current.citationFormat).toBe('apa-7');
   });
+
+  describe('selection (uuid-based, not DOM indices)', () => {
+    beforeEach(() => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([
+        { uuid: 'a', csl: { id: 'a', type: 'webpage', title: 'A' } },
+        { uuid: 'b', csl: { id: 'b', type: 'webpage', title: 'B' } },
+        { uuid: 'c', csl: { id: 'c', type: 'webpage', title: 'C' } },
+      ]));
+    });
+
+    it('toggleSelected adds and removes uuids; selectedCount tracks size', async () => {
+      const { result } = renderHook(() => useReferences());
+      await waitFor(() => expect(result.current.sourceCount).toBe(3));
+      expect(result.current.selectedCount).toBe(0);
+
+      act(() => result.current.toggleSelected('a', true));
+      act(() => result.current.toggleSelected('c', true));
+      expect(result.current.selectedCount).toBe(2);
+      expect(result.current.selected.has('a')).toBe(true);
+      expect(result.current.selected.has('b')).toBe(false);
+      expect(result.current.selected.has('c')).toBe(true);
+
+      act(() => result.current.toggleSelected('a', false));
+      expect(result.current.selectedCount).toBe(1);
+      expect(result.current.selected.has('a')).toBe(false);
+    });
+
+    it('selectAll(true) selects every source; selectAll(false) clears', async () => {
+      const { result } = renderHook(() => useReferences());
+      await waitFor(() => expect(result.current.sourceCount).toBe(3));
+
+      act(() => result.current.selectAll(true));
+      expect(result.current.selectedCount).toBe(3);
+      ['a', 'b', 'c'].forEach((u) => expect(result.current.selected.has(u)).toBe(true));
+
+      act(() => result.current.selectAll(false));
+      expect(result.current.selectedCount).toBe(0);
+    });
+
+    it('handleDelete removes only selected uuids and clears selection', async () => {
+      const { result } = renderHook(() => useReferences());
+      await waitFor(() => expect(result.current.sourceCount).toBe(3));
+
+      act(() => result.current.toggleSelected('b', true));
+      act(() => result.current.handleDelete());
+
+      expect(result.current.sources.map((s) => s.uuid)).toEqual(['a', 'c']);
+      expect(result.current.selectedCount).toBe(0);
+    });
+
+    it('selection survives list reordering by uuid (not index)', async () => {
+      const { result } = renderHook(() => useReferences());
+      await waitFor(() => expect(result.current.sourceCount).toBe(3));
+
+      act(() => result.current.toggleSelected('b', true));
+      // Reorder: move 'b' to front
+      act(() => result.current.setSources((prev) => [prev[1], prev[0], prev[2]]));
+
+      // 'b' still selected even though its index changed from 1 to 0
+      expect(result.current.selected.has('b')).toBe(true);
+      expect(result.current.selectedCount).toBe(1);
+    });
+  });
 });

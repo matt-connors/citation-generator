@@ -43,7 +43,11 @@ const DrawerContent = React.forwardRef<
         <DrawerPrimitive.Content
             ref={ref}
             className={cn(
-                "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
+                // `max-h-[97vh] overflow-hidden` bounds the drawer's box so its
+                // children can't render past the top of the viewport. Combined
+                // with `flex flex-col`, a child marked `flex-1 min-h-0` can
+                // safely become the scroll container for overflowing content.
+                "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto max-h-[97vh] flex-col overflow-hidden rounded-t-[10px] border bg-background",
                 className
             )}
             {...props}

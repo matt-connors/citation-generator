@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import type { StoredSource } from '../../lib/references/storage';
 import type { CSLItem } from '../../lib/citations/csl-types';
 import {
@@ -35,15 +35,21 @@ interface Props {
 export default function EditCitationForm({ source, setSources }: Props) {
     const [local, setLocal] = useState<CSLItem>(source.csl);
 
-    const debouncedSet = useDebounce((next: CSLItem) => {
-        setSources((prev) => prev.map((s) => s.uuid === source.uuid ? { ...s, csl: next } : s));
+    // Read the latest `local` via ref inside the debounced flush so the 500ms
+    // timer always writes the most recent state, regardless of how many
+    // intervening patches happened (functional setLocal + ref instead of
+    // closure-captured `local` avoids dropping characters under rapid typing).
+    const localRef = useRef(local);
+    useEffect(() => { localRef.current = local; }, [local]);
+
+    const debouncedSet = useDebounce(() => {
+        setSources((prev) => prev.map((s) => s.uuid === source.uuid ? { ...s, csl: localRef.current } : s));
     }, 500);
 
     const patch = useCallback((p: Partial<CSLItem>) => {
-        const next = { ...local, ...p } as CSLItem;
-        setLocal(next);
-        debouncedSet(next);
-    }, [local, debouncedSet]);
+        setLocal((prev) => ({ ...prev, ...p } as CSLItem));
+        debouncedSet();
+    }, [debouncedSet]);
 
     const handleTypeChange = (t: CSLItem['type']) => patch({ type: t });
 

@@ -7,12 +7,20 @@ const ScrollArea = React.forwardRef<
     React.ElementRef<typeof ScrollAreaPrimitive.Root>,
     React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
 >(({ className, children, ...props }, ref) => (
+    // The Root is `flex flex-col` so its single in-flow child (the Viewport)
+    // becomes a flex item with a definite height. Without this, the Viewport's
+    // `height: 100%` (`h-full`) resolves against the Root's `auto` height and
+    // grows to fit content, defeating `overflow: scroll`. ScrollBar and Corner
+    // are `position: absolute` (set by Radix) so they don't participate in
+    // flex layout. Consumers must give the Root a bounded height — either an
+    // explicit `h-*` / `max-h-*`, or `flex-1 min-h-0` inside a flex parent —
+    // otherwise both Root and Viewport size to content as before.
     <ScrollAreaPrimitive.Root
         ref={ref}
-        className={cn("relative overflow-hidden", className)}
+        className={cn("relative flex flex-col overflow-hidden", className)}
         {...props}
     >
-        <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
+        <ScrollAreaPrimitive.Viewport className="min-h-0 w-full flex-1 rounded-[inherit]">
             {children}
         </ScrollAreaPrimitive.Viewport>
         <ScrollBar />
