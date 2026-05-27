@@ -131,7 +131,16 @@ const EditReferenceDialogDrawer = forwardRef<HTMLButtonElement, EditReferenceDia
     }
 
     return (
-        <Drawer open={open} onOpenChange={handleOpenChange}>
+        // shouldScaleBackground=false: vaul's default scales the page wrapper on
+        // open via `[data-vaul-drawer-wrapper]`. We don't render that wrapper
+        // (so it's a no-op today) but disabling explicitly prevents a future
+        // regression if someone adds it and gets surprised by the scale animation.
+        //
+        // repositionInputs stays at default true so vaul's iOS visualViewport
+        // listener can shrink the drawer height and lift it above the keyboard.
+        // Disabling it left a visible gap between the keyboard and the drawer
+        // when an input is focused (vaul stops adjusting drawer position/height).
+        <Drawer open={open} onOpenChange={handleOpenChange} shouldScaleBackground={false}>
             <DrawerTrigger asChild>
                 <TriggerButton ref={ref} onClick={openDrawer} />
             </DrawerTrigger>

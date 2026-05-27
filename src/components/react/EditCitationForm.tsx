@@ -62,7 +62,13 @@ export default function EditCitationForm({ source, setSources, currentRef }: Pro
     const handleTypeChange = (t: CSLItem['type']) => patch({ type: t });
 
     return (
-        <div className="flex flex-col gap-4 w-full pt-8">
+        // data-vaul-no-drag tells vaul to skip its drag-to-dismiss detection
+        // for touches anywhere inside the form. Without it, tapping a dropdown
+        // trigger or input doesn't reliably register on the first tap — vaul's
+        // shouldDrag walks up the DOM, finds the ScrollArea viewport with
+        // scrollTop=0, and treats the touch as a potential dismiss instead of
+        // forwarding the click to the control.
+        <div data-vaul-no-drag className="flex flex-col gap-4 w-full pt-8">
             <div className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
                 <span className="flex flex-col leading-4 text-sm">
                     Source Type
