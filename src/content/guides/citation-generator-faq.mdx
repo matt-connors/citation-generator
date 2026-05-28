@@ -73,10 +73,10 @@ What the feature does not do: sync across devices, back up to a server, export t
 
 ## Privacy
 
-Because there is no account, the site does not collect identifying information. The references you generate are stored only in your browser. Server-side, we log basic usage analytics (citation styles requested, source types extracted, response times) to monitor performance; we do not log the URLs, ISBNs, or DOIs you submit alongside personal identifiers. The privacy details are documented on the [privacy page](/privacy).
+There is no account, no email signup, and no server-side storage of your reference list — references live in your browser's local storage. Standard web logging (IP address, browser type, referring URL) and ad-network cookies from Google AdSense apply across the site like any other ad-supported web property. The full details — what is collected, how long it is retained, and your rights — are documented on the [privacy page](/privacy).
 
 ## Browser and device support
 
-The tool runs in any current browser — Chrome, Edge, Firefox, Safari — on desktop and mobile. The citation engine is small enough (about 186 KB gzipped) to load comfortably even on a slow connection. Mobile layouts are responsive; the main use case is reading the generated citation to copy it into a word processor on the same device or a different one.
+The tool runs in any current browser — Chrome, Edge, Firefox, Safari — on desktop and mobile. The citation engine runs server-side on Cloudflare Pages Functions, so your browser never has to download a heavy formatting library — only the small amount of JavaScript needed to submit a source and display the result. Mobile layouts are responsive; the main use case is reading the generated citation to copy it into a word processor on the same device or a different one.
 
-The site does not require JavaScript to read the guides (every page is statically rendered); JavaScript is required for the citation generator and the references page, which manage state in the browser.
+The site does not require JavaScript to read the guides (every guide page is statically rendered); JavaScript is required for the citation generator and the references page, which manage state in the browser.
