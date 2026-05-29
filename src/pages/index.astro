@@ -62,172 +62,199 @@ const extraSchemas = [buildSoftwareApplication()];
             }
         </div>
     </PageSegment>
+    <section id="trust-block" aria-labelledby="trust-block-heading">
+        <div class="trust-block-inner">
+            <h2 class="heading-2" id="trust-block-heading">
+                Why MLA Generator
+            </h2>
+            <ul class="trust-list">
+                <li>
+                    <h3 class="heading-3">Free and account-free</h3>
+                    <p>
+                        No signup, no usage cap, no paywall on switching
+                        between styles. Cite as many sources as you need —
+                        a single paper or a full dissertation bibliography
+                        — and copy the formatted references straight into
+                        your document.
+                    </p>
+                </li>
+                <li>
+                    <h3 class="heading-3">Seven styles, kept current</h3>
+                    <p>
+                        <a href="/guides/apa">APA 7</a>, <a href="/guides/mla"
+                            >MLA 9</a
+                        >, <a href="/guides/chicago"
+                            >Chicago Manual of Style 18</a
+                        >, <a href="/guides/harvard"
+                            >Harvard (Cite Them Right 12)</a
+                        >, Vancouver, IEEE, and AMA 11 — all rendered
+                        from the official <a
+                            href="https://citationstyles.org/"
+                            rel="noopener"
+                            target="_blank">Citation Style Language</a
+                        > files used by Zotero, Mendeley, and Pandoc. When
+                        an organization updates its rules, we ship the
+                        revised CSL.
+                    </p>
+                </li>
+                <li>
+                    <h3 class="heading-3">Real source extraction</h3>
+                    <p>
+                        Paste a URL and the tool reads JSON-LD, Open
+                        Graph, Twitter cards, microdata, meta tags, and
+                        HTML heuristics in parallel, then merges them
+                        into the highest-confidence reference. Books are
+                        resolved through Google Books and Open Library
+                        ISBN lookups; journal articles through Crossref
+                        and OpenAlex DOI lookups.
+                    </p>
+                </li>
+                <li>
+                    <h3 class="heading-3">Editable, transparent output</h3>
+                    <p>
+                        The generator gets you most of the way; you fix
+                        the last details from accurate raw data, not from
+                        a guess. Every formatting decision traces back to
+                        the CSL spec rather than a black-box prompt — if
+                        a comma moves, it moved because the style
+                        manual moved it.
+                    </p>
+                </li>
+            </ul>
+        </div>
+    </section>
     <article id="guide-snippet">
         <h2 class="heading-2">A Quick Guide to Working with Sources</h2>
         <div id="guide-snippet-columns">
-            <!-- <nav id="guide-snippet-nav">
-                <p class="heading-3">Guide</p>
-                <ul>
-                    <li>
-                        <a href="#what-is-a-works-cited-page"> Introduction</a>
-                    </li>
-                    <li>
-                        <a href="#how-to-create-a-works-cited-page">
-                            Finding sources
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#a-quick-guide-to-working-with-sources">
-                            Evaluating sources
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#how-to-create-a-works-cited-page">
-                            Integrating sources
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#how-to-create-a-works-cited-page">
-                            Citing sources
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#how-to-create-a-works-cited-page">
-                            Tools and resources
-                        </a>
-                    </li>
-                </ul>
-            </nav> -->
             <div id="guide-snippet-content">
                 <p>
-                    Working with sources is a fundamental aspect of academic
-                    writing and research. It involves acknowledging the ideas,
-                    information, and words of others that you use in your work.
-                    Properly citing sources is crucial for maintaining academic
-                    integrity, avoiding plagiarism, and allowing readers to
-                    verify your claims and explore further.
+                    Citations do two things at once: they credit the work
+                    you built on, and they hand the reader a trail back
+                    to it. Get them right and your argument inherits the
+                    authority of its sources. Get them wrong — wrong
+                    style, missing page, fabricated date — and your reader
+                    starts looking for other things you might be wrong
+                    about. This guide covers the parts of source work
+                    that don't change between styles, then points to the
+                    style-specific guides for the rest.
                 </p>
 
                 <h3 class="heading-3">Why Cite Sources?</h3>
 
                 <p>
-                    Citing sources is not just about following rules; it's about
-                    respecting intellectual property and contributing to a
-                    scholarly conversation. Here are some key reasons why
-                    citations are essential:
+                    The first reason is honesty. Presenting someone
+                    else's ideas as your own is plagiarism whether the
+                    theft is intentional or accidental, and a citation
+                    is the line between "I read this" and "I made this
+                    up." The second reason is verification. A claim with
+                    a citation is a claim a reader can check; a claim
+                    without one is a claim a reader has to take on faith.
+                    In academic writing, faith is not a unit of evidence.
                 </p>
 
-                <ul>
-                    <li>
-                        Avoiding Plagiarism: Plagiarism, whether intentional or
-                        accidental, is a serious academic offense. It involves
-                        presenting someone else's work as your own. By citing
-                        your sources, you clearly distinguish between your own
-                        ideas and those of others.
-                    </li>
-                    <li>
-                        Credibility and Authority: Properly cited sources lend
-                        credibility to your work. They demonstrate that your
-                        arguments are supported by evidence and that you have
-                        engaged with relevant literature.
-                    </li>
-                    <li>
-                        Transparency and Verifiability: Citations allow readers
-                        to trace the origins of your information and verify your
-                        claims. This transparency is crucial for maintaining the
-                        integrity of research.
-                    </li>
-                    <li>
-                        Giving Credit: Citing sources gives credit where credit
-                        is due. It acknowledges the intellectual contributions
-                        of others and helps build a community of knowledge.
-                    </li>
-                    <li>
-                        Further Research: Citations provide a roadmap for
-                        readers who want to delve deeper into a particular
-                        topic. They can follow your citations to explore related
-                        sources and expand their understanding.
-                    </li>
-                </ul>
+                <p>
+                    The third reason is conversational. Every paper
+                    enters a discipline mid-argument — someone before you
+                    asked the question, and someone after you will revise
+                    your answer. Citations are how that conversation
+                    threads itself together over decades, and they're
+                    how a reader who finds your paper interesting locates
+                    the next four they should read.
+                </p>
 
                 <h3 class="heading-3">What Needs to be Cited?</h3>
 
                 <p>
-                    Any information that is not common knowledge or your own
-                    original idea should be cited. This includes:
+                    Cite anything that isn't your own original idea and
+                    isn't common knowledge in your discipline. Direct
+                    quotations need a citation and quotation marks.
+                    Paraphrases need a citation even though you've
+                    rewritten the sentence. Summaries of a longer
+                    argument need a citation at the point you summarize.
+                    Specific facts and statistics need a citation unless
+                    they're the sort of fact a literate adult would
+                    already know — the population of France yes, the
+                    median income in Lyon in 2019 no.
                 </p>
 
-                <ul>
-                    <li>
-                        Direct Quotations: Any time you use the exact words of
-                        another author, you must enclose them in quotation marks
-                        and provide a citation.
-                    </li>
-                    <li>
-                        Paraphrases: When you rephrase someone else's ideas in
-                        your own words, you still need to cite the original
-                        source.
-                    </li>
-                    <li>
-                        Summaries: Even when you condense a longer passage into
-                        a brief summary, you must acknowledge the source.
-                    </li>
-                    <li>
-                        Facts and Statistics: Data, statistics, and specific
-                        facts that are not widely known should be attributed to
-                        their source.
-                    </li>
-                    <li>
-                        Theories and Concepts: When you discuss the theories,
-                        concepts, or frameworks developed by others, proper
-                        citation is required.
-                    </li>
-                    <li>
-                        Images, Tables, and Graphs: Visual materials created by
-                        others must also be cited.
-                    </li>
-                </ul>
+                <p>
+                    The trickier category is theories, frameworks, and
+                    concepts attributed to a named originator. If you
+                    describe cognitive load theory, Sweller gets a
+                    citation even if you're not quoting him; if you
+                    discuss the Gini coefficient, the methodology paper
+                    gets credited even if you computed your own value.
+                    Images, tables, and graphs from another source need
+                    a citation and a caption, regardless of whether you
+                    redrew the figure or reproduced it directly. The
+                    rule of thumb: if someone could read your paper and
+                    reasonably ask "where did that come from?", a
+                    citation answers them.
+                </p>
 
                 <h3 class="heading-3">Popular Citation Styles</h3>
 
                 <p>
-                    Different academic disciplines and publications often prefer
-                    specific citation styles. Some of the most common styles
-                    include:
+                    Disciplines pick the citation style that fits the
+                    shape of their evidence. The seven styles supported
+                    by this generator cover the dominant choices across
+                    the humanities, social sciences, sciences, and
+                    professional fields.
                 </p>
 
                 <ul>
                     <li>
-                        MLA (Modern Language Association): Widely used in the
-                        humanities, particularly in literature, language, and
-                        cultural studies.
+                        <a href="/guides/apa"><strong>APA 7</strong></a> —
+                        psychology, education, nursing, and most of the
+                        social sciences. Author–date in the text.
                     </li>
                     <li>
-                        APA (American Psychological Association): Common in
-                        social sciences, education, and psychology.
+                        <a href="/guides/mla"><strong>MLA 9</strong></a> —
+                        literature, languages, film, and humanities
+                        composition. Author–page in the text and a Works
+                        Cited page assembled from nine core elements.
                     </li>
                     <li>
-                        Chicago/Turabian: Used in history, art history, and
-                        other disciplines.
+                        <a href="/guides/chicago"
+                            ><strong>Chicago 18</strong></a
+                        > — history, art history, and the rest of the
+                        humanities that prefer footnotes. Also a parallel
+                        author–date system used in some social sciences.
                     </li>
                     <li>
-                        IEEE: Often used in engineering and computer science.
+                        <a href="/guides/harvard"
+                            ><strong>Harvard</strong></a
+                        > — author–date style common in UK and Commonwealth
+                        universities across disciplines. The generator
+                        uses Cite Them Right 12, the dominant Harvard
+                        variant.
                     </li>
                     <li>
-                        Harvard: A commonly used style across multiple
-                        disciplines.
+                        <strong>Vancouver</strong> — biomedical and
+                        clinical research. Numbered references in the
+                        order they appear in the text.
                     </li>
                     <li>
-                        Vancouver: Often used in medical and scientific fields.
+                        <strong>IEEE</strong> — engineering, computer
+                        science, and the physical sciences. Bracketed
+                        numbers in the text, references listed in
+                        citation order.
+                    </li>
+                    <li>
+                        <strong>AMA 11</strong> — medicine and the
+                        health sciences outside the Vancouver group.
+                        Superscript numbers in the text.
                     </li>
                 </ul>
 
                 <p>
-                    Each citation style has its own specific rules for
-                    formatting in-text citations and the bibliography or works
-                    cited list. You can learn more about these styles in our <a
-                        href="/guides">citation style guides</a
-                    >.
+                    Use the style your assignment, journal, or program
+                    specifies. If nothing's specified, ask — guessing
+                    wrong is a marking-rubric line item in most
+                    courses. Browse the full <a href="/guides"
+                        >citation style guides</a
+                    > for in-text rules, reference formats, and worked
+                    examples in every supported style.
                 </p>
 
                 <h3 class="heading-3">
@@ -235,81 +262,117 @@ const extraSchemas = [buildSoftwareApplication()];
                 </h3>
 
                 <p>
-                    <cite>MLA Generator</cite> simplifies the process of creating
-                    citations. Our citation generator can help you quickly format
-                    citations for websites and books in various popular styles, including
-                    MLA, APA, Chicago, and more.
+                    The tool at the top of this page builds a citation
+                    from a URL, an ISBN, a DOI, or a manual entry, in
+                    whichever of the seven styles you select. The
+                    workflow is:
                 </p>
-
-                <p>Here's how to use it:</p>
 
                 <ol>
                     <li>
-                        Choose your source type: Select whether you are citing a
-                        website or a book.
+                        Pick your source type — website, book, or
+                        journal article — and your citation style.
                     </li>
                     <li>
-                        Select your citation style: Choose the citation style
-                        you need (e.g., MLA, APA).
+                        Paste a URL, ISBN, or DOI and click cite. The
+                        generator pulls metadata from the page or from
+                        Google Books, Open Library, Crossref, and
+                        OpenAlex, then merges the highest-confidence
+                        signal into a draft reference.
                     </li>
                     <li>
-                        Generate your citation: Click the "cite" button, and the
-                        citation generator will automatically retrieve any
-                        information it can about the source and format the
-                        citation according to the chosen style.
+                        Review the result. Auto-extraction handles most
+                        fields, but check the author, date, and title —
+                        these are the fields graders scan first.
                     </li>
                     <li>
-                        Edit source information: Edit or add any details about
-                        your source, such as the title, author, and publication
-                        date if it wasn't automatically populated.
+                        Edit any field that needs correcting. Edits
+                        save automatically and re-render the citation
+                        in place.
                     </li>
                     <li>
-                        Copy and paste: Copy the generated citation and paste it
-                        into your document.
+                        Copy the formatted citation into your document.
+                        Italics, hanging indent, and special characters
+                        carry through to Word and Google Docs.
                     </li>
                     <li>
-                        Manage your references: You can add and manage your
-                        generated citations on the <a href="/my-references"
-                            >My References</a
-                        > page.
+                        Every citation is saved automatically to your <a
+                            href="/my-references">My References</a
+                        > page, in your browser — no account required.
+                        Switch styles there to re-render every reference
+                        at once.
                     </li>
                 </ol>
 
                 <h3 class="heading-3">Tips for Effective Source Management</h3>
 
-                <ul>
-                    <li>
-                        Keep track of your sources as you research: Don't wait
-                        until the end to start gathering citation information.
-                        Note down the details of each source as you encounter
-                        it.
-                    </li>
-                    <li>
-                        Use a consistent citation style: Stick to one citation
-                        style throughout your paper unless instructed otherwise.
-                    </li>
-                    <li>
-                        Double-check your citations: Make sure your citations
-                        are accurate and complete. Errors in citations can
-                        undermine your credibility.
-                    </li>
-                    <li>
-                        Create a bibliography or works cited list: Compile all
-                        your citations in a list at the end of your paper. This
-                        list should be alphabetized by author's last name.
-                    </li>
-                </ul>
-
-                <h3 class="heading-3">Conclusion</h3>
+                <p>
+                    Collect citation metadata while you're still
+                    reading the source, not the night before the paper
+                    is due. The PDF you closed three days ago will not
+                    re-volunteer its DOI, and the URL you saved on the
+                    library computer may not still be visible from your
+                    laptop. Save the full reference the first time you
+                    read the source — title, author, date, journal or
+                    publisher, page range, and the access URL or DOI —
+                    and you'll never re-trace the same path twice.
+                </p>
 
                 <p>
-                    Working with sources is an integral part of academic
-                    writing. By understanding the principles of citation and
-                    utilizing tools like
-                    <a href="/">MLA Generator</a>, you
-                    can ensure that your work is ethical, credible, and
-                    well-supported. Remember to cite your sources diligently and
-                    accurately to contribute to a culture of academic integrity.
+                    Pick one style at the start of the project and stay
+                    in it. Switching styles mid-bibliography is a
+                    reliable way to introduce inconsistencies that a
+                    reader will spot: a stray ampersand in an MLA paper,
+                    a missing year in an APA reference, a hyphenated
+                    page range where the style wants an en dash. Choose
+                    your style first, set it in <a
+                        href="/my-references">My References</a
+                    >, and let every new source render the same way as
+                    you collect it.
+                </p>
+
+                <p>
+                    Verify what the generator produces. Auto-extraction
+                    is good at structured fields (titles, authors, and
+                    dates from JSON-LD, Crossref, or Open Library) and
+                    weaker on ambiguous ones (subtitles, edited-volume
+                    editors, organization-as-author, and the
+                    in-the-middle case of a journal article published in
+                    a special issue). When a reference looks off, open
+                    the source and confirm the field by hand. The
+                    generator's output is editable for exactly this
+                    reason — fix the field once and the corrected
+                    reference re-renders in your chosen style.
+                </p>
+
+                <p>
+                    Cross-check anything formatted to a discipline-
+                    specific edition. <a href="/guides/apa">APA 7</a>
+                    dropped "Retrieved from" before URLs; <a
+                        href="/guides/mla">MLA 9</a
+                    > strips the "https://" prefix from plain URLs but
+                    keeps it on DOIs; <a href="/guides/chicago"
+                        >Chicago 18</a
+                    > distinguishes notes-and-bibliography from
+                    author-date in ways earlier editions blurred. The
+                    style guides on this site track the current edition;
+                    outdated handouts often don't.
+                </p>
+
+                <h3 class="heading-3">Cite consistently, edit deliberately</h3>
+
+                <p>
+                    A good bibliography is one your reader doesn't have
+                    to think about — the formatting recedes and the
+                    sources do the talking. Pick the style your
+                    discipline expects, follow its rules per the
+                    current edition, and use the generator to handle
+                    the punctuation while you focus on the argument.
+                    The <a href="/guides">style guides</a> cover each
+                    style in detail; the tool above turns a URL into a
+                    reference; the <a href="/my-references"
+                        >My References</a
+                    > page keeps everything organized while you write.
                 </p>
             </div>
         </div>
@@ -631,4 +694,64 @@ text-decoration-thickness: 2px;
         font-size: 15px;
         text-align: center;
     } */
+</style>
+
+<style is:global>
+    /* Trust block (Why MLA Generator) */
+    #trust-block {
+        padding: min(calc(15vw + 2rem), 9rem) var(--page-inline-padding) 0;
+        box-sizing: border-box;
+    }
+    .trust-block-inner {
+        max-width: 950px;
+        margin: 0 auto;
+    }
+    #trust-block .heading-2 {
+        text-align: center;
+        max-width: 20ch;
+        margin: 0 auto min(3.5rem, 13vw);
+        color: var(--color-text-light);
+    }
+    .trust-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    .trust-list > li {
+        background-color: var(--color-background-2);
+        border-radius: 24px;
+        padding: 1.6rem 1.8rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+    .trust-list h3 {
+        font-size: 1.2rem;
+        line-height: 1.2;
+        color: var(--color-text-dark);
+    }
+    .trust-list p {
+        line-height: 1.4;
+        color: var(--color-text-light);
+        margin: 0;
+    }
+    .trust-list a {
+        color: inherit;
+        text-decoration: underline;
+    }
+    .trust-list a:hover {
+        color: var(--color-text-dark);
+    }
+    @media (max-width: 760px) {
+        .trust-list {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        .trust-list > li {
+            padding: 1.3rem 1.4rem;
+        }
+    }
 </style>
