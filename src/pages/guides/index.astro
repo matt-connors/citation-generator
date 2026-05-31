@@ -1,7 +1,9 @@
 ---
 import Layout from "../../layouts/page.astro";
 import Breadcrumbs from "../../components/astro/Breadcrumbs.astro";
+import GuideCardGrid from "../../components/astro/GuideCardGrid.astro";
 import { buildBreadcrumbList } from "../../lib/schema-org";
+import { GUIDE_CATEGORIES, categoryPath } from "../../lib/guide-categories";
 import { getCollection } from "astro:content";
 
 const title = "Citation Guides — APA, MLA, Chicago, Harvard, Vancouver, IEEE, AMA";
@@ -17,15 +19,7 @@ const all = await getCollection("guides");
 const sortByTitle = (a: typeof all[number], b: typeof all[number]) =>
     a.data.title.localeCompare(b.data.title);
 
-const categories: { key: string; label: string; blurb: string }[] = [
-    { key: 'style-guide', label: 'Style guides', blurb: 'Complete reference for each major citation style.' },
-    { key: 'how-to', label: 'How to cite', blurb: 'Format common source types across every style.' },
-    { key: 'concept', label: 'Concepts', blurb: 'Core citation concepts and how they apply.' },
-    { key: 'comparison', label: 'Comparisons', blurb: 'Choosing the right style for your work.' },
-    { key: 'meta', label: 'Reference & FAQ', blurb: 'Tool documentation and frequently asked questions.' },
-];
-
-const grouped = categories.map((cat) => ({
+const grouped = GUIDE_CATEGORIES.map((cat) => ({
     ...cat,
     items: all.filter((g) => g.data.category === cat.key).sort(sortByTitle),
 }));
@@ -46,18 +40,11 @@ const grouped = categories.map((cat) => ({
 
         {grouped.map((group) => group.items.length > 0 && (
             <section aria-labelledby={`cat-${group.key}`}>
-                <h2 id={`cat-${group.key}`}>{group.label}</h2>
+                <h2 id={`cat-${group.key}`}>
+                    <a href={categoryPath(group.key)}>{group.label}</a>
+                </h2>
                 <p class="cat-blurb">{group.blurb}</p>
-                <ul>
-                    {group.items.map((g) => (
-                        <li>
-                            <a href={`/guides/${g.slug}`}>
-                                <span class="guide-title">{g.data.title}</span>
-                                <span class="guide-desc">{g.data.description}</span>
-                            </a>
-                        </li>
-                    ))}
-                </ul>
+                <GuideCardGrid items={group.items} />
             </section>
         ))}
     </article>
@@ -81,6 +68,11 @@ const grouped = categories.map((cat) => ({
         margin-bottom: 3rem;
         max-width: 60ch;
     }
+    /* Inline prose link in the lede — a normal underlined text link, not a card. */
+    .guides-hub .lede a {
+        color: var(--color-text-dark);
+        text-decoration: underline;
+    }
     .guides-hub section {
         margin-bottom: 3rem;
     }
@@ -89,43 +81,16 @@ const grouped = categories.map((cat) => ({
         color: var(--color-text-dark);
         margin: 0 0 0.5rem;
     }
+    .guides-hub h2 a {
+        color: inherit;
+        text-decoration: none;
+    }
+    .guides-hub h2 a:hover,
+    .guides-hub h2 a:focus-visible {
+        text-decoration: underline;
+    }
     .cat-blurb {
         color: var(--color-text-light);
         margin-bottom: 1rem;
-    }
-    .guides-hub ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: grid;
-        gap: 0.75rem;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    }
-    .guides-hub a {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        padding: 1rem 1.25rem;
-        border: 1px solid var(--color-border);
-        border-radius: 10px;
-        text-decoration: none;
-        color: var(--color-text-dark);
-        height: 100%;
-    }
-    .guides-hub a:hover,
-    .guides-hub a:focus-visible {
-        background-color: var(--color-background-2);
-        outline: none;
-    }
-    .guides-hub a:focus-visible {
-        outline: 2px solid var(--color-text-dark);
-        outline-offset: 2px;
-    }
-    .guide-title {
-        font-weight: 510;
-    }
-    .guide-desc {
-        font-size: 14px;
-        color: var(--color-text-light);
     }
 </style>

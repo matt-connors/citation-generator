@@ -1,0 +1,62 @@
+---
+// Reusable grid of guide "cards". Used by the guides hub and the per-category
+// hub pages. Card styling is scoped here to `.guide-grid a` so it can never
+// leak onto inline prose links in the surrounding page (which was the bug that
+// turned an inline link into a padded card box).
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+    items: CollectionEntry<"guides">[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="guide-grid">
+    {items.map((g) => (
+        <li>
+            <a href={`/guides/${g.slug}`}>
+                <span class="guide-title">{g.data.title}</span>
+                <span class="guide-desc">{g.data.description}</span>
+            </a>
+        </li>
+    ))}
+</ul>
+
+<style>
+    .guide-grid {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 0.75rem;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+    .guide-grid a {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding: 1rem 1.25rem;
+        border: 1px solid var(--color-border);
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--color-text-dark);
+        height: 100%;
+    }
+    .guide-grid a:hover,
+    .guide-grid a:focus-visible {
+        background-color: var(--color-background-2);
+        outline: none;
+    }
+    .guide-grid a:focus-visible {
+        outline: 2px solid var(--color-text-dark);
+        outline-offset: 2px;
+    }
+    .guide-title {
+        font-weight: 510;
+    }
+    .guide-desc {
+        font-size: 14px;
+        color: var(--color-text-light);
+    }
+</style>

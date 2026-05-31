@@ -1,30 +1,58 @@
 ---
-const { id } = Astro.props;
+// Renders an MDX heading (h2 or h3) with a hover-revealed anchor link so
+// sections are deep-linkable. The anchor sits inline after the text (not
+// negative-offset absolute) so it never causes horizontal overflow on narrow
+// screens. `id` is supplied by Astro's auto-slug, matching the in-page nav.
 import { LinkIcon } from '@heroicons/react/24/outline';
+
+interface Props {
+    id?: string;
+    as?: 'h2' | 'h3';
+}
+
+const { id, as = 'h2' } = Astro.props;
+const Tag = as;
 ---
 
-<h2 id={id}>
-    <a href={`#${id}`}>
-        <LinkIcon className="icon"/>
-    </a>
+<Tag id={id} class="anchored-heading">
     <slot />
-</h2>
+    {id && (
+        <a class="heading-anchor" href={`#${id}`} aria-label="Link to this section">
+            <LinkIcon className="heading-anchor-icon" />
+        </a>
+    )}
+</Tag>
 
-<style>
-    h2 {
+<style is:global>
+    .anchored-heading {
         position: relative;
-        /* display: flex;
-        align-items: center; */
     }
-    .icon {
-        width: 20px;
-        margin-right: 8px;
-        position: absolute;
-        left: -28px;
-        top: 0;
-        bottom: 0;
-        transform: translateY(-50%);
-
-        display: none;
+    .heading-anchor {
+        display: inline-flex;
+        align-items: center;
+        margin-left: 0.4rem;
+        opacity: 0;
+        text-decoration: none;
+        color: var(--color-text-light);
+        transition: opacity 0.12s ease-in-out;
+        vertical-align: middle;
+    }
+    .heading-anchor:hover,
+    .heading-anchor:focus-visible {
+        color: var(--color-text-dark);
+    }
+    .anchored-heading:hover .heading-anchor,
+    .anchored-heading:focus-within .heading-anchor {
+        opacity: 1;
+    }
+    .heading-anchor-icon {
+        width: 18px;
+        height: 18px;
+    }
+    /* Touch devices have no hover — keep the anchor visible there. */
+    @media (hover: none) {
+        .heading-anchor {
+            opacity: 1;
+        }
     }
 </style>

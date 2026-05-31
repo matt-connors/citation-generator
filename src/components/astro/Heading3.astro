@@ -1,0 +1,9 @@
+---
+// Thin wrapper so MDX `h3` headings get the same anchor-link treatment as `h2`.
+// (MDX passes the heading's auto-slug `id` as a prop; we forward it.)
+import Heading from './Heading.astro';
+
+const { id } = Astro.props;
+---
+
+<Heading as="h3" id={id}><slot /></Heading>
