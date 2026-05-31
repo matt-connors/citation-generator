@@ -56,10 +56,10 @@ const allSchemas = [...baseSchemas, ...extraSchemas];
 <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1" />
 
 <meta property="og:type" content={pageType} />
-<meta property="og:url" content={Astro.url} />
+<meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={new URL(image, Astro.url)} />
+<meta property="og:image" content={new URL(image, Astro.site)} />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="MLA Generator" />
 
@@ -74,10 +74,10 @@ const allSchemas = [...baseSchemas, ...extraSchemas];
 )}
 
 <meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={Astro.url} />
+<meta property="twitter:url" content={canonicalURL} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={new URL(image, Astro.url)} />
+<meta property="twitter:image" content={new URL(image, Astro.site)} />
 
 <link rel="sitemap" href="/sitemap-index.xml" />
 

@@ -61,7 +61,7 @@ function ReferenceItem({ source, checked, onToggle, citationFormat, setSources, 
                     className={styles.checkboxElement}
                     checked={checked}
                     onChange={(e) => onToggle(source.uuid, e.target.checked)}
-                    aria-label="Select this reference"
+                    aria-label={`Select reference: ${source.csl.title || 'untitled'}`}
                 />
                 <div className={styles.checkbox} aria-hidden="true"></div>
                 <div className={styles.citationSourceWrapper}>

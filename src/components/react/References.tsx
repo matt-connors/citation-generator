@@ -35,6 +35,14 @@ export default function References() {
     const citationFormatRef = useRef<HTMLInputElement>(null);
     const selectAllRef = useRef<HTMLInputElement>(null);
 
+    // Mirror the active style into the hidden search-form input so re-citing from
+    // this page submits the right citationStyle. Covers the ?citationStyle=… URL-
+    // seeded path, where the dropdown onChange never fired and the input stayed
+    // empty (the form then silently reverted the next page to MLA).
+    useEffect(() => {
+        if (citationFormatRef.current) citationFormatRef.current.value = citationFormat;
+    }, [citationFormat]);
+
     // `indeterminate` has no React prop; sync it imperatively when selection changes.
     useEffect(() => {
         if (selectAllRef.current) {

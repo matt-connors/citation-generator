@@ -80,15 +80,27 @@ export function useFormattedCitation(source: Args, style: SupportedStyle): State
 // Cache-aware fetch used by the hook and exported for callers (e.g. Copy
 // Selected) that need the same memoization but outside the React tree.
 async function fetchFormatted(csl: CSLItem, style: SupportedStyle, key: string): Promise<RichText[]> {
-  const res = await fetch('/api/format', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ csl, style }),
-  });
-  if (!res.ok) throw new Error(`Format failed: HTTP ${res.status}`);
-  const body = await res.json() as { formatted: RichText[] };
-  cache.set(key, body.formatted);
-  return body.formatted;
+  // Bound the request so a slow/hung /api/format can't leave rows stuck on
+  // "Loading…" forever. The timeout is owned here (on the shared request) and
+  // flows into the hook's existing .catch → error state; we deliberately do NOT
+  // abort from a per-row effect cleanup, which would reject the shared promise
+  // for sibling rows and Copy-Selected.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15_000);
+  try {
+    const res = await fetch('/api/format', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ csl, style }),
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`Format failed: HTTP ${res.status}`);
+    const body = await res.json() as { formatted: RichText[] };
+    cache.set(key, body.formatted);
+    return body.formatted;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export function formatCitation(source: Args, style: SupportedStyle): Promise<RichText[]> {

@@ -33,7 +33,7 @@ beforeEach(() => {
 describe('References selection label', () => {
   it('shows the SELECTED count, not the total, when references are selected', async () => {
     const { container } = render(<References />);
-    const sel = 'input[type="checkbox"][aria-label="Select this reference"]';
+    const sel = 'input[type="checkbox"][aria-label^="Select reference"]';
     // Both stored sources load from localStorage.
     await waitFor(() => expect(container.querySelectorAll(sel).length).toBe(2));
     const boxes = container.querySelectorAll(sel);
