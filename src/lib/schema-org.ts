@@ -19,7 +19,9 @@ export function buildOrganization(): JsonLd {
     '@id': ORG_ID,
     name: ORG_NAME,
     url: ORG_URL,
-    logo: ORG_LOGO,
+    // ImageObject (not a bare URL) is the recommended publisher-logo form for
+    // Article rich results, which resolve the logo via this @id reference.
+    logo: { '@type': 'ImageObject', url: ORG_LOGO },
   };
 }
 

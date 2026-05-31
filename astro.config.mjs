@@ -25,8 +25,10 @@ const GUIDE_LASTMOD = (() => {
             const date = updated || published;
             if (date) map[`/guides/${file.replace(/\.mdx$/, '')}`] = new Date(`${date}T00:00:00.000Z`).toISOString();
         }
-    } catch {
-        // If the content dir can't be read, fall back to no lastmod rather than failing the build.
+    } catch (err) {
+        // Fall back to no lastmod rather than failing the build, but make the
+        // degradation visible so a future read failure isn't silent.
+        console.warn('[sitemap] could not read guide frontmatter for <lastmod>; sitemap will omit lastmod values.', err);
     }
     return map;
 })();

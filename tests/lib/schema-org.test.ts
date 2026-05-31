@@ -23,7 +23,7 @@ describe('buildOrganization', () => {
     expect(org['@id']).toBe(ORG_ID);
     expect(org.name).toBe(ORG_NAME);
     expect(org.url).toBe(ORG_URL);
-    expect(org.logo).toBe(ORG_LOGO);
+    expect(org.logo).toEqual({ '@type': 'ImageObject', url: ORG_LOGO });
   });
 });
 
