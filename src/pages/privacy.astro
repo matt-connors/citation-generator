@@ -1,28 +1,13 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Privacy Policy - MLA Generator</title>
-        <meta
-            name="description"
-            content="Privacy Policy for MLA Generator, a free citation generation website."
-        />
-        <style>
-            body {
-                font-family: sans-serif;
-                line-height: 1.6;
-                margin: 2em;
-            }
+---
+import Layout from "../layouts/page.astro";
 
-            h1,
-            h2,
-            h3 {
-                line-height: 1.2;
-            }
-        </style>
-    </head>
-    <body>
+const title = "Privacy Policy — MLA Generator";
+const description =
+    "Privacy Policy for MLA Generator, a free citation generation website.";
+---
+
+<Layout title={title} description={description}>
+    <article class="legal">
         <h1>Privacy Policy</h1>
 
         <p><strong>Last Updated:</strong> January 18, 2025</p>
@@ -182,5 +167,19 @@
             changes. Changes to this Privacy Policy are effective when they are
             posted on this page.
         </p>
-    </body>
-</html>
+    </article>
+</Layout>
+
+<style>
+    .legal {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 4rem 2rem 3rem;
+        line-height: 1.65;
+        color: var(--color-text-medium);
+    }
+    .legal h1 { font-size: 2.2rem; color: var(--color-text-dark); margin: 0 0 1rem; }
+    .legal h2 { font-size: 1.4rem; color: var(--color-text-dark); margin: 2rem 0 0.5rem; }
+    .legal h3 { font-size: 1.1rem; color: var(--color-text-dark); margin: 1.25rem 0 0.5rem; }
+    .legal a { color: var(--color-text-dark); }
+</style>
