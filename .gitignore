@@ -1,6 +1,9 @@
 # build output
 dist/
 
+# generated audit artifact (scripts/audit-format-matrix.ts output)
+scripts/.audit-matrix.json
+
 # generated types
 .astro/
 
@@ -30,3 +33,5 @@ pnpm-debug.log*
 # functions/api/
 
 wrangler.toml
+# Claude Code local state
+.claude/

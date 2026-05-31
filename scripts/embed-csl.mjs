@@ -58,7 +58,12 @@ for (const target of TARGETS) {
 
     for (const file of entries) {
         const fullPath = join(target.dir, file);
-        const raw = readFileSync(fullPath);
+        // Normalize CRLF -> LF so the embedded base64 is byte-identical on every
+        // platform. Without this, a Windows checkout (core.autocrlf=true) embeds
+        // CRLF-laden XML, inflating the payload (~2.7 KB per style) and making
+        // the generated *.ts spuriously dirty. The .gitattributes eol=lf rule is
+        // the first line of defense; this is belt-and-suspenders.
+        const raw = Buffer.from(readFileSync(fullPath, 'utf8').replace(/\r\n/g, '\n'), 'utf8');
         const b64 = toBase64(raw);
         const ident = safeIdent(file);
         const outPath = join(target.dir, `${basename(file, extname(file))}.ts`);

@@ -1,0 +1,16 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "Genome Study Results",
+  "author": [
+    { "family": "Adams", "given": "Amy" },
+    { "family": "Brown", "given": "Bob" },
+    { "family": "Clark", "given": "Cara" },
+    { "family": "Davis", "given": "Dan" },
+    { "family": "Evans", "given": "Eve" }
+  ],
+  "issued": { "date-parts": [[2023, 6, 1]] },
+  "accessed": { "date-parts": [[2026, 5, 31]] },
+  "container-title": "Genomics Today",
+  "URL": "https://example.com/genome"
+}

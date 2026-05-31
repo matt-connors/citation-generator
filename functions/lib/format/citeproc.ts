@@ -36,14 +36,26 @@ export function registerLocale(name: string, xml: string): void {
 //
 // We still cache parsed style XML and locale XML strings — those are pure
 // data and safe to share.
+// Per-style default rendering locale. Most styles are American English, but
+// Cite Them Right (Harvard) is a British style (declared xml:lang="en-GB").
+// Rendering it under en-US silently produces US date order ("May 31, 2026"
+// instead of "31 May 2026"), US double quotation marks instead of British
+// single quotes, and "ed." instead of "edn." Rendering under en-GB — with the
+// en-GB locale registered — fixes all three. citeproc falls back to en-US for
+// any locale that has not been registered.
+const STYLE_LOCALE: Partial<Record<SupportedStyle, string>> = {
+  harvard: 'en-GB',
+};
+
 function buildEngine(style: SupportedStyle, item: CSLItem): any {
   const csl = styles.get(style);
   if (!csl) throw new Error(`Unknown style: ${style}`);
+  const lang = STYLE_LOCALE[style] ?? 'en-US';
   const sys: any = {
-    retrieveLocale: (lang: string) => locales.get(lang) || locales.get('en-US') || '',
+    retrieveLocale: (l: string) => locales.get(l) || locales.get('en-US') || '',
     retrieveItem: (_id: string) => item,
   };
-  return new CSL.Engine(sys, csl, 'en-US');
+  return new CSL.Engine(sys, csl, lang);
 }
 
 export function formatCitation(item: CSLItem, style: SupportedStyle): RichText[] {
@@ -93,8 +105,14 @@ function parseRichText(html: string): RichText[] {
       flush(text);
     },
   }, { decodeEntities: true });
-  parser.write(html);
-  parser.end();
+  try {
+    parser.write(html);
+    parser.end();
+  } catch {
+    // htmlparser2 is lenient, but on truly malformed input we degrade to plain
+    // text (tags stripped) rather than letting the exception 500 the request.
+    return [{ text: html.replace(/<[^>]*>/g, '').trim() }].filter((s) => s.text);
+  }
 
   // Merge adjacent same-formatting segments (cosmetic; keeps RichText[] tidy
   // and avoids fragmenting JSX render output).

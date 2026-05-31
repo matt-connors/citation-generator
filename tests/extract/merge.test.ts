@@ -30,4 +30,14 @@ describe('mergeSignals', () => {
     expect(csl).toEqual({});
     expect(signals).toEqual({});
   });
+
+  it('ignores out-of-range or non-finite confidence scores', () => {
+    const over = { name: 'over', fields: { title: 'OVER' }, confidence: { title: 5 } };
+    const nan = { name: 'nan', fields: { title: 'NAN' }, confidence: { title: NaN } };
+    const neg = { name: 'neg', fields: { title: 'NEG' }, confidence: { title: -1 } };
+    const ok = { name: 'meta', fields: { title: 'OK' }, confidence: { title: 0.55 } };
+    const { csl, signals } = mergeSignals([over, nan, neg, ok]);
+    expect(csl.title).toBe('OK');
+    expect(signals.title).toBe('meta');
+  });
 });

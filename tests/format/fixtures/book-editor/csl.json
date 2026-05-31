@@ -1,0 +1,9 @@
+{
+  "id": "fixture",
+  "type": "book",
+  "title": "The Oxford Handbook of Philosophy",
+  "editor": [{ "family": "Jones", "given": "Mary" }],
+  "issued": { "date-parts": [[2015]] },
+  "publisher": "Oxford University Press",
+  "publisher-place": "Oxford"
+}

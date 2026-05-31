@@ -1,0 +1,10 @@
+{
+  "id": "fixture",
+  "type": "article-magazine",
+  "title": "The Future of Work",
+  "author": [{ "family": "Writer", "given": "Will" }],
+  "container-title": "The Atlantic",
+  "issued": { "date-parts": [[2024, 7]] },
+  "page": "30-38",
+  "URL": "https://example.com/work"
+}

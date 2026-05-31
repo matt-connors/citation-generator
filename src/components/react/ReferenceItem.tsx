@@ -50,10 +50,13 @@ export default function ReferenceItem({ source, sources, index, citationFormat, 
     }, [source.uuid, autoOpenEdit]);
 
     const handleCopy = (event: React.MouseEvent<HTMLButtonElement>) => {
-        const target = event.currentTarget;
-        const targetSpan = target.querySelector('span') as HTMLSpanElement;
-        const current = targetSpan.textContent;
+        // Don't copy an empty/placeholder citation while it is still loading or
+        // errored — that would wipe the clipboard while showing "Copied".
+        if (loading || error || formatted.length === 0) return;
         copyRichText(formatted);
+        const targetSpan = event.currentTarget.querySelector('span');
+        if (!targetSpan) return;
+        const current = targetSpan.textContent;
         targetSpan.textContent = 'Copied';
         setTimeout(() => { targetSpan.textContent = current; }, 1000);
     };
@@ -85,6 +88,7 @@ export default function ReferenceItem({ source, sources, index, citationFormat, 
                 <button
                     className={styles.button}
                     onClick={handleCopy}
+                    disabled={loading || !!error}
                     aria-label="Copy citation"
                 >
                     <Clipboard className={styles.icon} />

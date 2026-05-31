@@ -1,0 +1,8 @@
+# Citation Style Language (.csl) styles and locale (.xml) files are read
+# byte-for-byte by scripts/embed-csl.mjs and base64-embedded into the Cloudflare
+# Worker bundle. They MUST use LF line endings so the generated payload is
+# byte-identical on every platform. With core.autocrlf=true on Windows, CRLF
+# would otherwise inflate the embedded base64 (~2.7 KB per style) and leave the
+# generated *.ts modules spuriously dirty after every local build.
+*.csl text eol=lf
+functions/lib/format/locales/*.xml text eol=lf
