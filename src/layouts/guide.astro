@@ -187,7 +187,10 @@ const category = categoryByKey(frontmatter.category);
         color: var(--color-text-light);
         text-align: left;
     }
-    #guide-content a {
+    /* Prose links only — exclude the hover-revealed heading anchor links, which
+       carry their own subtle styling (a higher-specificity #guide-content rule
+       would otherwise force them to dark + underlined). */
+    #guide-content a:not(.heading-anchor) {
         color: var(--color-text-dark);
         text-decoration: underline;
     }
