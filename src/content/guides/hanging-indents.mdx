@@ -1,0 +1,115 @@
+---
+title: 'Hanging Indents: What They Are and How to Make Them in Word, Google Docs, Pages, and LaTeX'
+pubDate: 2026-05-19
+description: 'Hanging indents are the standard reference-list format in every major citation style. This guide explains what they are, why they exist, and how to apply them in Microsoft Word, Google Docs, Apple Pages, and LaTeX — without the manual tab work that breaks them. Written and reviewed by the MLA Generator Editorial Team.'
+category: 'concept'
+keywords: ['hanging indent', 'how to make a hanging indent', 'hanging indent Word', 'hanging indent Google Docs', 'hanging indent LaTeX', 'reference list formatting', 'works cited format']
+tags: ['hanging indents', 'reference list', 'formatting', 'Word', 'Google Docs', 'Pages', 'LaTeX']
+relatedGuides: ['apa', 'mla', 'chicago', 'works-cited-vs-bibliography', 'annotated-bibliography', 'in-text-citations']
+faq:
+  - question: 'What is a hanging indent exactly?'
+    answer: 'A hanging indent is a paragraph format in which the first line sits flush at the left margin and every subsequent line is indented — the visual opposite of the standard first-line-indent paragraph. In a reference list, the first line of each entry (which begins with the author''s surname) is flush left; every line after the first is indented half an inch. The format makes alphabetized lists scannable by surname.'
+  - question: 'How big should the hanging indent be?'
+    answer: 'Half an inch (0.5 inches, or 1.27 cm) in every major citation style — APA, MLA, Chicago, Harvard, Vancouver, IEEE, and AMA. This is the default in word processors when you apply a hanging indent. Larger or smaller indents are not standard and will look incorrect on a submitted manuscript.'
+  - question: 'Why use a hanging indent in references?'
+    answer: 'The first word of every reference-list entry is the author''s surname (in author–date styles) or the citation number (in numeric styles). The hanging indent visually separates that anchor from the rest of the entry, so a reader scanning the list can find a specific author or number without reading every word. Without the indent, every line begins at the left margin and the anchors blend into the body of each entry.'
+  - question: 'Can I use the Tab key to create a hanging indent?'
+    answer: 'You can — and you should not. Hitting Tab at the start of each line after the first produces the visual effect of a hanging indent but breaks the format the first time you change font size, line spacing, or page width. The lines no longer wrap correctly because the indent is fixed at a tab stop rather than tied to the paragraph format. Use your word processor''s paragraph-formatting menu instead; the indent then re-flows correctly when the document changes.'
+  - question: 'Do all citation styles use hanging indents?'
+    answer: 'Yes. APA, MLA, Chicago, Harvard, Vancouver, IEEE, and AMA all specify a half-inch hanging indent for reference list entries. The convention is so consistent that a flat-left reference list is one of the first signals a marker reads as "this paper was formatted carelessly." The hanging indent is one of the few format details that holds across every major style.'
+ogImage: '/images/banner.png'
+---
+
+A hanging indent is the paragraph format used in every major citation style for the reference list at the back of an academic paper: first line flush at the left margin, every subsequent line indented half an inch. The format is visually distinctive, easy to apply correctly through any word processor's paragraph menu, and easy to break by reaching for the Tab key instead. This guide explains what hanging indents are, why they exist, and how to create them in Microsoft Word, Google Docs, Apple Pages, and LaTeX without the manual workaround that quietly destroys them.
+
+> The shortest answer: every line after the first in each reference entry is indented half an inch. Apply it through paragraph formatting, not through the Tab key. APA, MLA, Chicago, Harvard, Vancouver, IEEE, and AMA all use the same half-inch hanging indent for reference lists.
+
+## What a hanging indent looks like
+
+A hanging indent inverts the standard paragraph: the first line sits flush at the left margin, and every line after the first is indented half an inch. In a reference list, this puts the author's surname (or the citation number, in numeric styles) hanging at the left margin of the page, with the rest of the entry shifted right.
+
+A correctly formatted APA entry:
+
+> Goldstein, A., Ramanathan, P., & O'Connor, L. (2024). Sleep
+>   consolidation effects on procedural learning in adolescents.
+>   *Journal of Cognitive Development, 19*(2), 87–104.
+>   https://doi.org/10.1037/cogdev0000412
+
+The first line begins at the left margin; every continuation line is indented. A reader scanning the list for "Goldstein" finds the surname immediately because it is the only word at that horizontal position. Without the hanging indent, the surnames would be scattered through the body of each entry depending on where line breaks fall, and the list would lose its scannability.
+
+This is the rendering target for every style. APA, MLA, Chicago, Harvard, Vancouver, IEEE, and AMA all specify the same half-inch hanging indent.
+
+## How to apply a hanging indent in each tool
+
+The fundamental rule is the same in every word processor: use the paragraph-formatting controls, not the Tab key. The Tab approach produces something that visually resembles a hanging indent until the document is reflowed, at which point the alignment breaks.
+
+### Microsoft Word (Windows and Mac)
+
+1. Select the reference-list entries (or the entire list — applying to multiple paragraphs at once is fine).
+2. Open the **Paragraph** dialog: right-click the selection and choose **Paragraph…**, or click the small arrow in the lower-right corner of the Paragraph section on the Home ribbon.
+3. Under **Indentation**, set **Special** to **Hanging**.
+4. Set the **By** value to **0.5"** (or 1.27 cm in metric units).
+5. Click **OK**.
+
+Word remembers the setting per paragraph, so any new reference entry typed after a hanging-indented paragraph inherits the format. If you paste in a new citation and it loses the indent, re-select and re-apply.
+
+### Google Docs
+
+1. Select the entries you want to format.
+2. Open the **Format** menu → **Align & indent** → **Indentation options**.
+3. Set **Special indent** to **Hanging**.
+4. Set the value to **0.5 in** (Google Docs may show **0.5"** or the metric equivalent depending on your locale).
+5. Click **Apply**.
+
+Alternatively, drag the lower triangle on the ruler to the 0.5-inch mark while leaving the upper triangle (the first-line indent) at the left margin. The ruler method produces the same result and is faster once you know which triangle is which.
+
+### Apple Pages
+
+1. Select the entries.
+2. Open the **Format** sidebar (the paintbrush icon at the top right) and click **Layout** at the top of the sidebar.
+3. Find the **Indents** section. Pages does not have a dedicated "hanging" preset; instead, set the **First** indent to **0** and the **Left** indent to **0.5 in**.
+4. The combination — first-line indent of zero, left indent of 0.5 inches — produces a hanging indent.
+
+Pages also lets you create a paragraph style that captures this setting; if you are doing a long bibliography, defining a "Reference" paragraph style and applying it to each entry is faster than reformatting individually.
+
+### LaTeX (with BibTeX or biblatex)
+
+LaTeX users typically do not apply hanging indents manually. The standard reference-list environment (`thebibliography`) and modern `biblatex` styles handle the hanging indent automatically based on the chosen bibliography style.
+
+If you are using a custom bibliography environment without `biblatex`, the hanging indent can be applied with the `hangindent` and `hangafter` parameters:
+
+```latex
+\setlength{\hangindent}{0.5in}
+\setlength{\hangafter}{1}
+```
+
+Setting `\hangafter` to 1 means the indent applies starting on the second line — the hanging-indent behavior. Setting it to a higher number delays the indent further; setting it to a negative number indents the first lines instead. For a standard reference list, 1 is correct.
+
+Most users do not need to touch these parameters because the standard journal classes and the `apacite`/`biblatex-apa`/`biblatex-mla` packages set them correctly by default.
+
+### HTML and CSS (for web reference lists)
+
+When publishing a reference list on the web, apply a hanging indent with CSS:
+
+```css
+.references li {
+  padding-left: 0.5in;
+  text-indent: -0.5in;
+}
+```
+
+The `text-indent: -0.5in` pulls the first line back to the left margin; the `padding-left: 0.5in` indents the entire block. The combination produces a hanging indent that survives font-size changes and reflows correctly at any viewport width.
+
+## Common mistakes
+
+**Using the Tab key.** The most common mistake. Hitting Tab at the start of every line after the first produces something that looks correct in the moment and falls apart the first time the document is reflowed. The Tab approach is wrong even when the result temporarily looks right.
+
+**Inconsistent indent values within one reference list.** Half an inch is the standard. A list that mixes 0.5-inch and 0.4-inch hanging indents — which happens when a citation is pasted in from a generator with different defaults — is visually obvious to a careful reader.
+
+**No indent at all.** A reference list with every line flush at the left margin is a recognizable submission error. Every major style requires the hanging indent; a flush-left list reads as "this paper was formatted carelessly" before a marker has read a single entry.
+
+**Indenting the first line instead.** A standard first-line indent (the format used for body paragraphs) is the visual opposite of a hanging indent. Applying a body-paragraph format to the reference list inverts what every style requires.
+
+**Manually adjusting line breaks to fake the indent.** Adding spaces, hard line breaks, or non-breaking spaces to push the wrapped text to a hanging position produces something that looks correct until the document is opened in a different word processor, the font is changed, or the page width is adjusted. Always apply the format through the paragraph-indent control.
+
+The generator at this site produces reference entries that copy-paste directly into Word, Google Docs, and Pages with the hanging-indent format preserved as long as the destination document already has the format applied to its reference-list paragraphs. Set up the format first; paste second.

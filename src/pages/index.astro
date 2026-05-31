@@ -11,19 +11,22 @@ import {
     DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 
-const title = "MLA Generator | Reliable Citations in MLA, APA, & Chicago";
+import { buildSoftwareApplication } from "../lib/schema-org";
+
+const title = "Free Citation Generator — APA, MLA, Chicago, Harvard, Vancouver, IEEE & AMA";
 const description =
-    "Effortlessly format & generate accurate citations in APA, MLA, Chicago & Harvard formats. MLA Generator: Trusted by students and researchers worldwide.";
+    "Generate accurate citations in APA 7, MLA 9, Chicago 18, Harvard, Vancouver, IEEE, and AMA formats from a URL, DOI, or ISBN. Free, fast, trusted by students worldwide.";
+
+const extraSchemas = [buildSoftwareApplication()];
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} extraSchemas={extraSchemas}>
     <section id="tool">
         <div id="text-container">
-            <h1 class="heading-1">MLA Format <br />Citation Generator</h1>
+            <h1 class="heading-1">Free Citation <br />Generator</h1>
             <p class="subtitle">
-                <!-- <a href={site}>MLA Generator</a>:  -->
-                Easy and Reliable APA, MLA, Chicago and Harvard citations, trused
-                by students worldwide.
+                Accurate APA, MLA, Chicago, Harvard, Vancouver, IEEE, and AMA
+                citations — trusted by students worldwide.
             </p>
         </div>
         <CitationSearch includeDropdown includeManualCite client:load />
@@ -223,7 +226,7 @@ const description =
                     Each citation style has its own specific rules for
                     formatting in-text citations and the bibliography or works
                     cited list. You can learn more about these styles in our <a
-                        href="/guides/">guides</a
+                        href="/guides">citation style guides</a
                     >.
                 </p>
 
@@ -303,7 +306,7 @@ const description =
                     Working with sources is an integral part of academic
                     writing. By understanding the principles of citation and
                     utilizing tools like
-                    <a href="https://mlagenerator.com">MLA Generator</a>, you
+                    <a href="/">MLA Generator</a>, you
                     can ensure that your work is ethical, credible, and
                     well-supported. Remember to cite your sources diligently and
                     accurately to contribute to a culture of academic integrity.
@@ -325,7 +328,7 @@ const description =
                 })
             }
             <a href="/my-references" class="button-primary">
-                <span>Citation Generator</span>
+                <span>View My References</span>
                 <ArrowUpRightIcon className="button-icon" />
             </a>
         </div>

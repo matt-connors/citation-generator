@@ -1,7 +1,12 @@
 import { handleCiteJournal } from './handler';
 import { defaultCacheStore } from '../../lib/cache';
+import type { AnalyticsBinding } from '../../lib/analytics';
+import { isTestRequest } from '../../lib/test-context';
 
-export const onRequest: PagesFunction = async (context) => {
+interface Env { ANALYTICS?: AnalyticsBinding }
+
+export const onRequest: PagesFunction<Env> = async (context) => {
   const url = new URL(context.request.url);
-  return handleCiteJournal(url, defaultCacheStore());
+  const analytics = isTestRequest(context.request) ? undefined : context.env.ANALYTICS;
+  return handleCiteJournal(url, defaultCacheStore(), analytics);
 };

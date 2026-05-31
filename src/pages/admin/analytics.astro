@@ -1,0 +1,401 @@
+---
+import { makeSqlClient, SqlError } from '../../lib/admin/sql';
+import { buildQueries, type QueryDef } from '../../lib/admin/queries';
+
+// Astro/Cloudflare runtime env. `as any` because the Astro types here
+// don't know about our Pages secrets — the basic-auth middleware in
+// functions/_middleware.ts has already gated the request.
+const env = (Astro.locals as any).runtime?.env ?? {};
+const accountId: string | undefined = env.CF_ACCOUNT_ID;
+const token: string | undefined = env.CF_API_TOKEN;
+const rawDataset: string = env.ANALYTICS_DATASET || 'citation_generator_events';
+
+// Dataset name is interpolated raw into SQL strings. The value is operator-
+// controlled (Pages env var), not user-controlled — but a typo like
+// "foo; DROP …" or a value with spaces would produce cryptic AE errors.
+// Restrict to the conservative identifier shape Cloudflare actually accepts.
+const DATASET_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
+const dataset = DATASET_RE.test(rawDataset) ? rawDataset : '';
+const datasetInvalid = !dataset;
+
+const queries = dataset ? buildQueries(dataset) : [];
+
+interface PanelResult {
+  def: QueryDef;
+  rows: Array<Record<string, unknown>>;
+  error?: string;
+  /** Precomputed per-column max for any column flagged `bar: true`. */
+  barMaxes: Record<string, number>;
+}
+
+let panels: PanelResult[] = [];
+let configError: string | null = null;
+
+function emptyPanel(def: QueryDef, error?: string): PanelResult {
+  return { def, rows: [], error, barMaxes: {} };
+}
+
+function maxOf(rows: Array<Record<string, unknown>>, key: string): number {
+  let m = 0;
+  for (const r of rows) {
+    const v = Number(r[key]);
+    if (Number.isFinite(v) && v > m) m = v;
+  }
+  return m;
+}
+
+function decorate(def: QueryDef, rows: Array<Record<string, unknown>>): PanelResult {
+  const barMaxes: Record<string, number> = {};
+  for (const c of def.columns ?? []) {
+    if (c.bar) barMaxes[c.key] = maxOf(rows, c.key);
+  }
+  return { def, rows, barMaxes };
+}
+
+if (datasetInvalid) {
+  configError = `ANALYTICS_DATASET env var is invalid: ${JSON.stringify(rawDataset)}. `
+    + 'Allowed: letters, digits, underscore; must start with a letter or underscore.';
+  panels = [];
+} else if (!accountId || !token) {
+  configError = 'Server is missing CF_ACCOUNT_ID and/or CF_API_TOKEN secret(s). '
+    + 'Set both in Cloudflare Pages → Settings → Environment variables (encrypt as secrets).';
+  panels = queries.map((def) => emptyPanel(def));
+} else {
+  const client = makeSqlClient({ accountId, token });
+  panels = await Promise.all(
+    queries.map(async (def) => {
+      try {
+        const r = await client.query(def.sql);
+        return decorate(def, r.data as Array<Record<string, unknown>>);
+      } catch (e) {
+        const msg = e instanceof SqlError
+          ? `${e.status}: ${e.message}`
+          : (e as Error).message;
+        return emptyPanel(def, msg);
+      }
+    }),
+  );
+}
+
+function fmt(v: unknown): string {
+  if (v === null || v === undefined) return '—';
+  if (typeof v === 'number') return Number.isInteger(v) ? v.toLocaleString() : v.toFixed(2);
+  return String(v);
+}
+
+function pctOf(value: unknown, max: number): number {
+  if (max <= 0) return 0;
+  const v = Number(value);
+  if (!Number.isFinite(v) || v <= 0) return 0;
+  return Math.min(100, (v / max) * 100);
+}
+
+// Build a sparkline SVG path from rows. Returns an empty string if no data.
+function sparklinePath(rows: Array<Record<string, unknown>>, valueKey: string, width: number, height: number, pad: number): { line: string; area: string; lastValue: number; max: number } {
+  if (!rows.length) return { line: '', area: '', lastValue: 0, max: 0 };
+  const vals = rows.map((r) => Number(r[valueKey]) || 0);
+  const max = Math.max(...vals, 1);
+  const w = width - 2 * pad;
+  const h = height - 2 * pad;
+  const step = vals.length > 1 ? w / (vals.length - 1) : 0;
+  const points = vals.map((v, i) => {
+    const x = pad + i * step;
+    const y = pad + h - (v / max) * h;
+    return [x, y] as const;
+  });
+  const line = points.map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
+  // Area = line plus a baseline closure
+  const last = points[points.length - 1];
+  const first = points[0];
+  const area = `${line} L ${last[0].toFixed(1)} ${(pad + h).toFixed(1)} L ${first[0].toFixed(1)} ${(pad + h).toFixed(1)} Z`;
+  return { line, area, lastValue: vals[vals.length - 1], max };
+}
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Analytics · Citation Generator</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #161922;
+      --panel-border: #232838;
+      --ink: #e7e9ee;
+      --muted: #8b93a7;
+      --accent: #7aa2f7;
+      --accent-soft: rgba(122, 162, 247, 0.18);
+      --accent-bar: rgba(122, 162, 247, 0.35);
+      --error: #f7768e;
+      --row-alt: #1a1e2a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 14px/1.45 ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      padding: 32px 24px;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    header.page { margin-bottom: 24px; }
+    header.page h1 { margin: 0 0 4px; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+    header.page .meta { color: var(--muted); font-size: 12px; }
+    header.page .meta code {
+      background: var(--panel);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--panel-border);
+    }
+    .config-error {
+      background: rgba(247, 118, 142, 0.1);
+      border: 1px solid var(--error);
+      color: var(--error);
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    /* Tiles strip */
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .tile {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .tile .label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: lowercase;
+      letter-spacing: 0.02em;
+    }
+    .tile .value {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      margin-top: 4px;
+    }
+
+    /* Sparkline panel */
+    .panel-wide {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .panel-wide h2 {
+      margin: 0 0 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .panel-wide p.desc {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .spark { width: 100%; height: 96px; display: block; }
+    .spark .area { fill: var(--accent-soft); }
+    .spark .line { fill: none; stroke: var(--accent); stroke-width: 1.5; }
+    .spark-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    /* Grid of regular panels */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 16px;
+    }
+    section.panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 16px;
+      min-width: 0;
+    }
+    section.panel h2 {
+      margin: 0 0 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    section.panel p.desc {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td {
+      padding: 6px 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--panel-border);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    th { color: var(--muted); font-weight: 500; }
+    tr:nth-child(even) td { background: var(--row-alt); }
+    td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* Inline horizontal bar inside a value cell */
+    td.bar-cell {
+      position: relative;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    td.bar-cell .bar-fill {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      height: 18px;
+      background: var(--accent-bar);
+      border-radius: 3px;
+      z-index: 0;
+    }
+    td.bar-cell .bar-value {
+      position: relative;
+      z-index: 1;
+    }
+
+    .empty { color: var(--muted); font-style: italic; padding: 8px 0; }
+    .err {
+      color: var(--error);
+      font-size: 11px;
+      padding: 8px;
+      background: rgba(247, 118, 142, 0.08);
+      border-radius: 4px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    footer {
+      margin-top: 32px;
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="page">
+      <h1>Citation Generator · Analytics</h1>
+      <div class="meta">
+        Dataset <code>{dataset}</code> · {new Date().toISOString()}
+      </div>
+    </header>
+
+    {configError && (
+      <div class="config-error">{configError}</div>
+    )}
+
+    {/* Tiles + sparkline appear first, then the regular grid */}
+    {panels.filter((p) => p.def.render === 'tiles').map(({ def, rows, error }) => (
+      <section>
+        {error ? (
+          <div class="config-error">{def.title}: {error}</div>
+        ) : !rows || rows.length === 0 ? (
+          <div class="config-error">No data in window for {def.title}.</div>
+        ) : (
+          <div class="tiles">
+            {rows.map((row) => (
+              <div class="tile">
+                <div class="label">{fmt(row[def.tilesLabelKey!])}</div>
+                <div class="value">{fmt(row[def.tilesValueKey!])}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    ))}
+
+    {panels.filter((p) => p.def.render === 'sparkline').map(({ def, rows, error }) => {
+      const data = rows ?? [];
+      const path = sparklinePath(data, def.sparklineValueKey!, 800, 96, 6);
+      return (
+        <div class="panel-wide">
+          <h2>{def.title}</h2>
+          <p class="desc">{def.description}</p>
+          {error ? (
+            <div class="err">{error}</div>
+          ) : data.length === 0 ? (
+            <div class="empty">No data in window.</div>
+          ) : (
+            <>
+              <svg class="spark" viewBox="0 0 800 96" preserveAspectRatio="none">
+                <path class="area" d={path.area} />
+                <path class="line" d={path.line} />
+              </svg>
+              <div class="spark-meta">
+                <span>{data.length} buckets · {def.sparklineWindowLabel}</span>
+                <span>max {fmt(path.max)} / last {fmt(path.lastValue)}</span>
+              </div>
+            </>
+          )}
+        </div>
+      );
+    })}
+
+    <div class="grid">
+      {panels.filter((p) => p.def.render === 'table').map(({ def, rows, error, barMaxes }) => (
+        <section class="panel">
+          <h2>{def.title}</h2>
+          <p class="desc">{def.description}</p>
+          {error ? (
+            <div class="err">{error}</div>
+          ) : rows.length === 0 ? (
+            <div class="empty">No data in window.</div>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  {def.columns?.map((c) => (
+                    <th class={c.align === 'right' ? 'r' : ''}>{c.label}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr>
+                    {def.columns?.map((c) => (
+                      c.bar ? (
+                        <td class="bar-cell">
+                          <span class="bar-fill" style={`width: ${pctOf(row[c.key], barMaxes[c.key] || 0).toFixed(1)}%`}></span>
+                          <span class="bar-value">{fmt(row[c.key])}</span>
+                        </td>
+                      ) : (
+                        <td class={c.align === 'right' ? 'r' : ''} title={fmt(row[c.key])}>{fmt(row[c.key])}</td>
+                      )
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
+      ))}
+    </div>
+
+    <footer>
+      Server-rendered. Auth via HTTP basic. <br/>
+      Test traffic (X-Mla-Test:1 header or ?nocache=1 query) is filtered before emission.
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from '../../styles/references.module.css';
 import citationStyles from '../citationStyles';
 import Dropdown from './Dropdown';
@@ -7,27 +7,27 @@ import ReferenceItem from './ReferenceItem';
 import { useReferences } from '../../lib/references/useReferences';
 import type { StoredSource } from '../../lib/references/storage';
 import type { SupportedStyle } from '../../lib/citations/csl-types';
+import { formatCitation } from '../../lib/citations/useFormattedCitation';
 import { Clipboard, Plus, Trash2 } from 'lucide-react';
 import { cn } from './utils';
 import { Button } from './Button';
+import { richTextToHtml } from './richText';
 
 function emptySource(): StoredSource {
     const id = crypto.randomUUID();
     return { uuid: id, csl: { id, type: 'webpage' } };
 }
 
-function escape(s: string): string {
-    return s.replace(/[&<>"']/g, (c) => c === '&' ? '&amp;' : c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '"' ? '&quot;' : '&#39;');
-}
-
 export default function References() {
     const {
         sources,
         sourceCount,
-        checkedCount,
+        selected,
+        selectedCount,
         citationFormat,
         setSources,
-        setCheckedCount,
+        toggleSelected,
+        selectAll,
         setCitationFormat,
         handleDelete,
     } = useReferences();
@@ -35,33 +35,25 @@ export default function References() {
     const citationFormatRef = useRef<HTMLInputElement>(null);
     const selectAllRef = useRef<HTMLInputElement>(null);
 
-    const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const checkboxes = document.querySelectorAll(`.${styles.citationSourceItem} input[type="checkbox"]`);
-        const checked = event.target.checked;
-        checkboxes.forEach((cb: any) => { cb.checked = checked; });
-        setCheckedCount(checked ? sources.length : 0);
-    };
-
-    const handleCheckChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const amount = checkedCount + (event.target.checked ? 1 : -1);
-        setCheckedCount(amount);
-        if (selectAllRef.current) selectAllRef.current.checked = amount === sources.length;
-    };
+    // `indeterminate` has no React prop; sync it imperatively when selection changes.
+    useEffect(() => {
+        if (selectAllRef.current) {
+            selectAllRef.current.indeterminate = selectedCount > 0 && selectedCount < sourceCount;
+        }
+    }, [selectedCount, sourceCount]);
 
     const handleCopySelected = async () => {
-        const selected = sources.filter((_, i) => (document.querySelector(`#source-${i}`) as HTMLInputElement | null)?.checked);
-        if (!selected.length) return;
-        // Request formatted versions in parallel
-        const results = await Promise.all(selected.map(async (s) => {
-            const res = await fetch('/api/format', {
-                method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ csl: s.csl, style: citationFormat }),
-            });
-            if (!res.ok) return '';
-            const body = await res.json();
-            return (body.formatted as Array<{ text: string; italic?: boolean }>)
-                .map((seg) => seg.italic ? `<i>${escape(seg.text)}</i>` : escape(seg.text)).join('');
+        const items = sources.filter((s) => selected.has(s.uuid));
+        if (!items.length) return;
+        // Reuses the same module-level cache as the per-item hook, so visible
+        // items are zero-network.
+        const results = await Promise.all(items.map(async (s) => {
+            try {
+                const rt = await formatCitation({ uuid: s.uuid, csl: s.csl }, citationFormat);
+                return richTextToHtml(rt);
+            } catch {
+                return '';
+            }
         }));
         const tempDiv = document.createElement('div');
         tempDiv.style.cssText = 'position:fixed;left:-9999px;font-family:"Times New Roman",Times,serif;font-size:12pt;line-height:2;';
@@ -89,6 +81,8 @@ export default function References() {
         setLastAddedId(next.uuid);
     };
 
+    const allSelected = sourceCount > 0 && selectedCount === sourceCount;
+
     return (
         <div className={styles.container}>
             <CitationSearch includeDropdown={false} includeManualCite={false} ref={citationFormatRef} />
@@ -111,17 +105,18 @@ export default function References() {
                         <input
                             type="checkbox"
                             className={styles.checkboxElement}
-                            onChange={handleSelectAll}
+                            onChange={(e) => selectAll(e.target.checked)}
+                            checked={allSelected}
                             ref={selectAllRef}
                             aria-label="Select all references"
                         />
-                        <div className={styles.checkbox}></div>
+                        <div className={styles.checkbox} aria-hidden="true"></div>
                         <span>
                             {sourceCount} source{sourceCount === 1 ? '' : 's'}
-                            {checkedCount > 0 ? ' selected' : ''}
+                            {selectedCount > 0 ? ' selected' : ''}
                         </span>
                     </label>
-                    {checkedCount > 0 && (
+                    {selectedCount > 0 && (
                         <div className={styles.referenceTitleButtons}>
                             <button
                                 className={styles.button}
@@ -152,15 +147,14 @@ export default function References() {
                 </div>
                 {sources.length > 0 && (
                     <ul className={styles.citationSourceContainer} role="list">
-                        {sources.map((source, i) => (
+                        {sources.map((source) => (
                             <ReferenceItem
                                 key={source.uuid}
                                 source={source}
-                                sources={sources}
                                 setSources={setSources}
-                                index={i}
+                                checked={selected.has(source.uuid)}
+                                onToggle={toggleSelected}
                                 citationFormat={citationFormat}
-                                onCheckChange={handleCheckChange}
                                 autoOpenEdit={source.uuid === lastAddedId}
                             />
                         ))}

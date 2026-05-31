@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import type { StoredSource } from '../../lib/references/storage';
 import type { CSLItem } from '../../lib/citations/csl-types';
 import {
@@ -11,9 +11,7 @@ import {
     AccessDate,
     Edition,
     VolumeNumber,
-    // TODO(typo): the named export below is misspelled `Publsiher` in EditCitationFormComponents.tsx.
-    // Aliased as Publisher here; rename the export in a follow-up PR.
-    Publsiher as Publisher,
+    Publisher,
     DOI,
 } from './EditCitationFormComponents';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -30,26 +28,46 @@ const TYPE_OPTIONS: CitationOption[] = [
 interface Props {
     source: StoredSource;
     setSources: (s: StoredSource[] | ((prev: StoredSource[]) => StoredSource[])) => void;
+    // Parent ref populated with the latest in-flight CSL on every render. The
+    // dialog/drawer reads it on close to decide empty-vs-flush before the
+    // debounced 500ms timer would have fired — otherwise typed input is lost
+    // (citation removed as "still empty") or stale (form unmount cancels timer).
+    currentRef?: React.MutableRefObject<CSLItem | null>;
 }
 
-export default function EditCitationForm({ source, setSources }: Props) {
+export default function EditCitationForm({ source, setSources, currentRef }: Props) {
     const [local, setLocal] = useState<CSLItem>(source.csl);
 
-    const debouncedSet = useDebounce((next: CSLItem) => {
-        setSources((prev) => prev.map((s) => s.uuid === source.uuid ? { ...s, csl: next } : s));
+    // Read the latest `local` via ref inside the debounced flush so the 500ms
+    // timer always writes the most recent state, regardless of how many
+    // intervening patches happened (functional setLocal + ref instead of
+    // closure-captured `local` avoids dropping characters under rapid typing).
+    const localRef = useRef(local);
+    useEffect(() => {
+        localRef.current = local;
+        if (currentRef) currentRef.current = local;
+    }, [local, currentRef]);
+
+    const debouncedSet = useDebounce(() => {
+        setSources((prev) => prev.map((s) => s.uuid === source.uuid ? { ...s, csl: localRef.current } : s));
     }, 500);
 
     const patch = useCallback((p: Partial<CSLItem>) => {
-        const next = { ...local, ...p } as CSLItem;
-        setLocal(next);
-        debouncedSet(next);
-    }, [local, debouncedSet]);
+        setLocal((prev) => ({ ...prev, ...p } as CSLItem));
+        debouncedSet();
+    }, [debouncedSet]);
 
     const handleTypeChange = (t: CSLItem['type']) => patch({ type: t });
 
     return (
-        <div className="flex flex-col gap-4 w-full pt-8">
-            <div className="grid grid-cols-[130px_1fr] items-center gap-4">
+        // data-vaul-no-drag tells vaul to skip its drag-to-dismiss detection
+        // for touches anywhere inside the form. Without it, tapping a dropdown
+        // trigger or input doesn't reliably register on the first tap — vaul's
+        // shouldDrag walks up the DOM, finds the ScrollArea viewport with
+        // scrollTop=0, and treats the touch as a potential dismiss instead of
+        // forwarding the click to the control.
+        <div data-vaul-no-drag className="flex flex-col gap-4 w-full pt-8">
+            <div className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
                 <span className="flex flex-col leading-4 text-sm">
                     Source Type
                     <span className="text-xs text-muted-foreground">Required</span>
@@ -59,7 +77,7 @@ export default function EditCitationForm({ source, setSources }: Props) {
                     value={TYPE_OPTIONS.find((o) => o.value === local.type)}
                     onChange={(o: CitationOption) => handleTypeChange(o.value)}
                     placeholder="Source Type"
-                    className="min-w-[7rem]"
+                    className="min-w-0 sm:min-w-[7rem]"
                 />
             </div>
             <Line className="my-4" />

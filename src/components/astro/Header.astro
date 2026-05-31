@@ -15,30 +15,31 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
   <div class="logo">
     <a href={`${site}`} aria-label="MLA Generator">
       <!-- <p>MLA Generator</p> -->
-      <img src={Logo.src} alt="MLA Generator" title="MLA Generator" />
+      <img src={Logo.src} alt="MLA Generator" title="MLA Generator" width="213" height="35" />
     </a>
   </div>
-  <ul id="menu-content">
-    <li><a href={`${site}`}>Citation Generator</a></li>
-    <li><a href={`${site}my-references`}>My References</a></li>
-    <li class="sub-menu-trigger"><span>Citation Guides</span></li>
-    <ul class="sub-menu">
-      <li>
-        <a href={`${site}guides/research-and-works-cited`}
-          >Mastering Your Sources</a
-        >
+  <nav aria-label="Primary" id="primary-nav">
+    <ul id="menu-content">
+      <li><a href={`${site}`}>Citation Generator</a></li>
+      <li><a href={`${site}my-references`}>My References</a></li>
+      <li class="sub-menu-trigger">
+        <button type="button" aria-haspopup="true" aria-expanded="false" aria-controls="guides-submenu">Citation Guides</button>
       </li>
-      <li><a href={`${site}guides/mla`}>MLA Format Guide</a></li>
-      <li><a href={`${site}guides/apa`}>APA Format Guide</a></li>
-      <li><a href={`${site}guides/chicago`}>Chicago Format Guide</a></li>
-      <li><a href={`${site}guides/harvard`}>Harvard Format Guide</a></li>
+      <ul class="sub-menu" id="guides-submenu" role="menu">
+        <li role="none"><a role="menuitem" href={`${site}guides`}>All Guides</a></li>
+        <li role="none"><a role="menuitem" href={`${site}guides/research-and-works-cited`}>Mastering Your Sources</a></li>
+        <li role="none"><a role="menuitem" href={`${site}guides/mla`}>MLA Format Guide</a></li>
+        <li role="none"><a role="menuitem" href={`${site}guides/apa`}>APA Format Guide</a></li>
+        <li role="none"><a role="menuitem" href={`${site}guides/chicago`}>Chicago Format Guide</a></li>
+        <li role="none"><a role="menuitem" href={`${site}guides/harvard`}>Harvard Format Guide</a></li>
+      </ul>
     </ul>
-  </ul>
+  </nav>
   <div id="obscure"></div>
-  <button id="mobile-menu-toggle">
-    <div class="menu-bar"></div>
-    <div class="menu-bar"></div>
-    <div class="menu-bar"></div>
+  <button id="mobile-menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">
+    <div class="menu-bar" aria-hidden="true"></div>
+    <div class="menu-bar" aria-hidden="true"></div>
+    <div class="menu-bar" aria-hidden="true"></div>
   </button>
   <a class="button-primary" href="/">
     <BookOpenIcon className="button-icon" />
@@ -127,11 +128,21 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
       background-color: var(--color-background-2);
     }
     .sub-menu-trigger:hover + .sub-menu,
-    .sub-menu:hover {
+    .sub-menu-trigger:focus-within + .sub-menu,
+    .sub-menu:hover,
+    .sub-menu.open {
       display: flex !important;
     }
   }
   @media (max-width: 1050px) {
+    /* Take the nav landmark out of the header grid below 1050px so the
+       hamburger doesn't get pushed onto a second row. The nav still exists
+       in the DOM (its role is preserved by modern browsers/screen readers);
+       its children become direct grid items, and the menu ul is itself
+       display:none until header[open] adds the position-absolute dropdown. */
+    #primary-nav {
+      display: contents;
+    }
     .sub-menu {
       flex-direction: column;
       align-items: flex-start !important;
@@ -181,9 +192,10 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
     }
   }
   @media (max-width: 650px) {
-    header {
-      grid-template-columns: 1fr auto !important;
-    }
+    /* Keep the default 3-column grid (1fr auto auto) — overriding to 2 columns
+       caused the hamburger button to wrap to a new row at narrow widths even
+       with #primary-nav using display:contents. The button-primary is still
+       hidden so the third column ends up zero-width auto. */
     header .button-primary {
       display: none;
     }
@@ -225,7 +237,21 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
   }
   .logo img {
     height: 100%;
+    width: auto;
     image-rendering: -webkit-optimize-contrast;
+  }
+  .sub-menu-trigger button {
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 10px;
+  }
+  .sub-menu-trigger button:focus-visible {
+    outline: 2px solid var(--color-text-dark);
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 </style>
 
@@ -235,10 +261,28 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
   const obscure = document.getElementById("obscure");
 
   mobileMenuToggle!.addEventListener("click", () => {
-    header!.toggleAttribute("open");
+    const isOpen = header!.toggleAttribute("open");
+    mobileMenuToggle!.setAttribute("aria-expanded", String(isOpen));
   });
 
   obscure!.addEventListener("click", (e) => {
     header!.removeAttribute("open");
+    mobileMenuToggle!.setAttribute("aria-expanded", "false");
+  });
+
+  // Sub-menu trigger: toggle aria-expanded on the button so screen readers
+  // know the popover state. Visual show/hide remains driven by CSS.
+  const subMenuTriggerBtn = document.querySelector('.sub-menu-trigger button');
+  const subMenu = document.getElementById('guides-submenu');
+  subMenuTriggerBtn?.addEventListener('click', () => {
+    const expanded = subMenuTriggerBtn.getAttribute('aria-expanded') === 'true';
+    subMenuTriggerBtn.setAttribute('aria-expanded', String(!expanded));
+    subMenu?.classList.toggle('open');
+  });
+  document.addEventListener('click', (e) => {
+    if (!subMenuTriggerBtn?.contains(e.target as Node) && !subMenu?.contains(e.target as Node)) {
+      subMenuTriggerBtn?.setAttribute('aria-expanded', 'false');
+      subMenu?.classList.remove('open');
+    }
   });
 </script>

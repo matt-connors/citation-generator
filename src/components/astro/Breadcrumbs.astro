@@ -1,0 +1,62 @@
+---
+// src/components/astro/Breadcrumbs.astro
+// Renders a visual + accessible breadcrumb nav. JSON-LD BreadcrumbList
+// is emitted separately by the layout that consumes this; this component
+// is the visible markup only.
+interface Crumb {
+    name: string;
+    href: string;
+    current?: boolean;
+}
+
+interface Props {
+    items: Crumb[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol>
+        {items.map((item, i) => (
+            <li>
+                {item.current
+                    ? <span aria-current="page">{item.name}</span>
+                    : <a href={item.href}>{item.name}</a>}
+                {i < items.length - 1 && <span class="separator" aria-hidden="true">/</span>}
+            </li>
+        ))}
+    </ol>
+</nav>
+
+<style>
+    .breadcrumbs ol {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        font-size: 14px;
+        color: var(--color-text-light);
+    }
+    .breadcrumbs li {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .breadcrumbs a {
+        color: var(--color-text-light);
+        text-decoration: none;
+    }
+    .breadcrumbs a:hover {
+        color: var(--color-text-dark);
+        text-decoration: underline;
+    }
+    .breadcrumbs [aria-current="page"] {
+        color: var(--color-text-dark);
+    }
+    .separator {
+        color: var(--color-text-light);
+    }
+</style>

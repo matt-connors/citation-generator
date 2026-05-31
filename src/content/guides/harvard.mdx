@@ -1,111 +1,202 @@
 ---
-title: 'Harvard Citation Guide: Mastering the Author-Date Style'
+title: 'Harvard Citation Guide: Cite Them Right 12th Edition (Author-Date)'
 pubDate: 2024-12-19
-description: 'This guide provides a comprehensive overview of the Harvard citation style, also known as the author-date system. Learn how to create in-text citations, format your reference list, and correctly attribute your sources. Widely used in business, law, and the sciences.'
-author: 'John Doe'
-tags: ['Harvard', 'citations', 'reference list', 'author-date', 'research', 'writing', 'formatting', 'business', 'law', 'science']
+updatedDate: 2026-05-27
+description: 'Complete Harvard guide following Cite Them Right 12th edition — the variant this site generates. In-text citations, reference list, worked examples for every common source type, and how Harvard differs from APA and MLA. Written and reviewed by the MLA Generator Editorial Team.'
+category: 'style-guide'
+keywords: ['Harvard citation', 'Cite Them Right', 'Harvard referencing', 'author-date Harvard', 'Harvard in-text citations', 'Harvard reference list', 'how to cite in Harvard']
+tags: ['Harvard', 'citations', 'reference list', 'author-date', 'Cite Them Right', 'UK academic', 'business', 'social sciences']
+relatedGuides: ['apa', 'mla', 'chicago', 'how-to-cite-a-book', 'how-to-cite-a-journal-article', 'in-text-citations']
+faq:
+  - question: 'Is Harvard a single official standard?'
+    answer: 'No. "Harvard style" is a family of author–date practices used widely in UK universities, business schools, and the social sciences, but it has no single governing body the way APA or MLA do. The most-cited authoritative reference is *Cite Them Right* by Richard Pears and Graham Shields (Bloomsbury Academic), now in its 12th edition (2022). This guide and this tool''s generator both follow Cite Them Right 12th. Many UK institutions publish their own Harvard style sheet that differs from Cite Them Right in small ways — check yours if your assignment grades on a specific local convention.'
+  - question: 'Is Harvard the same as APA?'
+    answer: 'No, though the two systems share the author–date logic and look similar at first glance. APA is a specific standard published by the American Psychological Association with strict rules on every detail; Harvard is a family of practices with variations between institutions. Compared to Cite Them Right specifically, APA 7 uses an ampersand for two-author parentheticals — `(Lin & Patel, 2022)` — where Cite Them Right spells out the word: `(Lin and Patel, 2022)`. APA also collapses to "et al." at three or more authors, where Cite Them Right doesn''t until four. The two systems share author–date logic but differ on punctuation, ampersand usage, capitalization conventions, the et al. threshold, and URL handling. Use whichever your discipline expects.'
+  - question: 'Does Harvard use page numbers in in-text citations?'
+    answer: 'You need page numbers only for direct quotes — the format is `(Chen, 2021, p. 47)` for a single page or `(Chen, 2021, pp. 47–49)` for a range. For paraphrasing, the author and year are sufficient. For sources without pages (most websites), include a paragraph number, section heading, or — when none of those is available — simply omit the locator.'
+  - question: 'Do I include "Available at:" before URLs in Harvard references?'
+    answer: 'Yes — Cite Them Right uses "Available at:" before the URL, followed by an access date. This site''s generator renders the date in month-day-year order, "(Accessed: May 12, 2026)". This is one of the cleanest visual differences between Cite Them Right Harvard and APA 7 (which omits "Available at:" and only includes an access date for sources designed to change).'
+  - question: 'How many authors does Harvard list before using "et al."?'
+    answer: 'In-text, Cite Them Right uses "et al." starting with four or more authors — `(Smith et al., 2024)` — from the very first citation. Three-author works spell out every surname every time: `(Goldstein, Ramanathan and O''Connor, 2024)`. In the reference list, list up to three authors in full; for four or more, list the first author and use "et al." Different Harvard variants set different thresholds, so check your institution''s house style if it conflicts with what your generator produces.'
+ogImage: '/images/banner.png'
 ---
 
-import TryMe from '../../components/astro/TryMe.astro';
+Harvard is the author–date style most UK universities, business schools, and social-science departments expect. Unlike APA or MLA, "Harvard" is a family of related conventions rather than a single official standard. This guide follows *Cite Them Right* (Pears and Shields, 2022, 12th edition, Bloomsbury Academic) — the most widely cited authority and the variant this site's generator produces.
 
-Harvard referencing, often referred to as the "author-date" style, is a widely used citation system in various academic disciplines, including business, law, the sciences, and social sciences. Unlike MLA or APA, there isn't one definitive "Harvard style" guide. Instead, many institutions and publications have developed their own variations. This guide will present a common and widely accepted version of Harvard referencing, providing you with a solid foundation for using this style.
+> The shortest version of Harvard (Cite Them Right 12th): author surname and year in the text with a comma between them, full entry in a Reference list at the back, sentence case for article and book titles, surname-and-initials author format, "Available at:" before every URL, hanging indent, and the word "and" — never "&".
 
-## Why Use Harvard Referencing?
+## What Harvard is and when you'll use it
 
-The Harvard style offers several benefits for academic writing:
+Harvard referencing grew out of late-nineteenth-century scientific writing, popularised by Harvard zoologist Edward Laurens Mark in an 1881 paper. The university never published a style guide of its own, and the convention spread without central governance. What "Harvard" means now depends on where you are: a UK business school, an Australian social-policy faculty, and a South African law journal can all call their style "Harvard" and prescribe slightly different details.
 
-*   **Clarity and Readability:** The author-date system allows readers to quickly identify the source and its publication year within the text.
-*   **Emphasis on Authorship:** It highlights the authors responsible for the work being cited.
-*   **Flexibility:** Although variations exist, the core principles of author-date referencing remain consistent, making it adaptable to different publication requirements.
-*   **Avoids Plagiarism:** Properly citing sources using Harvard style is essential for avoiding plagiarism and acknowledging intellectual property.
+This is the central thing to understand before you cite anything. There is no governing body for Harvard the way the American Psychological Association governs APA or the Modern Language Association governs MLA. The most-cited authoritative reference is *Cite Them Right* by Richard Pears and Graham Shields, published by Bloomsbury Academic and now in its 12th edition (2022). It is what UK academic libraries reach for first, what many UK universities adopt as their default, and what this site's generator produces. Every rule in this guide is keyed to that edition.
 
-## In-Text Citations in Harvard
+Other Harvard variants exist and most differ in small ways: whether the page abbreviation is "p." or "p", whether issue numbers sit in brackets or parentheses, whether article titles take single quotes or none, whether the comma between author and year is required. The differences are visual rather than structural. If your institution publishes its own Harvard style sheet — most UK universities do — check it before you submit, because the marker grades against that sheet, not Cite Them Right.
 
-In-text citations in Harvard referencing are concise and include the author's last name and the year of publication. Page numbers are included when quoting directly or referring to a specific part of a source.
+You will see Harvard required in UK undergraduate and postgraduate work across business, management, marketing, economics, sociology, education, geography, and law. Australian and South African universities follow similar practice. In the United States, Harvard is less common — APA dominates the social sciences there — but you may meet it in international journals and MBA coursework with UK ties. If your rubric says "Harvard" without naming a sheet, Cite Them Right 12th is the safest default.
 
-*   **Basic Format:** (Author's Last Name, Year)
-*   **Example:** (Smith, 2023)
-*   **Direct Quote:** (Smith, 2023, p. 45) or (Smith, 2023: 45) - be consistent with either using 'p.' or a colon.
+## In-text citations
 
-**Variations:**
+Harvard's in-text citation is **author–date**: the author's surname and the publication year, separated by a comma, in parentheses. With a direct quote, add the page number after another comma. The format points the reader to one — and only one — entry in the Reference list at the back.
 
-*   **Author mentioned in the sentence:** If the author's name is part of your sentence, only include the year in parentheses.
+### One author
 
-    > Example: Smith (2023) argues that...
-*   **Two authors:** Use "and" between the authors' names.
+Cite the surname and year. If the author's name appears in the running sentence, the year goes in parentheses immediately after the name.
 
-    > Example: (Smith and Jones, 2022)
-*   **Three or more authors:** Use the first author's name followed by "et al."
+Parenthetical: Working memory capacity correlates with reading comprehension across age groups (Chen, 2021).
 
-    > Example: (Johnson et al., 2021)
-*   **No author:** Use a shortened version of the title (in italics or quotation marks, depending on the source type) and the year.
+Narrative: Chen (2021) found that working memory capacity correlates with reading comprehension across age groups.
 
-    > Example: (*Impact of AI*, 2020) or ("Impact of AI," 2020)
-*   **Organization as author:**
-    > Example: (World Health Organization, 2019)
-*   **Multiple works by the same author in the same year:** Use lowercase letters (a, b, c) after the year to distinguish them.
+The comma between the surname and the year is mandatory in Cite Them Right (Pears and Shields, 2022). Some older Harvard sheets drop it; the 12th edition does not.
 
-    > Example: (Smith, 2023a), (Smith, 2023b)
+### Two or three authors
 
-## Creating a Reference List in Harvard
+For works with two or three authors, spell out every surname every time — there is no et al. shortcut at this threshold. Two authors are joined by *and* (never an ampersand). Three authors list all three surnames, joining the last two with *and* and no Oxford comma. Order matches the Reference list entry.
 
-The Reference List contains full bibliographic details for all the sources cited in your paper. It's arranged alphabetically by the author's last name.
+Two-author parenthetical: (Lin and Patel, 2022)
 
-*   **Heading:** The heading can be "Reference List" or "References." Choose one and be consistent.
-*   **Alphabetical Order:** List entries alphabetically by the author's last name. If no author, alphabetize by the first significant word in the title.
-*   **Hanging Indent:** Indent the second and subsequent lines of each entry.
-*   **Single or Double Spacing:** Harvard style can be single or double-spaced. Check your specific guidelines.
+Two-author narrative: Lin and Patel (2022) argue that cross-modal attention emerges earlier than developmental psychology has typically allowed.
 
-## Common Source Types and Their Harvard Citations
+Three-author parenthetical: (Goldstein, Ramanathan and O'Connor, 2024)
 
-Here are examples of how to cite common source types in Harvard style:
+Three-author narrative: Goldstein, Ramanathan and O'Connor (2024) report that overnight sleep amplifies procedural-skill consolidation in adolescents.
 
-### Book
+The two-author form is one of the clearest day-to-day differences between Harvard and APA. APA 7 uses *&* in the parenthetical and *and* in the narrative; Cite Them Right Harvard uses *and* in both. At three authors APA already collapses to *et al.* — Cite Them Right does not until four.
 
-**Format:**
+### Four or more authors
 
-Author's Last Name, Initial(s). (Year) *Title of book*. Place of publication: Publisher.
+Use the first author's surname followed by *et al.* (set in roman — no italics) from the very first citation, starting with four or more authors. Three-author works spell out every surname every time, as shown above.
 
-**Example:**
+Every citation: (Smith et al., 2024)
 
-<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
-    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">Doe, J.D. (2023) *The art of business*. London: Example Press.</p>
-</div>
+Note the comma before the year and the period after *al.* Some Harvard variants set the threshold at three; Cite Them Right 12th uses *et al.* only at four authors and above.
 
-### Journal Article
+### Organization as author
 
-**Format:**
+Spell out the organisation in full the first time, optionally introducing an abbreviation, and use the abbreviation thereafter.
 
-Author's Last Name, Initial(s). (Year) 'Title of article', *Title of Journal*, Volume(Issue), pp. Page range.
+First: (World Health Organization (WHO), 2019)
 
-**Example:**
+Subsequent: (WHO, 2019)
 
-<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
-    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">Smith, J.A. and Brown, A.B. (2022) 'The impact of social media on marketing', *Journal of Business Strategy*, 43(2), pp. 123-145.</p>
-</div>
+Treat government agencies, professional bodies, and corporate authors the same way. If the abbreviation is well known in your field, use it from the start.
 
-### Website
+### No named author
 
-**Format:**
+When a work has no identified author, move the title into the author slot. Italicise titles of standalone works (books, reports) and place article and web-page titles in double quotation marks.
 
-Author's Last Name, Initial(s). (or Organisation Name) (Year) *Title of webpage*. Available at: URL (Accessed: Day Month Year).
+Web article: ("Cognitive load and curriculum design", 2023)
 
-**Example:**
+Book or report: (*Reading proficiency and learning loss*, 2023)
 
-<div style="background: var(--background-1); padding: 1rem; border-radius: 12px;">
-    <p style="text-indent: -1.5rem; margin-left: 1.5rem; font-family: 'Source Serif 4', serif; font-weight: 400; letter-spacing: 0;">Johnson, L.M. (2023) *Harvard citation guide*. Available at: mlagenerator.com/guides/harvard (Accessed: 15 March 2024).</p>
-</div>
+### No date
 
-<TryMe />
+If the source genuinely has no publication date, use *no date* (lowercase, two words). The same form appears in the Reference list entry.
 
-## Tips for Mastering Harvard Referencing
+Example: (Alvarez, no date)
 
-*   **Check specific guidelines:** Always refer to the specific Harvard style guide provided by your institution, journal, or publisher, as variations exist. Note that our citation generator follows a standard and widely accepted format.
-*   **Be consistent:** Consistency is key in Harvard referencing. Choose one format for elements like page numbers (p. or :) and stick to it throughout your paper.
-*   **Use a citation generator:** Tools like the one offered on mlagenerator.com (yes, even though it's called MLA Generator, it does Harvard style, too!) can help you format citations correctly, but always double-check them against your specific guidelines.
-*   **Pay attention to details:** Pay close attention to punctuation, capitalization, and the order of elements in your citations.
-*   **Practice:** The more you practice, the more comfortable you'll become with Harvard referencing.
+Reserve *no date* for sources where the date is truly absent. A copyright year at the foot of a web page counts as a date; a "last updated" timestamp counts. Reach for *no date* only when nothing dateable appears anywhere.
 
-## Conclusion
+### Direct quotes (with page numbers)
 
-Harvard referencing, with its author-date system, is a clear and widely used citation style. By understanding the principles and guidelines outlined in this guide, you'll be well-equipped to cite your sources accurately and format your reference list correctly. Remember that accurate and consistent citation practices are essential for maintaining academic integrity, avoiding plagiarism, and giving credit to the original authors whose work has informed your own. Mastering Harvard style will enhance your credibility as a researcher and contribute to the clarity and impact of your work.
+Direct quotes require a page number. The format is `(Author, Year, p. X)` for a single page and `(Author, Year, pp. X–Y)` for a range. Note the space after `p.` and the en dash in the range.
+
+Short quote: Working memory is "a flexible mental workspace, not a fixed bin of slots" (Chen, 2021, p. 47).
+
+Quote from a website without page numbers: Alvarez (2023) writes that reading comprehension "outruns vocabulary growth in elementary readers" (para. 4).
+
+For sources without pages, give the reader a way to find the passage: a paragraph number, a named section heading, or a timestamp for video and audio. If no locator is available, the parenthetical is just the author and year.
+
+### Citing multiple sources at once
+
+When a single parenthetical points to multiple sources, separate them with semicolons. Cite Them Right (Pears and Shields, 2022) orders them chronologically — oldest first — rather than alphabetically.
+
+Example: Three studies converge on this pattern (Chen, 2021; Lin and Patel, 2022; Goldstein, Ramanathan and O'Connor, 2024).
+
+### Same author, multiple works
+
+When your Reference list contains two or more works by the same author, the in-text citation usually distinguishes them by year alone. When two works appeared in the same year, add lowercase letters after the year in both the in-text citation and the Reference list entry.
+
+Different years: (Chen, 2019; Chen, 2021)
+
+Same year: (Chen, 2021a; Chen, 2021b)
+
+The letter assignment follows the order of the entries on the Reference list, which is alphabetised by title once author and year are tied.
+
+## Reference list format
+
+The Reference list goes on its own page at the end of the paper, with the heading **Reference list** at the top — the singular *list* is Cite Them Right's preferred form (Pears and Shields, 2022), though *References* is widely accepted and your institution may insist on it. Every source cited in the body appears here, and every entry here is cited at least once in the body.
+
+Entries are alphabetised by the first author's surname. Where there is no named author, alphabetise by the first significant word of the title, ignoring leading *A*, *An*, and *The*. Each entry uses a hanging indent — the first line flush left, continuation lines indented — so the eye can scan a column of surnames at the left margin. Spacing is conventionally single-spaced within an entry with a blank line between entries, but double-spacing throughout is acceptable too.
+
+The author element inverts the first author's name as surname-then-initials, with periods after each initial and no spaces between them: `Chen, M.S.` — not `Chen, M. S.` or `Chen, MS`. Subsequent authors follow the same format, joined by *and* before the final author. The year follows the author block in parentheses: `Chen, M.S. (2021)`.
+
+Titles divide along two lines. Book and journal titles are *italicised* and use **sentence case** — only the first word and any proper nouns are capitalised. Article and chapter titles sit inside double quotation marks, also in sentence case. The asymmetry is consistent: the container (book or journal) is italicised; the thing inside the container is quoted. Page ranges use *p.* for a single page and *pp.* for a range, with an en dash between numbers (`pp. 87–104`, not `pp. 87-104`).
+
+For online sources, Cite Them Right (Pears and Shields, 2022) prefixes the URL with `Available at:` and follows it with `(Accessed: May 20, 2026)`. DOIs take the same prefix but no access date, because DOIs are stable identifiers.
+
+## Source-type examples
+
+The entries below use the fixture sources referenced throughout this guide and show each common source type exactly as this site's generator renders it in Cite Them Right 12th format. Render them with a hanging indent in your own document.
+
+| Source type | Reference list entry |
+| --- | --- |
+| Book (single author) | Chen, M.S. (2021) *The architecture of working memory*. Cambridge: Cambridge University Press. |
+| Chapter in edited book | Lin, D.K. and Patel, H.J. (2022) "Cross-modal attention in early development", in R.T. Morrison (ed.) *Handbook of developmental cognition*. London: Routledge, pp. 142–168. |
+| Journal article with DOI | Goldstein, A., Ramanathan, P. and O'Connor, L. (2024) "Sleep consolidation effects on procedural learning in adolescents", *Journal of Cognitive Development*, 19(2), pp. 87–104. Available at: https://doi.org/10.1037/cogdev0000412. |
+| Web article (no DOI) | Alvarez, S. (2023) *How working memory predicts reading comprehension*, *Psychology Today*. Available at: https://www.psychologytoday.com/intl/blog/working-memory-reading-comprehension (Accessed: May 20, 2026). |
+| Government report | U.S. Department of Education (2023) *Reading proficiency and learning loss in U.S. fourth-graders, 2019–2022* (NCES 2023-145). Washington, DC: National Center for Education Statistics. Available at: https://nces.ed.gov/pubsearch/pubsinfo.asp?pubid=2023145 (Accessed: May 20, 2026). |
+| Conference paper | Tanaka, Y. and Hoffmann, M. (2022) "A unified model of attention in dual-task performance", 63rd Annual Meeting of the Psychonomic Society. Boston, MA, 4–6 November 2022. |
+| Doctoral dissertation | Kowalski, E.R. (2020) *Memory consolidation in bilingual speakers: an fMRI investigation*. PhD thesis. University of Michigan. |
+
+A few details to notice. The book entry keeps the place of publication that APA 7 dropped. The chapter entry inverts the chapter authors' names but presents the editor in given-name-first order, `R.T. Morrison (ed.)`, with the editor abbreviation in lowercase parentheses — only the chapter authors get the surname-then-initials inversion. The web article italicises both the article title and the container (*Psychology Today*) with a comma between them. The journal entry's volume sits before the bracketed issue, `19(2)`, with no italics on either. The web article uses `Available at:` and a parenthetical access date in month-day-year order; the journal article uses `Available at:` for the DOI but no access date, because a DOI is stable. The conference paper names the meeting, city, and date span without page numbers, since the talk wasn't formally proceedings-published. The tool at [/](/) assembles the punctuation, italics, and `Available at:` prefixes for you, but the logic is what's shown above.
+
+## Common mistakes
+
+These five errors account for most of the marks students lose on Harvard assignments. Each shows the wrong version above the right one.
+
+**Missing the comma between author and year.**
+Wrong: (Chen 2021)
+Right: (Chen, 2021)
+
+Cite Them Right (Pears and Shields, 2022) requires the comma. Some older Harvard sheets omit it; the 12th edition does not. If your local sheet differs, follow it — but Cite Them Right's form is what this guide and this generator produce.
+
+**Using "&" instead of "and".**
+Wrong: (Lin & Patel, 2022)
+Right: (Lin and Patel, 2022)
+
+The ampersand is APA's habit. Cite Them Right Harvard spells out *and* in every position — parenthetical, narrative, and Reference list.
+
+**Year placed outside the parentheses or after the title.**
+Wrong: Chen, M.S. *The architecture of working memory* (2021). Cambridge: Cambridge University Press.
+Right: Chen, M.S. (2021) *The architecture of working memory*. Cambridge: Cambridge University Press.
+
+The year follows the author block in parentheses, before the title. Putting the year anywhere else doesn't fit author–date.
+
+**Title case on article and book titles.**
+Wrong: "Sleep Consolidation Effects on Procedural Learning in Adolescents"
+Right: "Sleep consolidation effects on procedural learning in adolescents"
+
+Cite Them Right uses sentence case for both article and book titles — only the first word and proper nouns are capitalised. Journal titles, by contrast, take title case because they are proper nouns naming a specific publication.
+
+**Missing "Available at:" or the access date on web sources.**
+Wrong: Alvarez, S. (2023) *How working memory predicts reading comprehension*, *Psychology Today*. https://www.psychologytoday.com/intl/blog/working-memory-reading-comprehension.
+Right: Alvarez, S. (2023) *How working memory predicts reading comprehension*, *Psychology Today*. Available at: https://www.psychologytoday.com/intl/blog/working-memory-reading-comprehension (Accessed: May 20, 2026).
+
+The `Available at:` prefix and the parenthetical access date are required for web sources in Cite Them Right (Pears and Shields, 2022). Dropping either makes the entry look like APA rather than Harvard.
+
+## How Harvard differs from other styles
+
+Students often ask whether Harvard is just APA with the labels changed, or whether it is some flavour of MLA. The shortest answer is no on both counts — it is its own thing, and the differences show up in every entry. Here is the same journal article in three styles, using the fixtures above.
+
+**Cite Them Right Harvard:** Goldstein, A., Ramanathan, P. and O'Connor, L. (2024) "Sleep consolidation effects on procedural learning in adolescents", *Journal of Cognitive Development*, 19(2), pp. 87–104. Available at: https://doi.org/10.1037/cogdev0000412.
+
+**APA 7:** Goldstein, A., Ramanathan, P., & O'Connor, L. (2024). Sleep consolidation effects on procedural learning in adolescents. *Journal of Cognitive Development, 19*(2), 87–104. https://doi.org/10.1037/cogdev0000412
+
+**MLA 9:** Goldstein, Aaron, et al. "Sleep Consolidation Effects on Procedural Learning in Adolescents." *Journal of Cognitive Development*, vol. 19, no. 2, 2024, pp. 87–104. https://doi.org/10.1037/cogdev0000412.
+
+The three entries cite the same source but every visible detail differs. Harvard uses *and* between the last two surnames; APA uses an ampersand; MLA collapses three or more authors to `et al.` on the Reference list. Harvard wraps the article title in double quotes; APA leaves it bare; MLA also wraps it in double quotes but applies title case. Harvard and MLA italicise the journal title alone; APA italicises the journal title and the volume number together. Harvard prefixes the DOI with `Available at:`; APA and MLA do not.
+
+The in-text citations differ too. Harvard reads `(Goldstein, Ramanathan and O'Connor, 2024)` — three authors spelled out in full, joined by *and* with no Oxford comma. APA 7 collapses to `(Goldstein et al., 2024)` because APA's et al. threshold is three or more authors, where Cite Them Right Harvard's is four or more. MLA reads `(Goldstein et al. 88)` with a page number and no year.
+
+Use Harvard when your UK course, business-school module, or social-science journal asks for it; use APA when your psychology, education, or nursing course asks for it; use MLA when literature or modern languages ask for it. The styles encode the same scholarly logic — credit the source, let the reader find it — and choosing well is a question of audience, not correctness.

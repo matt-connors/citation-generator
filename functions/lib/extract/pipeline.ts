@@ -32,5 +32,27 @@ export function runExtractionPipeline(html: string, url: string): PipelineResult
     URL: url,
     ...merged,
   };
+
+  // Wikipedia quirk: JSON-LD `headline` is the article description, not the title
+  // (e.g. <https://en.wikipedia.org/wiki/Citation> → "reference to a source").
+  // The <title> tag has the correct value, and the heuristic signal already
+  // strips the " - Wikipedia" suffix via TITLE_SEP.
+  if (isWikipediaHost(url)) {
+    const heuristic = named.find((s) => s.name === 'heuristic');
+    if (heuristic?.fields.title) {
+      final.title = heuristic.fields.title;
+      signals.title = 'heuristic';
+    }
+  }
+
   return { csl: final, signals };
+}
+
+function isWikipediaHost(url: string): boolean {
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    return host === 'wikipedia.org' || host.endsWith('.wikipedia.org');
+  } catch {
+    return false;
+  }
 }

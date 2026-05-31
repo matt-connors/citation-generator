@@ -1,14 +1,16 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { loadSources, saveSources, type StoredSource } from './storage';
 import type { CSLItem, SupportedStyle } from '../citations/csl-types';
 
 export interface UseReferencesReturn {
   sources: StoredSource[];
   sourceCount: number;
-  checkedCount: number;
+  selected: ReadonlySet<string>;
+  selectedCount: number;
   citationFormat: SupportedStyle;
   setSources: (sources: StoredSource[] | ((prev: StoredSource[]) => StoredSource[])) => void;
-  setCheckedCount: (count: number) => void;
+  toggleSelected: (uuid: string, checked: boolean) => void;
+  selectAll: (checked: boolean) => void;
   setCitationFormat: (format: SupportedStyle) => void;
   handleDelete: () => void;
 }
@@ -27,8 +29,14 @@ interface ApiEnvelope {
 
 export function useReferences(): UseReferencesReturn {
   const [sources, setSourcesState] = useState<StoredSource[]>([]);
-  const [checkedCount, setCheckedCount] = useState(0);
+  const [selected, setSelected] = useState<ReadonlySet<string>>(() => new Set());
   const [citationFormat, setCitationFormatState] = useState<SupportedStyle>('mla-9');
+
+  // Mirror sources into a ref so callbacks with stable identities (e.g.
+  // selectAll, captured before an in-flight fetch resolves) still read the
+  // latest list, not the snapshot from the render that created the closure.
+  const sourcesRef = useRef(sources);
+  useEffect(() => { sourcesRef.current = sources; }, [sources]);
 
   const setSources = useCallback((next: StoredSource[] | ((prev: StoredSource[]) => StoredSource[])) => {
     setSourcesState((prev) => {
@@ -42,23 +50,30 @@ export function useReferences(): UseReferencesReturn {
     setCitationFormatState(s);
   }, []);
 
-  const handleDelete = useCallback(() => {
-    const remaining: StoredSource[] = [];
-    sources.forEach((s, i) => {
-      const cb = document.querySelector(`#source-${i}`) as HTMLInputElement | null;
-      if (!cb?.checked) remaining.push(s);
+  const toggleSelected = useCallback((uuid: string, checked: boolean) => {
+    setSelected((prev) => {
+      if (checked === prev.has(uuid)) return prev;
+      const next = new Set(prev);
+      if (checked) next.add(uuid); else next.delete(uuid);
+      return next;
     });
-    setSources(remaining);
-    setCheckedCount(0);
-  }, [sources, setSources]);
+  }, []);
+
+  const selectAll = useCallback((checked: boolean) => {
+    setSelected(checked ? new Set(sourcesRef.current.map((s) => s.uuid)) : new Set());
+  }, []);
+
+  const handleDelete = useCallback(() => {
+    setSources((prev) => prev.filter((s) => !selected.has(s.uuid)));
+    setSelected(new Set());
+  }, [selected, setSources]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const styleParam = params.get('citationStyle');
     if (isSupportedStyle(styleParam)) setCitationFormatState(styleParam);
 
-    const existing = loadSources();
-    setSourcesState(existing);
+    setSourcesState(loadSources());
 
     const website = params.get('website');
     const book = params.get('book');
@@ -81,22 +96,43 @@ export function useReferences(): UseReferencesReturn {
       })
       .then((env) => {
         if (cancelled || !env?.csl) return;
-        if (existing.some((s) => s.uuid === env.uuid)) return;
-        const merged = [...existing, { uuid: env.uuid, csl: env.csl }];
-        setSources(merged);
+        // Functional updater (not a closed-over `existing`) so manual citations
+        // the user added between mount and fetch resolution aren't clobbered.
+        setSources((prev) => prev.some((s) => s.uuid === env.uuid)
+          ? prev
+          : [...prev, { uuid: env.uuid, csl: env.csl }]);
       })
       .catch((err) => { if (!cancelled) console.error('Citation fetch failed', err); })
       .finally(() => clearTimeout(timeout));
     return () => { cancelled = true; controller.abort(); clearTimeout(timeout); };
   }, [setSources]);
 
+  // Prune stale uuids when sources change (e.g. deletions outside handleDelete).
+  useEffect(() => {
+    setSelected((prev) => {
+      if (prev.size === 0) return prev;
+      const valid = new Set(sources.map((s) => s.uuid));
+      let changed = false;
+      const next = new Set<string>();
+      for (const id of prev) {
+        if (valid.has(id)) next.add(id); else changed = true;
+      }
+      return changed ? next : prev;
+    });
+  }, [sources]);
+
+  // No useMemo on the returned object: `selectAll` and `handleDelete` depend on
+  // state that changes on every meaningful update, so a memo never hits — it
+  // would only pay the shallow-compare cost without benefit.
   return {
     sources,
     sourceCount: sources.length,
-    checkedCount,
+    selected,
+    selectedCount: selected.size,
     citationFormat,
     setSources,
-    setCheckedCount,
+    toggleSelected,
+    selectAll,
     setCitationFormat,
     handleDelete,
   };

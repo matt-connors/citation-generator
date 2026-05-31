@@ -43,7 +43,26 @@ export default defineConfig({
         // Compresses images and minifies HTML, CSS, and JS
         compress(),
         // Generates a sitemap file
-        sitemap(),
+        sitemap({
+            serialize(item) {
+                const pathname = new URL(item.url).pathname.replace(/\/$/, '') || '/';
+                if (pathname.startsWith('/admin')) return undefined;
+                if (pathname === '/') {
+                    item.priority = 1.0;
+                    item.changefreq = 'weekly';
+                } else if (pathname.startsWith('/guides/')) {
+                    item.priority = 0.9;
+                    item.changefreq = 'monthly';
+                } else if (pathname === '/guides' || pathname === '/about') {
+                    item.priority = 0.7;
+                    item.changefreq = 'monthly';
+                } else {
+                    item.priority = 0.5;
+                    item.changefreq = 'monthly';
+                }
+                return item;
+            },
+        }),
         // React integration
         react(),
         // MDX integration

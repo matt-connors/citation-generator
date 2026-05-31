@@ -1,46 +1,39 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-/**
- * Returns a debounced version of `callback`. Pending calls are FLUSHED on
- * unmount: if the component (e.g. an edit dialog) closes before the timer
- * fires, the latest call still runs, so in-flight edits aren't silently lost.
- * The callback is read through a ref so the latest closure always runs without
- * resetting the timer on every render.
- */
+// Returns a stable debounced function whose latest-callback semantics hold even
+// when consumers pass freshly-allocated callbacks each render (the callback is
+// read through a ref, so the returned function's identity only depends on
+// `delay`). Pending calls are also FLUSHED on unmount: if the component (e.g.
+// an edit dialog) closes before the timer fires, the latest call still runs, so
+// in-flight edits aren't silently lost.
 export function useDebounce<T extends (...args: any[]) => void>(
     callback: T,
     delay: number
 ): T {
-    const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+    const timeoutRef = useRef<NodeJS.Timeout>();
     const callbackRef = useRef(callback);
     const pendingArgsRef = useRef<Parameters<T> | null>(null);
-
-    callbackRef.current = callback;
-
-    useEffect(() => {
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                if (pendingArgsRef.current) {
-                    callbackRef.current(...pendingArgsRef.current);
-                    pendingArgsRef.current = null;
-                }
+    useEffect(() => { callbackRef.current = callback; }, [callback]);
+    useEffect(() => () => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            if (pendingArgsRef.current) {
+                callbackRef.current(...pendingArgsRef.current);
+                pendingArgsRef.current = null;
             }
-        };
+        }
     }, []);
 
     return useCallback(
-        (...args: Parameters<T>) => {
+        ((...args: Parameters<T>) => {
             pendingArgsRef.current = args;
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
             timeoutRef.current = setTimeout(() => {
                 timeoutRef.current = undefined;
                 pendingArgsRef.current = null;
                 callbackRef.current(...args);
             }, delay);
-        },
+        }) as T,
         [delay]
-    ) as T;
+    );
 }

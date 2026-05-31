@@ -6,23 +6,24 @@ import Logo from '../../../public/images/logo.svg';
 <footer>
     <figure>
         <a href={`${site}`} aria-label="MLA Generator">
-            <img src={Logo.src} alt="MLA Generator" />
+            <img src={Logo.src} alt="MLA Generator" width="213" height="35" />
         </a>
         <figcaption>
             MLA Generator is a free tool that creates citations, references, and
             bibliographies for your academic papers.
         </figcaption>
     </figure>
-    <nav>
+    <nav aria-label="Site navigation">
         <p class="heading-3">MLA Generator</p>
         <ul>
             <li><a href={`${site}`}>Citation Generator</a></li>
             <li><a href={`${site}my-references`}>My References</a></li>
+            <li><a href={`${site}about`}>About</a></li>
             <li><a href={`${site}privacy`}>Privacy</a></li>
             <li><a href={`${site}terms`}>Terms</a></li>
         </ul>
     </nav>
-    <nav>
+    <nav aria-label="Guide navigation">
         <p class="heading-3">Guides</p>
         <div class="grouping">
             <ul>
@@ -72,7 +73,7 @@ import Logo from '../../../public/images/logo.svg';
     }
     footer img {
         text-align: left;
-        width: min-content;
+        width: auto;
         image-rendering: -webkit-optimize-contrast;
     }
     footer nav a {
