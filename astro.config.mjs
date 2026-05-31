@@ -47,14 +47,26 @@ export default defineConfig({
             serialize(item) {
                 const pathname = new URL(item.url).pathname.replace(/\/$/, '') || '/';
                 if (pathname.startsWith('/admin')) return undefined;
+                // Tier priority to match the link-graph emphasis: the generator,
+                // the guides hub, and the seven cornerstone style guides outrank
+                // the long-tail how-to/concept guides (was a flat 0.9 for all guides
+                // with the hub below its own children).
+                const STYLE_GUIDES = ['apa', 'mla', 'chicago', 'harvard', 'vancouver', 'ieee', 'ama']
+                    .map((s) => `/guides/${s}`);
                 if (pathname === '/') {
                     item.priority = 1.0;
                     item.changefreq = 'weekly';
-                } else if (pathname.startsWith('/guides/')) {
+                } else if (pathname === '/guides') {
+                    item.priority = 0.9;
+                    item.changefreq = 'weekly';
+                } else if (STYLE_GUIDES.includes(pathname)) {
                     item.priority = 0.9;
                     item.changefreq = 'monthly';
-                } else if (pathname === '/guides' || pathname === '/about') {
-                    item.priority = 0.7;
+                } else if (pathname.startsWith('/guides/')) {
+                    item.priority = 0.8;
+                    item.changefreq = 'monthly';
+                } else if (pathname === '/about') {
+                    item.priority = 0.6;
                     item.changefreq = 'monthly';
                 } else {
                     item.priority = 0.5;

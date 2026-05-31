@@ -1,10 +1,17 @@
 ---
 import Layout from "../../layouts/page.astro";
+import Breadcrumbs from "../../components/astro/Breadcrumbs.astro";
+import { buildBreadcrumbList } from "../../lib/schema-org";
 import { getCollection } from "astro:content";
 
 const title = "Citation Guides — APA, MLA, Chicago, Harvard, Vancouver, IEEE, AMA";
 const description =
     "In-depth citation guides for APA, MLA, Chicago, Harvard, Vancouver, IEEE, and AMA — plus how-to guides for citing websites, books, journal articles, and more.";
+
+const breadcrumbSchema = buildBreadcrumbList([
+    { name: 'Home', url: new URL('/', Astro.site).href },
+    { name: 'Guides', url: new URL('/guides', Astro.site).href },
+]);
 
 const all = await getCollection("guides");
 const sortByTitle = (a: typeof all[number], b: typeof all[number]) =>
@@ -24,14 +31,16 @@ const grouped = categories.map((cat) => ({
 }));
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} extraSchemas={[breadcrumbSchema]}>
     <article class="guides-hub">
+        <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: 'Guides', href: '/guides', current: true }]} />
         <header>
             <h1>Citation Guides</h1>
             <p class="lede">
                 Authoritative guides covering every supported style — written
                 and reviewed by the MLA Generator Editorial Team against the
-                current editions of their respective style manuals.
+                current editions of their respective style manuals. Or jump
+                straight to the <a href="/">citation generator</a>.
             </p>
         </header>
 
