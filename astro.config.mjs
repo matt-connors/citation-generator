@@ -4,6 +4,32 @@ import sitemap from '@astrojs/sitemap';
 import compress from "astro-compress";
 import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
+import { readFileSync, readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+// Build a map of /guides/<slug> -> last-significant-change date, read straight
+// from each guide's frontmatter (updatedDate, else pubDate). This feeds honest
+// per-guide <lastmod> values into the sitemap. Pages without a real change date
+// (the generator, legal pages) intentionally get no lastmod rather than a faked
+// build-time one.
+const GUIDE_LASTMOD = (() => {
+    const map = {};
+    try {
+        const dir = join(dirname(fileURLToPath(import.meta.url)), 'src/content/guides');
+        for (const file of readdirSync(dir)) {
+            if (!file.endsWith('.mdx')) continue;
+            const src = readFileSync(join(dir, file), 'utf8');
+            const updated = src.match(/^updatedDate:\s*['"]?(\d{4}-\d{2}-\d{2})/m)?.[1];
+            const published = src.match(/^pubDate:\s*['"]?(\d{4}-\d{2}-\d{2})/m)?.[1];
+            const date = updated || published;
+            if (date) map[`/guides/${file.replace(/\.mdx$/, '')}`] = new Date(`${date}T00:00:00.000Z`).toISOString();
+        }
+    } catch {
+        // If the content dir can't be read, fall back to no lastmod rather than failing the build.
+    }
+    return map;
+})();
 
 /**
  * Astro Config file for Cloudflare
@@ -47,6 +73,8 @@ export default defineConfig({
             serialize(item) {
                 const pathname = new URL(item.url).pathname.replace(/\/$/, '') || '/';
                 if (pathname.startsWith('/admin')) return undefined;
+                // Honest per-guide last-modified date from frontmatter, where we have one.
+                if (GUIDE_LASTMOD[pathname]) item.lastmod = GUIDE_LASTMOD[pathname];
                 // Tier priority to match the link-graph emphasis: the generator,
                 // the guides hub, and the seven cornerstone style guides outrank
                 // the long-tail how-to/concept guides (was a flat 0.9 for all guides
