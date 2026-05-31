@@ -251,5 +251,28 @@ export function buildQueries(dataset: string): QueryDef[] {
         ${J}
       `,
     },
+    {
+      key: 'top_urls',
+      title: 'Top cited URLs (last 30d, cite_website only)',
+      description: 'The exact pages users cite most, by full normalized URL (blob5).',
+      render: 'table',
+      columns: [
+        { key: 'url', label: 'URL' },
+        { key: 'requests', label: 'Requests', align: 'right', bar: true },
+      ],
+      sql: `
+        SELECT
+          blob5 AS url,
+          count() AS requests
+        FROM ${dataset}
+        WHERE index1 = 'cite_website'
+          AND blob5 <> ''
+          AND timestamp >= NOW() - INTERVAL '30' DAY
+        GROUP BY url
+        ORDER BY requests DESC
+        LIMIT 50
+        ${J}
+      `,
+    },
   ];
 }

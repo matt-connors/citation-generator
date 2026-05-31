@@ -75,6 +75,8 @@ Analytics Engine stores columns positionally, not by name. The writer in `functi
 
 The `fetch_ms` column on `cite_website` was added 2026-05-27 — older rows have null/empty for that column. It separates network fetch time from extraction time so you can tell whether a slow citation was upstream (`fetch_ms` high) or our pipeline (`extraction_ms` high).
 
+`cite_website` also carries **`blob5` = `url`** (the full normalized cited URL), added 2026-05-31 — older rows have null/empty. This is the exact page the user cited (tracking params already stripped by `url-normalize`), enabling per-URL analysis beyond the host-level `blob4`.
+
 On a cache hit, `source` for cite_book / cite_journal is `''` (empty string) because we didn't talk to either upstream; the `cache_hit` metric is the source of truth for "this was a cache hit". **Per-source SQL slices should filter on the metric, not on `blob2`** — e.g. to count fresh OpenLibrary hits, write `WHERE index1 = 'cite_book' AND double2 = 0 AND blob2 = 'openlibrary'`, not `WHERE blob2 = 'openlibrary'` alone (that's already correct, but the omission of `double2 = 0` would silently exclude cache hits even though they came from "openlibrary" originally — usually the desired behavior, but be explicit). cite_website on a cache hit carries the cached signal-winner dimensions but `html_size_kb` and `extraction_ms` are both 0.
 
 ## Sample queries
@@ -190,6 +192,23 @@ LIMIT 20
 
 Tells you which sites' extraction quality matters most — high-volume hosts with low signal-winner diversity are where regressions hurt.
 
+### 6b. Exact URLs being cited most often (cite_website)
+
+```sql
+SELECT
+  blob5 AS url,
+  count() AS requests
+FROM citation_generator_events
+WHERE index1 = 'cite_website'
+  AND blob5 <> ''
+  AND timestamp >= NOW() - INTERVAL '30' DAY
+GROUP BY url
+ORDER BY requests DESC
+LIMIT 50
+```
+
+The full normalized cited URL (`blob5`, added 2026-05-31) — shows exactly which pages drive citations, not just which domains. `url` is the highest-cardinality dimension in the dataset.
+
 ## Notes on cardinality and cost
 
 Analytics Engine charges per data point written (the writer emits one per request) and per byte stored. The schema above is deliberately low-cardinality:
@@ -198,4 +217,4 @@ Analytics Engine charges per data point written (the writer emits one per reques
 - `signal_winner_*` ∈ 6 signal names
 - `host` is the only high-cardinality dimension; if you ever want to cap it, you can post-process the dimension into TLD-only before emission.
 
-The dataset has no PII — no IPs, no user agents, no URLs (only hostnames for `cite_website`). If that ever changes, redact at the writer (in `functions/lib/analytics.ts`) rather than at the query layer.
+The dataset records no IPs and no user agents. As of 2026-05-31 it **does store the full normalized cited URL** for `cite_website` (`blob5`) in addition to the host — an intentional decision to allow per-URL analysis. Tracking/identifying query params (`utm_*`, `fbclid`, `gclid`, `ref`, `mc_*`) are stripped by `url-normalize` before emission, but paths and any remaining query string are retained, so treat the dataset as containing the public URLs users chose to cite. The `host` dimension was previously the only high-cardinality column; `url` is now higher still. To redact further, do it at the writer (`functions/lib/analytics.ts`) or the `cite_website` call site, not at the query layer.
