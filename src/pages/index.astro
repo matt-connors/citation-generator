@@ -11,13 +11,13 @@ import {
     DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 
-import { buildSoftwareApplication } from "../lib/schema-org";
+import { buildSoftwareApplication, buildFaqPage } from "../lib/schema-org";
 
 const title = "Free Citation Generator — APA, MLA, Chicago, Harvard, Vancouver, IEEE & AMA";
 const description =
     "Generate accurate citations in APA 7, MLA 9, Chicago 18, Harvard, Vancouver, IEEE, and AMA formats from a URL, DOI, or ISBN. Free, fast, trusted by students worldwide.";
 
-const extraSchemas = [buildSoftwareApplication()];
+const extraSchemas = [buildSoftwareApplication(), buildFaqPage(faqs)];
 ---
 
 <Layout title={title} description={description} extraSchemas={extraSchemas}>

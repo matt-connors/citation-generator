@@ -93,9 +93,13 @@ export default function Dropdown({ options, className, value, onChange }: Dropdo
     }, []);
 
     return (
-        <div className={`${styles.dropdown} ${className} ${clsx(open && styles.open)}`} onClick={handleOpen}>
+        <div
+            className={`${styles.dropdown} ${className} ${clsx(open && styles.open)}`}
+            onClick={handleOpen}
+            onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
+        >
             <input type="hidden" name="citationStyle" value={selectedOption.value} />
-            <button className={styles.dropdownBtn} type="button">
+            <button className={styles.dropdownBtn} type="button" aria-haspopup="listbox" aria-expanded={open}>
                 <span className={parentStyles.inputLabel}>Citation Style</span>
                 <div className={styles.dropdownValue}>
                     <span>{selectedOption.label}</span>
@@ -106,7 +110,7 @@ export default function Dropdown({ options, className, value, onChange }: Dropdo
                 <div className={styles.dropdownSearch}>
                     <input type="text" placeholder="Search" value={searchText} onChange={(e) => setSearchText(e.target.value)} />
                 </div>
-                <ul>
+                <ul role="listbox">
                     {visibleOptions.map((option) => (
                         <li key={option.value}>
                             <button
