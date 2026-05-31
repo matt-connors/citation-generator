@@ -39,4 +39,21 @@ describe('storage v2', () => {
     localStorage.setItem('sources_v2', JSON.stringify({ not: 'array' }));
     expect(loadSources()).toEqual([]);
   });
+
+  it('drops entries with a corrupted (non-array) author, keeps valid ones', () => {
+    localStorage.setItem('sources_v2', JSON.stringify([
+      { uuid: 'good', csl: { id: 'good', type: 'webpage', title: 'T', author: [{ family: 'X' }] } },
+      { uuid: 'bad', csl: { id: 'bad', type: 'webpage', author: 'not-an-array' } },
+    ]));
+    const loaded = loadSources();
+    expect(loaded).toHaveLength(1);
+    expect(loaded[0].uuid).toBe('good');
+  });
+
+  it('drops entries with an invalid csl.type', () => {
+    localStorage.setItem('sources_v2', JSON.stringify([
+      { uuid: 'bad', csl: { id: 'bad', type: 'not-a-type' } },
+    ]));
+    expect(loadSources()).toEqual([]);
+  });
 });

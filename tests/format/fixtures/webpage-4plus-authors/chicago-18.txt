@@ -1,1 +1,1 @@
-Doe, Jane, John Smith, Anna Lee, Carlos Garcia, and Priya Patel. 2025. “Quantum Computing Advances.” Nature Tech, June 15. https://example.com/quantum.
+Doe, Jane, John Smith, Anna Lee, Carlos Garcia, and Priya Patel. “Quantum Computing Advances.” Nature Tech, June 15, 2025. https://example.com/quantum.

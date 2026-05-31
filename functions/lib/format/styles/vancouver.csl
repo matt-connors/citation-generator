@@ -48,6 +48,7 @@
       <date-part name="day"/>
     </date>
     <terms>
+      <term name="page-range-delimiter">-</term>
       <term name="available at">available from</term>
       <term name="collection-editor">
         <single>editor</single>

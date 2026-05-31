@@ -23,7 +23,10 @@ export function mergeSignals(signals: NamedSignal[]): {
     let bestName: string | undefined;
     for (const s of signals) {
       const conf = s.confidence[field];
-      if (typeof conf === 'number' && s.fields[field] !== undefined && conf > bestConf) {
+      // Guard the confidence contract: ignore NaN/Infinity/out-of-range scores so
+      // a misbehaving signal can't hijack a field with a pathological value.
+      if (typeof conf === 'number' && Number.isFinite(conf) && conf > 0 && conf <= 1
+        && s.fields[field] !== undefined && conf > bestConf) {
         bestConf = conf;
         bestVal = s.fields[field];
         bestName = s.name;

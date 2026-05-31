@@ -85,7 +85,11 @@ export function useReferences(): UseReferencesReturn {
     if (!requestUrl) return;
 
     let cancelled = false;
-    fetch(requestUrl)
+    // Bound the request so a slow/hung backend can't leave the page spinning
+    // forever; abort on unmount so a late response can't update stale state.
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15_000);
+    fetch(requestUrl, { signal: controller.signal })
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json() as Promise<ApiEnvelope>;
@@ -98,8 +102,9 @@ export function useReferences(): UseReferencesReturn {
           ? prev
           : [...prev, { uuid: env.uuid, csl: env.csl }]);
       })
-      .catch((err) => console.error('Citation fetch failed', err));
-    return () => { cancelled = true; };
+      .catch((err) => { if (!cancelled) console.error('Citation fetch failed', err); })
+      .finally(() => clearTimeout(timeout));
+    return () => { cancelled = true; controller.abort(); clearTimeout(timeout); };
   }, [setSources]);
 
   // Prune stale uuids when sources change (e.g. deletions outside handleDelete).

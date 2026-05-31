@@ -1,0 +1,1 @@
+[1] T. H. Cormen, C. E. Leiserson, R. L. Rivest, and C. Stein, <i>Introduction to Algorithms</i>, 3rd ed. Cambridge: MIT Press, 2009.

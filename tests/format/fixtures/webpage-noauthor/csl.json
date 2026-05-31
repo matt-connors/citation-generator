@@ -1,0 +1,9 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "Understanding Inflation",
+  "issued": { "date-parts": [[2023, 2, 9]] },
+  "accessed": { "date-parts": [[2026, 5, 31]] },
+  "container-title": "Investopedia",
+  "URL": "https://example.com/inflation"
+}

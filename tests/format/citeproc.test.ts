@@ -8,6 +8,7 @@ const PROJECT_ROOT = join(__dirname, '..', '..');
 
 beforeAll(() => {
   registerLocale('en-US', readFileSync(join(PROJECT_ROOT, 'functions/lib/format/locales/locales-en-US.xml'), 'utf-8'));
+  registerLocale('en-GB', readFileSync(join(PROJECT_ROOT, 'functions/lib/format/locales/locales-en-GB.xml'), 'utf-8'));
   for (const s of ['mla-9', 'apa-7', 'chicago-18', 'ama-11', 'harvard', 'ieee', 'vancouver'] as const) {
     registerStyle(s, readFileSync(join(PROJECT_ROOT, `functions/lib/format/styles/${s}.csl`), 'utf-8'));
   }

@@ -260,7 +260,10 @@
                           <if type="article">
                             <text term="preprint" text-case="capitalize-first"/>
                           </if>
-                          <else-if type="article-newspaper"/>
+                          <!-- LOCAL PATCH: group article-magazine with article-newspaper so a dated
+                               magazine article is not mislabeled "Published online" (AMA reserves that
+                               phrase for journal content released online ahead of print). -->
+                          <else-if type="article-newspaper article-magazine" match="any"/>
                           <else>
                             <text term="advance-online-publication" text-case="capitalize-first"/>
                           </else>

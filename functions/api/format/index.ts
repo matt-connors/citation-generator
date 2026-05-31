@@ -11,6 +11,7 @@ let registered = false;
 function ensureRegistered() {
   if (registered) return;
   registerLocale('en-US', decodeLocale('locales-en-US'));
+  registerLocale('en-GB', decodeLocale('locales-en-GB'));
   for (const name of STYLE_NAMES) {
     registerStyle(name as any, decodeStyle(name));
   }

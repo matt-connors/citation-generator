@@ -5,10 +5,11 @@ import { formatCitation, registerStyle, registerLocale } from '../../functions/l
 
 const ROOT = join(__dirname, '..', '..');
 const FIX_ROOT = join(__dirname, 'fixtures');
-const STYLES = ['mla-9', 'apa-7', 'chicago-18'] as const;
+const STYLES = ['mla-9', 'apa-7', 'chicago-18', 'ama-11', 'harvard', 'ieee', 'vancouver'] as const;
 
 beforeAll(() => {
   registerLocale('en-US', readFileSync(join(ROOT, 'functions/lib/format/locales/locales-en-US.xml'), 'utf-8'));
+  registerLocale('en-GB', readFileSync(join(ROOT, 'functions/lib/format/locales/locales-en-GB.xml'), 'utf-8'));
   for (const s of STYLES) {
     registerStyle(s, readFileSync(join(ROOT, `functions/lib/format/styles/${s}.csl`), 'utf-8'));
   }

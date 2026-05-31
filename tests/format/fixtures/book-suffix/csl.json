@@ -1,0 +1,9 @@
+{
+  "id": "fixture",
+  "type": "book",
+  "title": "Why We Can't Wait",
+  "author": [{ "family": "King", "given": "Martin Luther", "suffix": "Jr." }],
+  "issued": { "date-parts": [[2000]] },
+  "publisher": "Signet Classics",
+  "publisher-place": "New York"
+}

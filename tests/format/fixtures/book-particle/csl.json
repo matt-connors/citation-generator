@@ -1,0 +1,9 @@
+{
+  "id": "fixture",
+  "type": "book",
+  "title": "The Body Keeps the Score",
+  "author": [{ "family": "Kolk", "given": "Bessel", "non-dropping-particle": "van der" }],
+  "issued": { "date-parts": [[2014]] },
+  "publisher": "Viking",
+  "publisher-place": "New York"
+}

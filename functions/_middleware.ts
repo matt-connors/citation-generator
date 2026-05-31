@@ -27,6 +27,14 @@ function applySecurityHeaders(headers: Headers): void {
     headers.set('referrer-policy', 'no-referrer');
 }
 
+// CORS headers shared by the preflight short-circuit and the normal response path.
+const CORS_HEADERS: Record<string, string> = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400',
+};
+
 /**
  * HTTP basic auth gate on /admin/* paths.
  *
@@ -126,17 +134,20 @@ const errorHandling: PagesFunction<Env> = async (context) => {
 }
 
 /**
- * Set CORS headers on non-admin responses. Admin paths get no CORS header
- * because cross-origin access would only be useful with credentials — and
- * basic-auth credentials aren't sent cross-origin by default anyway — so
- * we deliberately keep the admin attack surface narrow.
+ * Answer CORS preflight (OPTIONS) directly for non-admin paths, and add CORS
+ * headers to every other non-admin response. Without the preflight branch, the
+ * browser's OPTIONS probe falls through to a route handler (e.g. /api/format,
+ * which is POST-only) and gets a 405, which then blocks the real cross-origin
+ * POST. Admin paths get no CORS header so their attack surface stays narrow.
  */
 const cors: PagesFunction<Env> = async (context) => {
     const url = new URL(context.request.url);
+    if (context.request.method === 'OPTIONS' && !isAdminPath(url.pathname)) {
+        return new Response(null, { status: 204, headers: { ...CORS_HEADERS } });
+    }
     const response = await context.next();
     if (!isAdminPath(url.pathname)) {
-        response.headers.set('Access-Control-Allow-Origin', '*');
-        response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+        for (const [k, v] of Object.entries(CORS_HEADERS)) response.headers.set(k, v);
     }
     return response;
 }

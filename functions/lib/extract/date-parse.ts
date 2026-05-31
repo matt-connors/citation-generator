@@ -23,8 +23,19 @@ export function parseIsoDate(s: string | null | undefined): CSLDateParts | null 
   if (!m) return null;
   const y = parseInt(m[1], 10);
   if (!Number.isFinite(y) || y < 1000 || y > 9999) return null;
-  if (m[3]) return [y, parseInt(m[2], 10), parseInt(m[3], 10)];
-  if (m[2]) return [y, parseInt(m[2], 10)];
+  if (m[3]) {
+    const month = parseInt(m[2], 10);
+    const day = parseInt(m[3], 10);
+    // Reject impossible months/days (e.g. "2020-99-99") so we never emit a
+    // malformed CSL date that citeproc would render nonsensically.
+    if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+    return [y, month, day];
+  }
+  if (m[2]) {
+    const month = parseInt(m[2], 10);
+    if (month < 1 || month > 12) return null;
+    return [y, month];
+  }
   return [y];
 }
 
@@ -34,12 +45,14 @@ export function parseFreeformDate(s: string | null | undefined): CSLDateParts | 
   let m = text.match(/^([A-Za-z]+)\.?\s+(\d{1,2}),?\s+(\d{4})$/);
   if (m) {
     const month = MONTHS[m[1].toLowerCase()];
-    if (month) return [parseInt(m[3], 10), month, parseInt(m[2], 10)];
+    const day = parseInt(m[2], 10);
+    if (month && day >= 1 && day <= 31) return [parseInt(m[3], 10), month, day];
   }
   m = text.match(/^(\d{1,2})\s+([A-Za-z]+)\.?\s+(\d{4})$/);
   if (m) {
     const month = MONTHS[m[2].toLowerCase()];
-    if (month) return [parseInt(m[3], 10), month, parseInt(m[1], 10)];
+    const day = parseInt(m[1], 10);
+    if (month && day >= 1 && day <= 31) return [parseInt(m[3], 10), month, day];
   }
   return null;
 }

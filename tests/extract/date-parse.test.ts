@@ -24,6 +24,12 @@ describe('parseIsoDate', () => {
   it('parses YYYY/MM', () => {
     expect(parseIsoDate('2021/04')).toEqual([2021, 4]);
   });
+  it('rejects impossible months and days', () => {
+    expect(parseIsoDate('2020-99-99')).toBeNull();
+    expect(parseIsoDate('2020-13-01')).toBeNull();
+    expect(parseIsoDate('2020-00-10')).toBeNull();
+    expect(parseIsoDate('2020-05-40')).toBeNull();
+  });
 });
 
 describe('parseFreeformDate', () => {
@@ -41,5 +47,9 @@ describe('parseFreeformDate', () => {
   });
   it('returns null on garbage', () => {
     expect(parseFreeformDate('hello world')).toBeNull();
+  });
+  it('rejects impossible days', () => {
+    expect(parseFreeformDate('May 40, 2026')).toBeNull();
+    expect(parseFreeformDate('0 May 2026')).toBeNull();
   });
 });

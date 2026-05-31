@@ -1,0 +1,10 @@
+{
+  "id": "fixture",
+  "type": "article-newspaper",
+  "title": "City Council Approves Budget",
+  "author": [{ "family": "Reporter", "given": "Rita" }],
+  "container-title": "The New York Times",
+  "issued": { "date-parts": [[2025, 4, 18]] },
+  "URL": "https://example.com/budget",
+  "accessed": { "date-parts": [[2026, 5, 31]] }
+}

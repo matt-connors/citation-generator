@@ -112,8 +112,9 @@ export default function References() {
                         />
                         <div className={styles.checkbox} aria-hidden="true"></div>
                         <span>
-                            {sourceCount} source{sourceCount === 1 ? '' : 's'}
-                            {selectedCount > 0 ? ' selected' : ''}
+                            {selectedCount > 0
+                                ? `${selectedCount} source${selectedCount === 1 ? '' : 's'} selected`
+                                : `${sourceCount} source${sourceCount === 1 ? '' : 's'}`}
                         </span>
                     </label>
                     {selectedCount > 0 && (
