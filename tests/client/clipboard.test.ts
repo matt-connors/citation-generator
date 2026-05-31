@@ -73,6 +73,20 @@ describe('copyRichText (legacy fallback)', () => {
 
         expect(ok).toBe(true);
         expect(exec).toHaveBeenCalledWith('copy');
+        // The offscreen element used for the selection copy must be cleaned up.
+        expect(document.querySelectorAll('div[style*="-9999px"]').length).toBe(0);
+    });
+
+    it('returns false when no async API is available and execCommand fails', async () => {
+        delete (navigator as any).clipboard;
+        delete (globalThis as any).ClipboardItem;
+        (document as any).execCommand = vi.fn().mockReturnValue(false);
+
+        const ok = await copyRichText(richTextToHtml(RT), richTextToPlain(RT));
+
+        expect(ok).toBe(false);
+        // Still cleaned up even on failure.
+        expect(document.querySelectorAll('div[style*="-9999px"]').length).toBe(0);
     });
 
     it('falls back to execCommand when the async write rejects', async () => {
