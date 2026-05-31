@@ -2,7 +2,7 @@
 import "../../styles/global.css";
 import "../../styles/tailwind-output.css";
 import SchemaOrgJsonLd from "./SchemaOrgJsonLd.astro";
-import { buildOrganization, buildWebSite } from "../../lib/schema-org";
+import { buildOrganization, buildWebSite, buildGraph } from "../../lib/schema-org";
 
 interface Props {
     title: string;
@@ -30,8 +30,10 @@ const {
     extraSchemas = [],
 } = Astro.props;
 
-const baseSchemas = [buildOrganization(), buildWebSite()];
-const allSchemas = [...baseSchemas, ...extraSchemas];
+// One connected JSON-LD graph per page: the Organization + WebSite are the
+// shared root, and page-specific nodes (Article, BreadcrumbList, FAQPage, …)
+// reference them by @id instead of repeating the publisher on every node.
+const schemaGraph = buildGraph([buildOrganization(), buildWebSite(), ...extraSchemas]);
 ---
 
 <meta charset="utf-8" />
@@ -81,7 +83,7 @@ const allSchemas = [...baseSchemas, ...extraSchemas];
 
 <link rel="sitemap" href="/sitemap-index.xml" />
 
-<SchemaOrgJsonLd schemas={allSchemas} />
+<SchemaOrgJsonLd schemas={schemaGraph} />
 
 <script
     defer

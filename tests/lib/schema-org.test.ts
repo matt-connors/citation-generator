@@ -7,38 +7,45 @@ import {
   buildBreadcrumbList,
   buildFaqPage,
   buildAboutPage,
+  buildGraph,
   ORG_NAME,
   ORG_URL,
   ORG_LOGO,
+  ORG_ID,
+  WEBSITE_ID,
 } from '../../src/lib/schema-org';
 
 describe('buildOrganization', () => {
-  it('returns an Organization with name, url, logo', () => {
+  it('returns an Organization with @id, name, url, logo', () => {
     const org = buildOrganization();
     expect(org['@context']).toBe('https://schema.org');
     expect(org['@type']).toBe('Organization');
+    expect(org['@id']).toBe(ORG_ID);
     expect(org.name).toBe(ORG_NAME);
     expect(org.url).toBe(ORG_URL);
-    expect(org.logo).toBe(ORG_LOGO);
+    expect(org.logo).toEqual({ '@type': 'ImageObject', url: ORG_LOGO });
   });
 });
 
 describe('buildWebSite', () => {
-  it('returns a WebSite anchored to the canonical site URL', () => {
+  it('returns a WebSite anchored to the canonical site URL, published by the org', () => {
     const site = buildWebSite();
     expect(site['@type']).toBe('WebSite');
+    expect(site['@id']).toBe(WEBSITE_ID);
     expect(site.name).toBe(ORG_NAME);
     expect(site.url).toBe(ORG_URL);
+    expect(site.publisher).toEqual({ '@id': ORG_ID });
   });
 });
 
 describe('buildSoftwareApplication', () => {
-  it('describes the free citation tool', () => {
+  it('describes the free citation tool and references the org as publisher', () => {
     const app = buildSoftwareApplication();
     expect(app['@type']).toBe('SoftwareApplication');
     expect(app.applicationCategory).toBe('EducationalApplication');
     expect(app.operatingSystem).toBe('Web');
     expect(app.offers.price).toBe('0');
+    expect(app.publisher).toEqual({ '@id': ORG_ID });
   });
 });
 
@@ -60,7 +67,8 @@ describe('buildArticle', () => {
     expect(a.datePublished).toBe('2026-01-01T00:00:00.000Z');
     expect(a.dateModified).toBe('2026-05-27T00:00:00.000Z');
     expect(a.author).toEqual({ '@type': 'Organization', name: 'MLA Generator Editorial Team' });
-    expect(a.publisher.name).toBe(ORG_NAME);
+    expect(a.publisher).toEqual({ '@id': ORG_ID });
+    expect(a.isPartOf).toEqual({ '@id': WEBSITE_ID });
     expect(a.mainEntityOfPage['@id']).toBe('https://mlagenerator.com/guides/apa');
     expect(a.keywords).toEqual(['apa', 'citations']);
     expect(a.articleSection).toBe('style-guide');
@@ -115,10 +123,42 @@ describe('buildFaqPage', () => {
 });
 
 describe('buildAboutPage', () => {
-  it('references the organization', () => {
+  it('references the organization by @id', () => {
     const a = buildAboutPage('https://mlagenerator.com/about');
     expect(a['@type']).toBe('AboutPage');
     expect(a.url).toBe('https://mlagenerator.com/about');
-    expect(a.mainEntity['@type']).toBe('Organization');
+    expect(a.mainEntity).toEqual({ '@id': ORG_ID });
+  });
+});
+
+describe('buildGraph', () => {
+  it('wraps nodes in a single @graph with one shared @context and strips per-node @context', () => {
+    const graph = buildGraph([buildOrganization(), buildWebSite()]);
+    expect(graph['@context']).toBe('https://schema.org');
+    expect(Array.isArray(graph['@graph'])).toBe(true);
+    expect(graph['@graph']).toHaveLength(2);
+    for (const node of graph['@graph']) {
+      expect((node as Record<string, unknown>)['@context']).toBeUndefined();
+    }
+    // Nodes keep their @id so cross-references (publisher, isPartOf) resolve.
+    const ids = (graph['@graph'] as Array<{ '@id'?: string }>).map((n) => n['@id']);
+    expect(ids).toContain(ORG_ID);
+    expect(ids).toContain(WEBSITE_ID);
+  });
+
+  it('connects an Article to the org and website by @id within the graph', () => {
+    const article = buildArticle({
+      title: 'T',
+      description: 'D',
+      url: 'https://mlagenerator.com/guides/x',
+      datePublished: new Date('2026-01-01'),
+      author: 'MLA Generator Editorial Team',
+      image: 'https://mlagenerator.com/images/banner.png',
+    });
+    const graph = buildGraph([buildOrganization(), buildWebSite(), article]);
+    const graphIds = (graph['@graph'] as Array<{ '@id'?: string }>).map((n) => n['@id']);
+    // The publisher/isPartOf @id references must point at nodes present in the graph.
+    expect(graphIds).toContain((article.publisher as { '@id': string })['@id']);
+    expect(graphIds).toContain((article.isPartOf as { '@id': string })['@id']);
   });
 });
