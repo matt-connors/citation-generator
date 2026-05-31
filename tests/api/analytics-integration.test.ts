@@ -139,8 +139,9 @@ describe('analytics integration', () => {
       );
       const shape = shapeOf(writeDataPoint.mock.calls[0][0]);
       expect(shape.event).toBe('cite_website');
-      // [signal_winner_title, signal_winner_url, host]
+      // [signal_winner_title, signal_winner_url, host, url]
       expect(shape.dimensions[2]).toBe('example.com');
+      expect(shape.dimensions[3]).toBe('https://example.com/page'); // full normalized URL (blob5)
       expect(shape.dimensions[0]).toBeTruthy(); // a signal name (jsonld, microdata, etc.)
       // metrics: [html_size_kb, extraction_ms, cache_hit]
       expect(shape.metrics[0]).toBeGreaterThanOrEqual(0);

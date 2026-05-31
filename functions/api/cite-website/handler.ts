@@ -43,6 +43,7 @@ export async function handleCiteWebsite(
           signal_winner_title: body._signals?.title ?? '',
           signal_winner_url: body._signals?.URL ?? '',
           host,
+          url: target,
         },
         { html_size_kb: 0, extraction_ms: 0, cache_hit: 1, fetch_ms: 0 },
       );
@@ -87,6 +88,7 @@ export async function handleCiteWebsite(
       signal_winner_title: signals.title ?? '',
       signal_winner_url: signals.URL ?? '',
       host,
+      url: target,
     },
     {
       html_size_kb: Math.round(html.length / 1024),
