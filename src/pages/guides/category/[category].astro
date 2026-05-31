@@ -1,0 +1,85 @@
+---
+import Layout from "../../../layouts/page.astro";
+import Breadcrumbs from "../../../components/astro/Breadcrumbs.astro";
+import GuideCardGrid from "../../../components/astro/GuideCardGrid.astro";
+import { buildBreadcrumbList } from "../../../lib/schema-org";
+import { GUIDE_CATEGORIES, categoryPath } from "../../../lib/guide-categories";
+import { getCollection } from "astro:content";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+    const all = await getCollection("guides");
+    const sortByTitle = (a: typeof all[number], b: typeof all[number]) =>
+        a.data.title.localeCompare(b.data.title);
+    return GUIDE_CATEGORIES.map((cat) => ({
+        params: { category: cat.key },
+        props: {
+            cat,
+            items: all.filter((g) => g.data.category === cat.key).sort(sortByTitle),
+        },
+    }));
+}
+
+const { cat, items } = Astro.props;
+
+const title = `${cat.label} — Citation Guides`;
+const description = cat.description;
+
+const breadcrumbSchema = buildBreadcrumbList([
+    { name: 'Home', url: new URL('/', Astro.site).href },
+    { name: 'Guides', url: new URL('/guides', Astro.site).href },
+    { name: cat.label, url: new URL(categoryPath(cat.key), Astro.site).href },
+]);
+---
+
+<Layout title={title} description={description} extraSchemas={[breadcrumbSchema]}>
+    <article class="category-hub">
+        <Breadcrumbs
+            items={[
+                { name: 'Home', href: '/' },
+                { name: 'Guides', href: '/guides' },
+                { name: cat.label, href: categoryPath(cat.key), current: true },
+            ]}
+        />
+        <header>
+            <h1>{cat.label}</h1>
+            <p class="lede">{cat.description}</p>
+        </header>
+
+        <GuideCardGrid items={items} />
+
+        <p class="back-link"><a href="/guides">← All citation guides</a></p>
+    </article>
+</Layout>
+
+<style>
+    .category-hub {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 4.5rem 2rem 3rem;
+        color: var(--color-text-medium);
+        line-height: 1.5;
+    }
+    .category-hub h1 {
+        font-size: 2.4rem;
+        color: var(--color-text-dark);
+        margin: 0 0 0.75rem;
+    }
+    .category-hub .lede {
+        font-size: 1.1rem;
+        margin-bottom: 2.5rem;
+        max-width: 60ch;
+    }
+    .category-hub .back-link {
+        margin-top: 2.5rem;
+    }
+    .category-hub .back-link a {
+        color: var(--color-text-light);
+        text-decoration: underline;
+    }
+    .category-hub .back-link a:hover,
+    .category-hub .back-link a:focus-visible {
+        color: var(--color-text-dark);
+    }
+</style>

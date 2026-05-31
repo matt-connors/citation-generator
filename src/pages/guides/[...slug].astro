@@ -3,12 +3,14 @@ import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import GuideLayout from "../../layouts/guide.astro";
 import Heading from "../../components/astro/Heading.astro";
+import Heading3 from "../../components/astro/Heading3.astro";
 import GithubSlugger from "github-slugger";
 import {
     buildArticle,
     buildBreadcrumbList,
     buildFaqPage,
 } from "../../lib/schema-org";
+import { categoryByKey, categoryPath } from "../../lib/guide-categories";
 
 export async function getStaticPaths() {
     const entries = await getCollection("guides");
@@ -51,9 +53,11 @@ const articleSchema = buildArticle({
     section: entry.data.category,
 });
 
+const category = categoryByKey(entry.data.category);
 const breadcrumbSchema = buildBreadcrumbList([
     { name: 'Home', url: `${site}/` },
     { name: 'Guides', url: `${site}/guides` },
+    ...(category ? [{ name: category.label, url: `${site}${categoryPath(category.key)}` }] : []),
     { name: entry.data.title, url: pageUrl },
 ]);
 
@@ -69,5 +73,5 @@ if (entry.data.faq && entry.data.faq.length > 0) {
     slug={entry.slug}
     extraSchemas={extraSchemas}
 >
-    <Content components={{ ...components, h2: Heading }} />
+    <Content components={{ ...components, h2: Heading, h3: Heading3 }} />
 </GuideLayout>

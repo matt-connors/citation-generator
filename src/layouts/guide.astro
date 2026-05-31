@@ -4,6 +4,7 @@ import Breadcrumbs from "../components/astro/Breadcrumbs.astro";
 import RelatedGuides from "../components/astro/RelatedGuides.astro";
 import GuideFaq from "../components/astro/GuideFaq.astro";
 import TryGenerator from "../components/astro/TryGenerator.astro";
+import { categoryByKey, categoryPath } from "../lib/guide-categories";
 
 interface Props {
     frontmatter: {
@@ -24,6 +25,7 @@ interface Props {
 const { frontmatter, headings, slug, extraSchemas } = Astro.props;
 const displayDate = frontmatter.updatedDate ?? frontmatter.pubDate;
 const dateLabel = frontmatter.updatedDate ? 'Updated' : 'Published';
+const category = categoryByKey(frontmatter.category);
 ---
 
 <Layout
@@ -58,6 +60,7 @@ const dateLabel = frontmatter.updatedDate ? 'Updated' : 'Published';
                 items={[
                     { name: 'Home', href: '/' },
                     { name: 'Guides', href: '/guides' },
+                    ...(category ? [{ name: category.label, href: categoryPath(category.key) }] : []),
                     { name: frontmatter.title, href: `/guides/${slug}`, current: true },
                 ]}
             />
@@ -184,7 +187,10 @@ const dateLabel = frontmatter.updatedDate ? 'Updated' : 'Published';
         color: var(--color-text-light);
         text-align: left;
     }
-    #guide-content a {
+    /* Prose links only — exclude the hover-revealed heading anchor links, which
+       carry their own subtle styling (a higher-specificity #guide-content rule
+       would otherwise force them to dark + underlined). */
+    #guide-content a:not(.heading-anchor) {
         color: var(--color-text-dark);
         text-decoration: underline;
     }
@@ -253,6 +259,9 @@ const dateLabel = frontmatter.updatedDate ? 'Updated' : 'Published';
             target.scrollIntoView({
                 behavior: prefersReduced ? 'auto' : 'smooth',
             });
+            // Reflect the section in the URL so a clicked anchor is shareable,
+            // without adding a history entry on every jump.
+            history.replaceState(null, '', href);
         });
     });
 
