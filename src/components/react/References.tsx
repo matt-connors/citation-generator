@@ -6,12 +6,13 @@ import CitationSearch from './CitationSearch';
 import ReferenceItem from './ReferenceItem';
 import { useReferences } from '../../lib/references/useReferences';
 import type { StoredSource } from '../../lib/references/storage';
-import type { SupportedStyle } from '../../lib/citations/csl-types';
+import type { SupportedStyle, RichText } from '../../lib/citations/csl-types';
 import { formatCitation } from '../../lib/citations/useFormattedCitation';
 import { Clipboard, Plus, Trash2 } from 'lucide-react';
 import { cn } from './utils';
 import { Button } from './Button';
-import { richTextToHtml } from './richText';
+import { richTextToHtml, richTextToPlain } from './richText';
+import { copyRichText } from './clipboard';
 
 function emptySource(): StoredSource {
     const id = crypto.randomUUID();
@@ -55,26 +56,19 @@ export default function References() {
         if (!items.length) return;
         // Reuses the same module-level cache as the per-item hook, so visible
         // items are zero-network.
-        const results = await Promise.all(items.map(async (s) => {
+        const rts = await Promise.all(items.map(async (s) => {
             try {
-                const rt = await formatCitation({ uuid: s.uuid, csl: s.csl }, citationFormat);
-                return richTextToHtml(rt);
+                return await formatCitation({ uuid: s.uuid, csl: s.csl }, citationFormat);
             } catch {
-                return '';
+                return null;
             }
         }));
-        const tempDiv = document.createElement('div');
-        tempDiv.style.cssText = 'position:fixed;left:-9999px;font-family:"Times New Roman",Times,serif;font-size:12pt;line-height:2;';
-        tempDiv.innerHTML = results.filter(Boolean).join('<br><br>');
-        document.body.appendChild(tempDiv);
-        const range = document.createRange();
-        range.selectNodeContents(tempDiv);
-        const sel = window.getSelection();
-        sel?.removeAllRanges();
-        sel?.addRange(range);
-        document.execCommand('copy');
-        document.body.removeChild(tempDiv);
-        sel?.removeAllRanges();
+        const valid = rts.filter((rt): rt is RichText[] => rt !== null && rt.length > 0);
+        if (!valid.length) return;
+        const html = valid.map(richTextToHtml).join('<br><br>');
+        const plain = valid.map(richTextToPlain).join('\n\n');
+        const ok = await copyRichText(html, plain);
+        if (!ok) return;
         const span = document.querySelector('[data-copy-selected] span');
         if (span) {
             const current = span.textContent;

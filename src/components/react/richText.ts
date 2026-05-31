@@ -8,3 +8,9 @@ export function escapeHtml(s: string): string {
 export function richTextToHtml(rt: RichText[]): string {
     return rt.map((seg) => seg.italic ? `<i>${escapeHtml(seg.text)}</i>` : escapeHtml(seg.text)).join('');
 }
+
+// Plain-text rendering (formatting dropped) for the clipboard's text/plain
+// flavor, so pasting into a plain-text field yields readable text.
+export function richTextToPlain(rt: RichText[]): string {
+    return rt.map((seg) => seg.text).join('');
+}
