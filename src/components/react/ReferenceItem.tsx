@@ -2,10 +2,11 @@ import React, { memo, useEffect, useRef } from 'react';
 import EditReferenceDialogDrawer from './EditReferenceDialogDrawer';
 import { useFormattedCitation } from '../../lib/citations/useFormattedCitation';
 import type { StoredSource } from '../../lib/references/storage';
-import type { SupportedStyle, RichText } from '../../lib/citations/csl-types';
+import type { SupportedStyle } from '../../lib/citations/csl-types';
 import styles from '../../styles/references.module.css';
 import { Clipboard, Globe } from 'lucide-react';
-import { escapeHtml, richTextToHtml } from './richText';
+import { escapeHtml, richTextToHtml, richTextToPlain } from './richText';
+import { copyRichText } from './clipboard';
 
 interface Props {
     source: StoredSource;
@@ -16,22 +17,6 @@ interface Props {
     autoOpenEdit?: boolean;
 }
 
-function copyRichText(rt: RichText[]) {
-    const html = richTextToHtml(rt);
-    const div = document.createElement('div');
-    div.style.cssText = 'position:fixed;left:-9999px;font-family:"Times New Roman",Times,serif;font-size:12pt;line-height:2;';
-    div.innerHTML = html;
-    document.body.appendChild(div);
-    const range = document.createRange();
-    range.selectNodeContents(div);
-    const sel = window.getSelection();
-    sel?.removeAllRanges();
-    sel?.addRange(range);
-    document.execCommand('copy');
-    document.body.removeChild(div);
-    sel?.removeAllRanges();
-}
-
 function ReferenceItem({ source, checked, onToggle, citationFormat, setSources, autoOpenEdit }: Props) {
     const editButtonRef = useRef<HTMLButtonElement>(null);
     const { formatted, loading, error } = useFormattedCitation(source, citationFormat);
@@ -40,13 +25,15 @@ function ReferenceItem({ source, checked, onToggle, citationFormat, setSources, 
         if (autoOpenEdit && editButtonRef.current) editButtonRef.current.click();
     }, [source.uuid, autoOpenEdit]);
 
-    const handleCopy = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const handleCopy = async (event: React.MouseEvent<HTMLButtonElement>) => {
         // Don't copy an empty/placeholder citation while it is still loading or
         // errored — that would wipe the clipboard while showing "Copied".
         if (loading || error || formatted.length === 0) return;
-        copyRichText(formatted);
+        // Capture the label span before awaiting: React resets the synthetic
+        // event's currentTarget once the handler returns.
         const targetSpan = event.currentTarget.querySelector('span');
-        if (!targetSpan) return;
+        const ok = await copyRichText(richTextToHtml(formatted), richTextToPlain(formatted));
+        if (!ok || !targetSpan) return;
         const current = targetSpan.textContent;
         targetSpan.textContent = 'Copied';
         setTimeout(() => { targetSpan.textContent = current; }, 1000);
