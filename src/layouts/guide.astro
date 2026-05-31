@@ -146,10 +146,15 @@ const category = categoryByKey(frontmatter.category);
         list-style: circle;
     }
     #guide-content table {
+        /* display:block + overflow-x:auto makes a too-wide table scroll inside
+           its own box on mobile instead of widening the page. (Cells also wrap
+           long URLs below, so most tables fit without scrolling.) */
+        display: block;
         width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
         border-collapse: collapse;
         border-radius: 14px;
-        overflow: hidden;
         margin: 0.5rem 0;
         --border-radius: 8px;
     }
@@ -165,6 +170,12 @@ const category = categoryByKey(frontmatter.category);
     #guide-content td {
         padding: 0.8rem 1rem;
         line-height: 1;
+        /* `anywhere` (unlike break-word) reduces the cell's min-content width,
+           so a table with long URLs can shrink to fit a phone instead of
+           forcing the whole table (and page) wider. Desktop has room, so
+           nothing breaks there; the table's own overflow-x is the backstop for
+           genuinely many-column tables. */
+        overflow-wrap: anywhere;
     }
     #guide-content td {
         padding-top: 0.6rem;
@@ -233,6 +244,17 @@ const category = categoryByKey(frontmatter.category);
         display: flex;
         flex-direction: column;
         gap: 16px;
+        /* As a grid item, min-width defaults to auto, so a wide table or a long
+           unbreakable URL would expand the column past the viewport and force
+           the whole page to scroll horizontally on mobile. min-width:0 lets the
+           column shrink; overflow-wrap breaks long URLs instead of overflowing. */
+        min-width: 0;
+        overflow-wrap: break-word;
+    }
+    /* Code blocks scroll instead of pushing the page wide. */
+    #guide-content pre {
+        max-width: 100%;
+        overflow-x: auto;
     }
     @media (max-width: 1150px) {
         article {
@@ -240,6 +262,12 @@ const category = categoryByKey(frontmatter.category);
         }
         #guide-nav {
             position: static;
+        }
+    }
+    @media (max-width: 640px) {
+        article {
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
         }
     }
 </style>
