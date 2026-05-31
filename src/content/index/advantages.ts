@@ -35,8 +35,8 @@ const advantages = [
     },
     {
         icon: NoSymbolIcon,
-        text: "Reduced and reasonable number of ads to ensure a smooth experience",
-        heading: "Minimal ads",
+        text: "A clean, distraction-free interface with no ads or invasive trackers",
+        heading: "No ads or clutter",
     },
 ];
 

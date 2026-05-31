@@ -31,22 +31,6 @@ const extraSchemas = [buildSoftwareApplication(), buildFaqPage(faqs)];
         </div>
         <CitationSearch includeDropdown includeManualCite client:load />
     </section>
-    <!-- <div class="ad-container">
-        <script
-            async
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3675571854758381"
-            crossorigin="anonymous"></script>
-        <ins
-            class="adsbygoogle"
-            style="display:block"
-            data-ad-client="ca-pub-3675571854758381"
-            data-ad-slot="9255203790"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-        <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-    </div> -->
     <PageSegment title="MLA Citation Generator Features" background>
         <div class="advantage-card-container">
             {
@@ -596,45 +580,4 @@ text-decoration-thickness: 2px;
         border-radius: 14px;
         /* width: min-content; */
     }
-
-    .ad-container {
-        background-color: var(--color-background-2);
-        border-radius: 30px;
-        width: min-content;
-        margin: 4rem auto 0;
-        padding: 1.5rem;
-
-        overflow: hidden;
-        max-width: 100%;
-        width: min(50vw, 600px);
-        min-height: 100px;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .ad {
-        width: 970px;
-        height: 250px;
-        background: url("https://via.placeholder.com/970x250") no-repeat center
-            center;
-    }
-    @media (max-width: 1000px) {
-        .ad-container {
-            margin: 4rem 1.5rem 0;
-            width: auto;
-        }
-        .ad {
-            width: 100%;
-        }
-    }
-    /* .ad-container::after {
-        content: "Advertisement";
-        line-height: 1;
-        color: var(--color-text-light);
-        margin-top: 9px;
-        display: block;
-        font-size: 15px;
-        text-align: center;
-    } */
 </style>
