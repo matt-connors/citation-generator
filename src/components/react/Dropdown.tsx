@@ -24,16 +24,26 @@ export default function Dropdown({ options, className, value, onChange }: Dropdo
     const defaultOption = value || options.find(option => option.default) || options[0];
 
     const [open, setOpen] = useState(false);
-    const [matchingOptions, setMatchingOptions] = useState(options);
+    const [searchText, setSearchText] = useState('');
     const [selectedOption, setSelectedOption] = useState(defaultOption);
 
     useEffect(() => {
         setSelectedOption(defaultOption);
     }, [defaultOption]);
 
+    // Filtered + alphabetized list derived during render (no shadow state to go
+    // stale across opens). Falls back to all options when a search matches none.
+    // `.slice()` before sort so we never mutate the shared `options` array.
+    const q = searchText.trim().toLowerCase();
+    const filtered = q ? options.filter((o) => o.label.toLowerCase().includes(q)) : options;
+    const visibleOptions = (filtered.length > 0 ? filtered : options)
+        .slice()
+        .sort((a, b) => a.label.localeCompare(b.label));
+
     // Handle opening/closing dropdown
     const handleOpen = (event: any) => {
         if (event.target.closest(`.${styles.dropdownBtn}`)) {
+            if (!open) setSearchText(''); // start each open with a clean, unfiltered list
             setOpen(!open);
         }
     }
@@ -42,15 +52,6 @@ export default function Dropdown({ options, className, value, onChange }: Dropdo
     const handleClickOutside = (event: any) => {
         if (event.target.closest(`.${styles.dropdown}`)) return;
         setOpen(false);
-    }
-
-    // Handle search filtering
-    const handleSearch = (event: any) => {
-        const searchValue = event.target.value.toLowerCase();
-        const matching = options.filter((option) =>
-            option.label.toLowerCase().includes(searchValue)
-        );
-        setMatchingOptions(matching.length > 0 ? matching : options);
     }
 
     // Handle option selection
@@ -103,14 +104,11 @@ export default function Dropdown({ options, className, value, onChange }: Dropdo
             </button>
             <div className={styles.dropdownList}>
                 <div className={styles.dropdownSearch}>
-                    <input type="text" placeholder="Search" onChange={handleSearch} />
+                    <input type="text" placeholder="Search" value={searchText} onChange={(e) => setSearchText(e.target.value)} />
                 </div>
                 <ul>
-                    {matchingOptions
-                    // sort alphabetically
-                    .sort((a, b) => a.label.localeCompare(b.label))
-                    .map((option, index) => (
-                        <li key={index}>
+                    {visibleOptions.map((option) => (
+                        <li key={option.value}>
                             <button
                                 type="button"
                                 className={clsx(styles.dropdownOption, option.label === selectedOption.label && styles.selected)}

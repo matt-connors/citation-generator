@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { loadSources, saveSources, type StoredSource } from './storage';
+import { loadSources, saveSources, STORAGE_KEY, type StoredSource } from './storage';
 import type { CSLItem, SupportedStyle } from '../citations/csl-types';
 
 export interface UseReferencesReturn {
@@ -106,6 +106,17 @@ export function useReferences(): UseReferencesReturn {
       .finally(() => clearTimeout(timeout));
     return () => { cancelled = true; controller.abort(); clearTimeout(timeout); };
   }, [setSources]);
+
+  // Reload when another tab writes our localStorage key so two open tabs don't
+  // clobber each other's references on the next save. The `storage` event fires
+  // only in OTHER tabs, so this never loops with the writing tab.
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY) setSourcesState(loadSources());
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
 
   // Prune stale uuids when sources change (e.g. deletions outside handleDelete).
   useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "./Input";
 import { cn } from "./utils";
 import { Button } from "./Button";
@@ -55,7 +55,23 @@ const isPerson = (n: CSLName): n is Exclude<CSLName, { literal: string }> => !('
  * Contributors component — operates on CSL-JSON `author` arrays.
  */
 export const Contributors = ({ authors, onChange }: ContributorsProps) => {
-    const [lastOpenedIdx, setLastOpenedIdx] = useState<number | null>(null);
+    // Stable per-row ids kept parallel to `authors`, used as React keys and to
+    // track the expanded row. Index keys + an uncontrolled <details> meant that
+    // deleting a middle contributor left the wrong row expanded showing another
+    // person's data; stable keys fix that. Ids never enter the saved CSL.
+    const idCounter = useRef(0);
+    const [ids, setIds] = useState<string[]>(() => authors.map(() => `c${idCounter.current++}`));
+    const [openId, setOpenId] = useState<string | null>(null);
+
+    // Best-effort length-sync if `authors` changes from outside the mutators below.
+    useEffect(() => {
+        setIds((prev) => {
+            if (prev.length === authors.length) return prev;
+            const next = prev.slice(0, authors.length);
+            while (next.length < authors.length) next.push(`c${idCounter.current++}`);
+            return next;
+        });
+    }, [authors.length]);
 
     const previewName = (n: CSLName) => {
         if (isPerson(n)) {
@@ -69,18 +85,25 @@ export const Contributors = ({ authors, onChange }: ContributorsProps) => {
     };
 
     const handleAddPerson = () => {
-        const next = [...authors, { family: '', given: '' } as CSLName];
-        onChange(next);
-        setLastOpenedIdx(next.length - 1);
+        const id = `c${idCounter.current++}`;
+        onChange([...authors, { family: '', given: '' } as CSLName]);
+        setIds((prev) => [...prev, id]);
+        setOpenId(id);
     };
 
     const handleAddOrganization = () => {
-        const next = [...authors, { literal: '' } as CSLName];
-        onChange(next);
-        setLastOpenedIdx(next.length - 1);
+        const id = `c${idCounter.current++}`;
+        onChange([...authors, { literal: '' } as CSLName]);
+        setIds((prev) => [...prev, id]);
+        setOpenId(id);
     };
 
-    const handleDelete = (idx: number) => onChange(authors.filter((_, i) => i !== idx));
+    const handleDelete = (idx: number) => {
+        const removed = ids[idx];
+        onChange(authors.filter((_, i) => i !== idx));
+        setIds((prev) => prev.filter((_, i) => i !== idx));
+        if (openId === removed) setOpenId(null);
+    };
 
     return (
         <div className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:gap-4">
@@ -90,7 +113,7 @@ export const Contributors = ({ authors, onChange }: ContributorsProps) => {
             </span>
             <div className="flex flex-col gap-4">
                 {authors.map((author, idx) => (
-                    <details key={idx} className="border border-border rounded-md shadow-sm [&[open]_summary_[data-chevron]]:rotate-180" open={idx === lastOpenedIdx}>
+                    <details key={ids[idx] ?? `i${idx}`} className="border border-border rounded-md shadow-sm [&[open]_summary_[data-chevron]]:rotate-180" open={openId === (ids[idx] ?? `i${idx}`)} onToggle={(e) => { const id = ids[idx] ?? `i${idx}`; if (e.currentTarget.open) setOpenId(id); else if (openId === id) setOpenId(null); }}>
                         <summary className="pl-3 cursor-pointer w-full h-9 flex justify-between items-center">
                             <span className="leading-none">{previewName(author)}</span>
                             <div className="flex gap-2 items-center">

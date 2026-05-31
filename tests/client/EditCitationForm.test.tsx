@@ -78,4 +78,22 @@ describe('EditCitationForm contributors', () => {
     clickButton(container, 'Add Organization');
     expect(container.querySelectorAll('details').length).toBe(1);
   });
+
+  it('deleting a contributor removes its row and keeps the rest (stable keys)', () => {
+    const source: StoredSource = {
+      uuid: 'u1',
+      csl: { id: 'u1', type: 'webpage', author: [{ family: 'Alpha', given: '' }, { family: 'Beta', given: '' }] },
+    };
+    const { container } = render(<EditCitationForm source={source} setSources={() => {}} />);
+    expect(container.querySelectorAll('details').length).toBe(2);
+    // Trash button lives in the first row's <summary>.
+    const firstRow = container.querySelector('details')!;
+    const trash = firstRow.querySelector('summary button') as HTMLButtonElement;
+    fireEvent.click(trash);
+    const rows = container.querySelectorAll('details');
+    expect(rows.length).toBe(1);
+    // The surviving row is Beta, not Alpha (correct identity mapping after delete).
+    expect(rows[0].textContent).toContain('Beta');
+    expect(rows[0].textContent).not.toContain('Alpha');
+  });
 });
