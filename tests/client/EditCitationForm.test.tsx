@@ -51,3 +51,31 @@ describe('EditCitationForm currentRef sync', () => {
     expect(setSources).not.toHaveBeenCalled();
   });
 });
+
+describe('EditCitationForm contributors', () => {
+  // Regression: Add Person / Add Organization wrote to the global store instead
+  // of the form's local state. The form renders contributors from local state,
+  // so the new row never appeared — clicking the buttons looked like a no-op.
+  const clickButton = (container: HTMLElement, label: string) => {
+    const btn = Array.from(container.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes(label),
+    ) as HTMLButtonElement | undefined;
+    expect(btn).toBeTruthy();
+    fireEvent.click(btn!);
+  };
+
+  it('Add Person adds a contributor row rendered from the form local state', () => {
+    const source: StoredSource = { uuid: 'u1', csl: { id: 'u1', type: 'webpage', title: 'T' } };
+    const { container } = render(<EditCitationForm source={source} setSources={() => {}} />);
+    expect(container.querySelectorAll('details').length).toBe(0);
+    clickButton(container, 'Add Person');
+    expect(container.querySelectorAll('details').length).toBe(1);
+  });
+
+  it('Add Organization adds a contributor row', () => {
+    const source: StoredSource = { uuid: 'u1', csl: { id: 'u1', type: 'webpage' } };
+    const { container } = render(<EditCitationForm source={source} setSources={() => {}} />);
+    clickButton(container, 'Add Organization');
+    expect(container.querySelectorAll('details').length).toBe(1);
+  });
+});

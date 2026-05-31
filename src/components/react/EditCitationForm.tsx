@@ -86,7 +86,7 @@ export default function EditCitationForm({ source, setSources, currentRef }: Pro
                 <WebsiteName value={local['container-title'] || ''} onChange={(v) => patch({ 'container-title': v })} />
             )}
             <Line className="my-4" />
-            <Contributors source={{ ...source, csl: local }} setSources={setSources} />
+            <Contributors authors={local.author ?? []} onChange={(next) => patch({ author: next })} />
             <Line className="my-4" />
             <PublicationDate value={local.issued} onChange={(d) => patch({ issued: d })} isRecommended />
             <AccessDate value={local.accessed} onChange={(d) => patch({ accessed: d })} />

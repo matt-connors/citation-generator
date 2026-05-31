@@ -5,7 +5,6 @@ import { Button } from "./Button";
 import { Building2, Calendar, ChevronDown, Trash2, UserRound } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./Tabs";
 import type { CSLDate, CSLName } from "../../lib/citations/csl-types";
-import type { StoredSource } from "../../lib/references/storage";
 import type { Option } from './Dropdown';
 import SimpleDropdown from './SimpleDropdown';
 
@@ -46,8 +45,8 @@ const months: Option[] = [
 export const Line = ({ className }: { className?: string }) => <div className={cn("h-[1px] w-full bg-border", className)} />
 
 interface ContributorsProps {
-    source: StoredSource;
-    setSources: (s: StoredSource[] | ((prev: StoredSource[]) => StoredSource[])) => void;
+    authors: CSLName[];
+    onChange: (authors: CSLName[]) => void;
 }
 
 const isPerson = (n: CSLName): n is Exclude<CSLName, { literal: string }> => !('literal' in n);
@@ -55,15 +54,8 @@ const isPerson = (n: CSLName): n is Exclude<CSLName, { literal: string }> => !('
 /**
  * Contributors component — operates on CSL-JSON `author` arrays.
  */
-export const Contributors = ({ source, setSources }: ContributorsProps) => {
-    const authors = source.csl.author ?? [];
+export const Contributors = ({ authors, onChange }: ContributorsProps) => {
     const [lastOpenedIdx, setLastOpenedIdx] = useState<number | null>(null);
-
-    const update = (next: CSLName[]) => {
-        setSources((prev) => prev.map((s) =>
-            s.uuid === source.uuid ? { ...s, csl: { ...s.csl, author: next } } : s,
-        ));
-    };
 
     const previewName = (n: CSLName) => {
         if (isPerson(n)) {
@@ -73,22 +65,22 @@ export const Contributors = ({ source, setSources }: ContributorsProps) => {
     };
 
     const handleEdit = (idx: number, patch: Partial<CSLName>) => {
-        update(authors.map((a, i) => i === idx ? ({ ...a, ...patch } as CSLName) : a));
+        onChange(authors.map((a, i) => i === idx ? ({ ...a, ...patch } as CSLName) : a));
     };
 
     const handleAddPerson = () => {
         const next = [...authors, { family: '', given: '' } as CSLName];
-        update(next);
+        onChange(next);
         setLastOpenedIdx(next.length - 1);
     };
 
     const handleAddOrganization = () => {
         const next = [...authors, { literal: '' } as CSLName];
-        update(next);
+        onChange(next);
         setLastOpenedIdx(next.length - 1);
     };
 
-    const handleDelete = (idx: number) => update(authors.filter((_, i) => i !== idx));
+    const handleDelete = (idx: number) => onChange(authors.filter((_, i) => i !== idx));
 
     return (
         <div className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:gap-4">
