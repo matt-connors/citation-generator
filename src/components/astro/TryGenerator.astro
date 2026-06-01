@@ -19,7 +19,7 @@ const {
 <aside class="try-generator" aria-labelledby="try-generator-heading">
     <h2 id="try-generator-heading">{heading}</h2>
     <p>{blurb}</p>
-    <a href="/" class="try-generator-cta">{cta} →</a>
+    <a href="/" class="try-generator-cta">{cta}</a>
 </aside>
 
 <style>
@@ -44,9 +44,10 @@ const {
         display: inline-block;
         font-weight: 510;
         color: var(--color-text-dark);
-        text-decoration: none;
+        /* Single underline only — no border-bottom (which, combined with the
+           inherited #guide-content underline, rendered as a double line). */
+        text-decoration: underline;
         padding: 0.5rem 0;
-        border-bottom: 1px solid currentColor;
     }
     .try-generator-cta:hover,
     .try-generator-cta:focus-visible {
