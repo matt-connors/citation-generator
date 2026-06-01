@@ -1,17 +1,22 @@
-// Copy a citation to the clipboard preserving rich text (italics, the
-// Times-New-Roman / double-line-height styling that word processors honor on
-// paste). Uses the async Clipboard API with both `text/html` and `text/plain`
-// flavors, and falls back to the legacy execCommand selection method when the
-// async API or ClipboardItem is unavailable or rejects (e.g. permission denied,
-// document not focused, older browsers).
+// Copy a citation to the clipboard preserving rich text — italics AND the
+// Times-New-Roman / 12pt / double-line-height styling that word processors keep
+// on paste.
+//
+// IMPORTANT: the selection + execCommand('copy') path is the PRIMARY method. It
+// copies a *rendered, styled* DOM selection, so the browser serializes the
+// computed formatting onto the clipboard exactly the way Word / Google Docs
+// expect — this is the behavior that has always worked. A hand-built
+// `ClipboardItem` HTML fragment (the async Clipboard API) does NOT reliably
+// preserve that formatting across paste targets, so it is only a fallback for
+// the rare case where execCommand is unavailable or refused.
 
 const COPY_STYLE =
     'font-family:"Times New Roman",Times,serif;font-size:12pt;line-height:2;';
 
-// Legacy path: drop the HTML into an offscreen styled element, select it, and
-// run execCommand('copy'). This is what the app did before the async rewrite;
-// it carries the wrapper's inline styles onto the clipboard.
-function legacyCopyHtml(html: string): boolean {
+// Primary path: drop the HTML into an offscreen styled element, select it, and
+// run execCommand('copy'). The selection carries the element's styling onto the
+// clipboard, which is what preserves font/size/line-height/italics on paste.
+function copyViaSelection(html: string): boolean {
     if (typeof document === 'undefined') return false;
     const div = document.createElement('div');
     div.style.cssText = `position:fixed;left:-9999px;${COPY_STYLE}`;
@@ -35,33 +40,36 @@ function legacyCopyHtml(html: string): boolean {
     return ok;
 }
 
-/**
- * Copy rich text to the clipboard. `html` is the formatted markup (with `<i>`
- * for titles, etc.); `plain` is the text-only fallback flavor.
- * Returns true on success.
- */
-export async function copyRichText(html: string, plain: string): Promise<boolean> {
+// Fallback only: the async Clipboard API. Writes both flavors, but a bare
+// fragment loses much of the formatting on paste — used only if the selection
+// copy fails (e.g. execCommand disabled by policy).
+async function copyViaAsyncApi(html: string, plain: string): Promise<boolean> {
     const canUseAsync =
         typeof navigator !== 'undefined' &&
         !!navigator.clipboard &&
         typeof navigator.clipboard.write === 'function' &&
         typeof ClipboardItem !== 'undefined';
-
-    if (canUseAsync) {
-        try {
-            // Inline the formatting on a wrapper so pasted output keeps the
-            // citation's font/spacing the way the legacy selection copy did.
-            const styledHtml = `<div style="${COPY_STYLE}">${html}</div>`;
-            const item = new ClipboardItem({
-                'text/html': new Blob([styledHtml], { type: 'text/html' }),
-                'text/plain': new Blob([plain], { type: 'text/plain' }),
-            });
-            await navigator.clipboard.write([item]);
-            return true;
-        } catch {
-            // Fall through to the legacy path.
-        }
+    if (!canUseAsync) return false;
+    try {
+        const styledHtml = `<div style="${COPY_STYLE}">${html}</div>`;
+        const item = new ClipboardItem({
+            'text/html': new Blob([styledHtml], { type: 'text/html' }),
+            'text/plain': new Blob([plain], { type: 'text/plain' }),
+        });
+        await navigator.clipboard.write([item]);
+        return true;
+    } catch {
+        return false;
     }
+}
 
-    return legacyCopyHtml(html);
+/**
+ * Copy rich text to the clipboard. `html` is the formatted markup (with `<i>`
+ * for titles); `plain` is the text-only fallback flavor. Returns true on
+ * success. Uses the selection + execCommand copy first (preserves formatting),
+ * falling back to the async Clipboard API only if that fails.
+ */
+export async function copyRichText(html: string, plain: string): Promise<boolean> {
+    if (copyViaSelection(html)) return true;
+    return copyViaAsyncApi(html, plain);
 }
