@@ -68,8 +68,16 @@ export default defineConfig({
         // imageService: 'cloudflare',
     }),
     integrations: [
-        // Compresses images and minifies HTML, CSS, and JS
-        compress(),
+        // Compresses images and minifies HTML, CSS, and JS.
+        // Skip the committed per-guide OG PNGs (public/og/*.png): they are
+        // already optimized at generation time, and recompressing them in the
+        // Cloudflare build was implicated in a deploy failure. Excluding them
+        // ships the generated PNGs as-is.
+        compress({
+            Exclude: [
+                (file) => /[\\/]og[\\/][^\\/]+\.png$/i.test(String(file)),
+            ],
+        }),
         // Generates a sitemap file
         sitemap({
             serialize(item) {
