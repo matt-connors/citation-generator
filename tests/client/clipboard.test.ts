@@ -93,5 +93,7 @@ describe('copyRichText — fallback: async Clipboard API', () => {
         const ok = await copyRichText(richTextToHtml(RT), richTextToPlain(RT));
 
         expect(ok).toBe(false);
+        // Offscreen element cleaned up even when the copy fails.
+        expect(document.querySelectorAll('div[style*="-9999px"]').length).toBe(0);
     });
 });
