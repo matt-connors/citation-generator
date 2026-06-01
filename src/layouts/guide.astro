@@ -170,12 +170,11 @@ const category = categoryByKey(frontmatter.category);
     #guide-content td {
         padding: 0.8rem 1rem;
         line-height: 1;
-        /* `anywhere` (unlike break-word) reduces the cell's min-content width,
-           so a table with long URLs can shrink to fit a phone instead of
-           forcing the whole table (and page) wider. Desktop has room, so
-           nothing breaks there; the table's own overflow-x is the backstop for
-           genuinely many-column tables. */
-        overflow-wrap: anywhere;
+        /* Keep natural column widths — cells inherit overflow-wrap:break-word
+           from #guide-content, which breaks long URLs but (unlike `anywhere`)
+           does NOT collapse a short label column to a single vertical letter.
+           A genuinely too-wide table scrolls horizontally via the table's own
+           overflow-x instead of squishing its columns. */
     }
     #guide-content td {
         padding-top: 0.6rem;
