@@ -11,6 +11,7 @@ import {
     buildFaqPage,
 } from "../../lib/schema-org";
 import { categoryByKey, categoryPath } from "../../lib/guide-categories";
+import { faqAnswerText } from "../../lib/faq";
 
 export async function getStaticPaths() {
     const entries = await getCollection("guides");
@@ -66,7 +67,12 @@ const breadcrumbSchema = buildBreadcrumbList([
 
 const extraSchemas: object[] = [articleSchema, breadcrumbSchema];
 if (entry.data.faq && entry.data.faq.length > 0) {
-    extraSchemas.push(buildFaqPage(entry.data.faq));
+    // Structured data gets plain-text answers (inline markdown stripped).
+    extraSchemas.push(
+        buildFaqPage(
+            entry.data.faq.map((f) => ({ question: f.question, answer: faqAnswerText(f.answer) })),
+        ),
+    );
 }
 ---
 

@@ -2,6 +2,8 @@
 // src/components/astro/GuideFaq.astro
 // Renders visible FAQ markup as native <details>/<summary> elements
 // for accessibility + zero-JS expand/collapse.
+import { renderFaqAnswerHtml } from "../../lib/faq";
+
 interface FaqItem {
     question: string;
     answer: string;
@@ -21,7 +23,7 @@ const { items } = Astro.props;
             {items.map((item) => (
                 <details>
                     <summary>{item.question}</summary>
-                    <div class="faq-answer" set:html={item.answer} />
+                    <div class="faq-answer" set:html={renderFaqAnswerHtml(item.answer)} />
                 </details>
             ))}
         </div>
