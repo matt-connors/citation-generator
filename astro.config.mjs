@@ -52,8 +52,19 @@ export default defineConfig({
     adapter: cloudflare({
         mode: "directory",
         routes: {
-            strategy: "exclude",
-            include: ["/api/*", "/guides/*"],
+            // "auto" lets the adapter emit whichever of include/exclude yields
+            // the FEWEST _routes.json entries. The old "exclude" strategy
+            // enumerated every static file individually, which pushed the file
+            // past Cloudflare's hard 100-rule limit once the 24 per-guide OG
+            // PNGs were added (119 rules → deploy rejected). "auto" describes
+            // the same routing with far fewer entries.
+            strategy: "auto",
+            // Only the API Pages Functions need to be force-routed to the
+            // worker. The guide pages under /guides/* are prerendered static
+            // HTML and must stay static — do NOT list them here, or they'd be
+            // routed to the worker. The adapter adds the genuinely SSR pages
+            // (/, /guides hub, /my-references, etc.) to include automatically.
+            include: ["/api/*"],
         },
         runtime: {
             mode: "local",

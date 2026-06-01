@@ -19,10 +19,11 @@ interface Props {
     };
     headings: { level: number; text: string; slug: string }[];
     slug: string;
+    image?: string;
     extraSchemas: object[];
 }
 
-const { frontmatter, headings, slug, extraSchemas } = Astro.props;
+const { frontmatter, headings, slug, image, extraSchemas } = Astro.props;
 const displayDate = frontmatter.updatedDate ?? frontmatter.pubDate;
 const dateLabel = frontmatter.updatedDate ? 'Updated' : 'Published';
 const category = categoryByKey(frontmatter.category);
@@ -31,6 +32,7 @@ const category = categoryByKey(frontmatter.category);
 <Layout
     title={frontmatter.title}
     description={frontmatter.description}
+    image={image}
     pageType="article"
     article={{
         publishedTime: frontmatter.pubDate,
