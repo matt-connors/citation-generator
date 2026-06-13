@@ -36,10 +36,14 @@ export function parseAuthorName(input: string | CSLName | null | undefined): CSL
   }
   const family = parts.pop();
   if (!family) return null;
-  let particle: string | undefined;
-  if (parts.length >= 1 && PARTICLES.has(parts[parts.length - 1].toLowerCase())) {
-    particle = parts.pop();
+  // Collect ALL trailing particles, not just one, so multi-word particles like
+  // "van der" (Bessel van der Kolk) stay together in non-dropping-particle
+  // instead of leaking "van" into the given name.
+  const particleParts: string[] = [];
+  while (parts.length >= 1 && PARTICLES.has(parts[parts.length - 1].toLowerCase())) {
+    particleParts.unshift(parts.pop() as string);
   }
+  const particle = particleParts.length ? particleParts.join(' ') : undefined;
   const given = parts.join(' ');
 
   const out: CSLName = { family };

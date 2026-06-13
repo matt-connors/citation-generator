@@ -1,7 +1,7 @@
 import type { CheerioAPI } from 'cheerio';
 import type { CSLItem, CSLName } from '../../csl-types';
 import { parseAuthorName } from '../author-parse';
-import { parseIsoDate } from '../date-parse';
+import { parseDate } from '../date-parse';
 import type { SignalResult } from './jsonld';
 
 const CONF_META = 0.55;
@@ -64,7 +64,7 @@ export function metaSignal($: CheerioAPI): SignalResult {
     meta($, 'meta[name="dc.date" i]') ||
     meta($, 'meta[name="DC.date.issued" i]');
   if (dateRaw) {
-    const dp = parseIsoDate(dateRaw);
+    const dp = parseDate(dateRaw);
     if (dp) { fields.issued = { 'date-parts': [dp] }; confidence.issued = CONF_DC_DATE; }
   }
 

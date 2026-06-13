@@ -19,6 +19,20 @@ describe('parseAuthorName', () => {
       family: 'Neumann', given: 'John', 'non-dropping-particle': 'von',
     });
   });
+  it('keeps multi-word particles together ("van der")', () => {
+    // Regression: only one trailing particle was popped, so "Bessel van der
+    // Kolk" leaked "van" into the given name (given: "Bessel van"). Book
+    // lookups (e.g. "The Body Keeps the Score") run author strings through
+    // this parser, so the bug surfaced in real citations.
+    expect(parseAuthorName('Bessel van der Kolk')).toEqual({
+      family: 'Kolk', given: 'Bessel', 'non-dropping-particle': 'van der',
+    });
+  });
+  it('handles a particle with no given name ("van der Kolk")', () => {
+    expect(parseAuthorName('van der Kolk')).toEqual({
+      family: 'Kolk', 'non-dropping-particle': 'van der',
+    });
+  });
   it('recognises trailing suffixes', () => {
     expect(parseAuthorName('John Smith Jr.')).toEqual({
       family: 'Smith', given: 'John', suffix: 'Jr.',

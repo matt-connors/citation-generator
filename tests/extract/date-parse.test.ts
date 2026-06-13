@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseIsoDate, parseFreeformDate } from '../../functions/lib/extract/date-parse';
+import { parseIsoDate, parseFreeformDate, parseDate } from '../../functions/lib/extract/date-parse';
 
 describe('parseIsoDate', () => {
   it('parses YYYY-MM-DD', () => {
@@ -51,5 +51,29 @@ describe('parseFreeformDate', () => {
   it('rejects impossible days', () => {
     expect(parseFreeformDate('May 40, 2026')).toBeNull();
     expect(parseFreeformDate('0 May 2026')).toBeNull();
+  });
+  it('parses month + year without a day ("September 2011")', () => {
+    expect(parseFreeformDate('September 2011')).toEqual([2011, 9]);
+    expect(parseFreeformDate('Sep. 2011')).toEqual([2011, 9]);
+  });
+});
+
+describe('parseDate (combined ISO + freeform)', () => {
+  it('parses strict ISO forms', () => {
+    expect(parseDate('2014-04-15')).toEqual([2014, 4, 15]);
+    expect(parseDate('2014')).toEqual([2014]);
+  });
+  it('falls back to freeform when ISO fails', () => {
+    // Regression: OpenLibrary returns dates like "Sep 06, 2016", which
+    // parseIsoDate cannot handle. Book normalization dropped the year entirely
+    // until parseDate was wired in.
+    expect(parseDate('Sep 06, 2016')).toEqual([2016, 9, 6]);
+    expect(parseDate('September 2011')).toEqual([2011, 9]);
+    expect(parseDate('14 March 2025')).toEqual([2025, 3, 14]);
+  });
+  it('returns null when neither parser matches', () => {
+    expect(parseDate('not a date')).toBeNull();
+    expect(parseDate(null)).toBeNull();
+    expect(parseDate(undefined)).toBeNull();
   });
 });

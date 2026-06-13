@@ -42,6 +42,14 @@ describe('metaSignal', () => {
     }
   });
 
+  it('parses a freeform publication date in meta tags', () => {
+    // Some publishers emit human-readable dates (e.g. "June 1, 2024") in
+    // citation_publication_date / DC.date rather than ISO 8601. parseIsoDate
+    // alone dropped these.
+    const $ = cheerio.load(`<meta name="DC.date" content="June 1, 2024" />`);
+    expect(metaSignal($).fields.issued).toEqual({ 'date-parts': [[2024, 6, 1]] });
+  });
+
   it('returns empty when no relevant meta', () => {
     expect(metaSignal(cheerio.load(`<meta name="viewport" content="x" />`)).fields).toEqual({});
   });

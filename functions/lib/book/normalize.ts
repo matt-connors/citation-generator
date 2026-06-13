@@ -1,6 +1,6 @@
 import type { CSLItem, CSLName } from '../csl-types';
 import { parseAuthorName } from '../extract/author-parse';
-import { parseIsoDate } from '../extract/date-parse';
+import { parseDate } from '../extract/date-parse';
 import type { OpenLibraryBook } from './openlibrary';
 import type { GoogleBooksVolume } from './googlebooks';
 
@@ -21,7 +21,7 @@ export function normalizeOpenLibrary(book: OpenLibraryBook, isbn: string): CSLIt
   }
   if (book.publishers?.length) item.publisher = book.publishers[0].name;
   if (book.publish_date) {
-    const dp = parseIsoDate(book.publish_date);
+    const dp = parseDate(book.publish_date);
     if (dp) item.issued = { 'date-parts': [dp] };
   }
   if (book.publish_places?.length) item['publisher-place'] = book.publish_places[0].name;
@@ -45,7 +45,7 @@ export function normalizeGoogleBooks(vol: GoogleBooksVolume, isbn: string): CSLI
   }
   if (vol.publisher) item.publisher = vol.publisher;
   if (vol.publishedDate) {
-    const dp = parseIsoDate(vol.publishedDate);
+    const dp = parseDate(vol.publishedDate);
     if (dp) item.issued = { 'date-parts': [dp] };
   }
   return item;

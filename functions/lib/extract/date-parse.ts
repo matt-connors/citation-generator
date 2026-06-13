@@ -42,17 +42,33 @@ export function parseIsoDate(s: string | null | undefined): CSLDateParts | null 
 export function parseFreeformDate(s: string | null | undefined): CSLDateParts | null {
   if (!s) return null;
   const text = s.trim();
+  // "March 14, 2025" / "Mar. 14 2025"
   let m = text.match(/^([A-Za-z]+)\.?\s+(\d{1,2}),?\s+(\d{4})$/);
   if (m) {
     const month = MONTHS[m[1].toLowerCase()];
     const day = parseInt(m[2], 10);
     if (month && day >= 1 && day <= 31) return [parseInt(m[3], 10), month, day];
   }
+  // "14 March 2025" / "14 Mar. 2025"
   m = text.match(/^(\d{1,2})\s+([A-Za-z]+)\.?\s+(\d{4})$/);
   if (m) {
     const month = MONTHS[m[2].toLowerCase()];
     const day = parseInt(m[1], 10);
     if (month && day >= 1 && day <= 31) return [parseInt(m[3], 10), month, day];
   }
+  // "September 2011" / "Sep. 2011" — month + year, no day. OpenLibrary and many
+  // publishers emit dates at this granularity.
+  m = text.match(/^([A-Za-z]+)\.?\s+(\d{4})$/);
+  if (m) {
+    const month = MONTHS[m[1].toLowerCase()];
+    if (month) return [parseInt(m[2], 10), month];
+  }
   return null;
+}
+
+// Combined parser: try strict ISO/numeric first, then human-readable freeform.
+// Use this whenever the upstream date format is unknown (book lookups, HTML
+// metadata) so a non-ISO date like "Sep 06, 2016" is not silently dropped.
+export function parseDate(s: string | null | undefined): CSLDateParts | null {
+  return parseIsoDate(s) ?? parseFreeformDate(s);
 }

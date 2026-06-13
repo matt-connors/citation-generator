@@ -26,6 +26,29 @@ describe('normalizeOpenLibrary', () => {
     expect(csl.author).toBeUndefined();
     expect(csl.publisher).toBeUndefined();
   });
+
+  it('parses freeform publish_date like OpenLibrary\'s "Sep 06, 2016"', () => {
+    // Regression: normalize used parseIsoDate only, so non-ISO OpenLibrary
+    // dates ("Sep 06, 2016", "September 2011") were silently dropped and the
+    // citation came out with no year.
+    const csl = normalizeOpenLibrary({ title: 'X', publish_date: 'Sep 06, 2016' }, '111');
+    expect(csl.issued).toEqual({ 'date-parts': [[2016, 9, 6]] });
+  });
+
+  it('parses a month + year publish_date', () => {
+    const csl = normalizeOpenLibrary({ title: 'X', publish_date: 'September 2011' }, '111');
+    expect(csl.issued).toEqual({ 'date-parts': [[2011, 9]] });
+  });
+
+  it('keeps multi-word author particles intact', () => {
+    const csl = normalizeOpenLibrary({
+      title: 'The Body Keeps the Score',
+      authors: [{ name: 'Bessel van der Kolk' }],
+    }, '111');
+    expect(csl.author).toEqual([
+      { family: 'Kolk', given: 'Bessel', 'non-dropping-particle': 'van der' },
+    ]);
+  });
 });
 
 describe('normalizeGoogleBooks', () => {
