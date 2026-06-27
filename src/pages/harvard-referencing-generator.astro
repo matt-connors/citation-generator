@@ -1,0 +1,262 @@
+---
+import Layout from "../layouts/page.astro";
+import CitationSearch from "../components/react/CitationSearch";
+import {
+    buildSoftwareApplication,
+    buildFaqPage,
+    buildBreadcrumbList,
+} from "../lib/schema-org";
+
+export const prerender = true;
+
+const title = "Free Harvard Referencing Generator — Cite Them Right";
+const description =
+    "Free Harvard referencing generator following Cite Them Right 12th edition. Create author–date in-text citations and reference list entries from a URL or DOI.";
+
+const faqs = [
+    {
+        question: "Which Harvard variant does this generator use?",
+        answer: "<p>This Harvard referencing generator follows <em>Cite Them Right</em> by Pears and Shields (12th edition, 2022, Bloomsbury Academic) — the variant most UK university libraries treat as the default. \"Harvard\" is a family of author–date conventions with no single governing body, so many institutions publish their own style sheet that differs in small ways. If your assignment grades against a specific local sheet, check it against your output. Full detail is in our <a href=\"/guides/harvard\">Harvard citation guide</a>.</p>",
+    },
+    {
+        question: "How do I write a Harvard in-text citation?",
+        answer: "<p>Harvard in-text citations are author–date: the author's surname and the publication year in parentheses, separated by a comma — for example <code>(Chen, 2021)</code>. Add a page number for direct quotes: <code>(Chen, 2021, p. 47)</code>. Two authors are joined by \"and\" (never \"&amp;\"), and \"et al.\" is used only at four or more authors. See our <a href=\"/guides/in-text-citations\">in-text citations guide</a> for every case.</p>",
+    },
+    {
+        question: "Does Harvard use \"Available at:\" before URLs?",
+        answer: "<p>Yes. Cite Them Right Harvard prefixes every URL with \"Available at:\" and follows it with an access date, such as <code>(Accessed: 20 May 2026)</code>. DOIs take the same \"Available at:\" prefix but no access date, because a DOI is a stable identifier. This \"Available at:\" prefix is one of the clearest visual differences between Harvard and APA 7.</p>",
+    },
+    {
+        question: "Is Harvard the same as APA?",
+        answer: "<p>No. Both are author–date systems and look similar, but they differ in detail. Cite Them Right Harvard joins two authors with \"and\" — <code>(Lin and Patel, 2022)</code> — where APA 7 uses an ampersand, and Harvard switches to \"et al.\" only at four authors where APA does so at three. Harvard also adds \"Available at:\" before URLs. Use whichever your course requires.</p>",
+    },
+    {
+        question: "How do I list authors in a Harvard reference?",
+        answer: "<p>In the reference list, invert the first author as surname-then-initials with no spaces between initials — <code>Chen, M.S.</code> — and put the year in parentheses after the author block: <code>Chen, M.S. (2021)</code>. List up to three authors in full, joining the last two with \"and\"; for four or more, give the first author followed by \"et al.\" Book and article titles take sentence case. Worked examples for every source type are in our <a href=\"/guides/harvard\">Harvard guide</a>.</p>",
+    },
+];
+
+const homeUrl = new URL("/", Astro.site).toString();
+const pageUrl = new URL("/harvard-referencing-generator", Astro.site).toString();
+
+const extraSchemas = [
+    buildSoftwareApplication(),
+    buildFaqPage(faqs),
+    buildBreadcrumbList([
+        { name: "Home", url: homeUrl },
+        { name: "Harvard Citation Generator", url: pageUrl },
+    ]),
+];
+---
+
+<Layout title={title} description={description} extraSchemas={extraSchemas}>
+    <section id="tool">
+        <div id="text-container">
+            <h1 class="heading-1">Harvard Referencing<br />Generator</h1>
+            <p class="subtitle">
+                Build accurate Harvard citations in seconds. This Harvard
+                citation generator follows Cite Them Right 12th edition — the
+                author–date variant UK universities expect — and formats the
+                in-text citation and reference list entry for you from a URL,
+                DOI, or ISBN.
+            </p>
+        </div>
+        <CitationSearch includeDropdown includeManualCite client:load />
+    </section>
+
+    <article class="harvard-page">
+        <h2>How to cite in Harvard</h2>
+        <p>
+            Harvard is an <strong>author–date</strong> style: in the body of
+            your text you give the author's surname and the year of publication
+            in parentheses — <code>(Chen, 2021)</code> — and every source is
+            listed in full in a <strong>Reference list</strong> at the end. Add a
+            page number for direct quotes, as in <code>(Chen, 2021, p. 47)</code>.
+            Two authors are joined by the word <em>and</em>, never an ampersand,
+            and you only switch to <em>et al.</em> at four or more authors. For
+            the full rules and worked examples, read our
+            <a href="/guides/harvard">Harvard citation guide</a>.
+        </p>
+        <p>
+            In the reference list, invert the first author as surname-then-initials
+            with no spaces (<code>Chen, M.S.</code>) and place the year in
+            parentheses after it. Book titles are italicised in sentence case,
+            journal names are italicised in <strong>title case</strong>, and
+            article and chapter titles sit in quotation marks in sentence case.
+            Online sources are prefixed with
+            <code>Available at:</code> and an access date, while DOIs use the same
+            prefix without a date. Entries are alphabetised by surname and set
+            with a <a href="/guides/hanging-indents">hanging indent</a>.
+        </p>
+        <p>
+            Remember that "Harvard" is a family of conventions rather than one
+            official standard — this tool produces the widely cited
+            <em>Cite Them Right</em> variant, but your institution may publish a
+            slightly different house style, so check your assignment brief if it
+            names a specific sheet.
+        </p>
+        <ul class="related-links">
+            <li>
+                <a href="/guides/harvard">Full Harvard citation guide</a> — every
+                rule and source type, keyed to Cite Them Right 12th.
+            </li>
+            <li>
+                <a href="/guides/how-to-cite-a-book">How to cite a book</a> in
+                Harvard, with single-author and edited-chapter examples.
+            </li>
+            <li>
+                <a href="/guides/how-to-cite-a-journal-article"
+                    >How to cite a journal article</a
+                > — volume, issue, page range, and DOI formatting.
+            </li>
+            <li>
+                <a href="/guides/in-text-citations"
+                    >In-text citations explained</a
+                > across Harvard and the other major styles.
+            </li>
+        </ul>
+        <p class="other-styles">
+            Need a different style, or citing across several? Use the main
+            <a href="/">free citation generator</a> for APA, MLA, Chicago,
+            Vancouver, IEEE, and AMA as well as Harvard.
+        </p>
+    </article>
+
+    <section class="faq-section">
+        <h2>Harvard referencing FAQs</h2>
+        <div class="faq-container">
+            {
+                faqs.map((faq, i) => {
+                    const open = i === 0;
+                    return (
+                        <details class="faq" open={open}>
+                            <summary>{faq.question}</summary>
+                            <div set:html={faq.answer} class="faq-content" />
+                        </details>
+                    );
+                })
+            }
+        </div>
+    </section>
+</Layout>
+
+<style>
+    /* Tool hero — mirrors index.astro */
+    #tool {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0 var(--page-inline-padding);
+    }
+    #text-container {
+        text-align: center;
+        margin: 4rem 0;
+    }
+    #text-container .heading-1 {
+        margin-bottom: 1rem;
+    }
+    #text-container .subtitle {
+        max-width: 52ch;
+        margin: 0 auto;
+        color: var(--color-text-light);
+    }
+
+    /* How-to-cite article */
+    .harvard-page {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: min(calc(10vw + 2rem), 6rem) var(--page-inline-padding) 3rem;
+        color: var(--color-text-light);
+        line-height: 1.6;
+        overflow-wrap: break-word;
+    }
+    .harvard-page h2 {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+        color: var(--color-text-dark);
+    }
+    .harvard-page p {
+        margin-bottom: 1rem;
+    }
+    .harvard-page code {
+        font-size: 0.95em;
+        background-color: var(--color-background-3);
+        padding: 0.1em 0.35em;
+        border-radius: 6px;
+    }
+    .harvard-page a {
+        color: var(--color-text-dark);
+        text-decoration: underline;
+    }
+    .related-links {
+        list-style: disc;
+        padding-left: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .related-links li {
+        margin-bottom: 0.5rem;
+    }
+    .other-styles {
+        font-size: 0.95rem;
+    }
+
+    /* FAQ — mirrors index.astro */
+    .faq-section {
+        padding: 0 0 4rem;
+    }
+    .faq-section > h2 {
+        text-align: center;
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
+        color: var(--color-text-dark);
+    }
+    .faq-container {
+        display: grid;
+        gap: 1rem;
+        max-width: calc(720px + var(--page-inline-padding) * 2);
+        padding: 0 var(--page-inline-padding);
+        margin: auto;
+    }
+    .faq {
+        padding: 1.3rem;
+        border-radius: 1rem;
+        background-color: var(--color-background-3);
+        text-align: left;
+    }
+    .faq summary {
+        font-size: 1.2rem;
+        cursor: pointer;
+        user-select: none;
+        line-height: 1.2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+    .faq[open] summary {
+        margin-bottom: 1rem;
+    }
+    .faq[open] summary::after {
+        content: url("/icons/close.svg");
+        transform: translate(0, 2px);
+    }
+    .faq summary::after {
+        content: url("/icons/open.svg");
+        display: flex;
+        align-items: center;
+        transform: translate(-1px, 2px);
+        width: 20px;
+        height: 20px;
+    }
+    .faq-content {
+        color: var(--color-text-light);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .faq-content :global(a) {
+        text-decoration: underline;
+        color: var(--color-text-dark);
+    }
+</style>

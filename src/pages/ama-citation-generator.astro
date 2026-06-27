@@ -1,0 +1,221 @@
+---
+import Layout from "../layouts/page.astro";
+import CitationSearch from "../components/react/CitationSearch";
+import {
+    buildSoftwareApplication,
+    buildFaqPage,
+    buildBreadcrumbList,
+} from "../lib/schema-org";
+
+export const prerender = true;
+
+const title = "AMA Citation Generator — Free AMA 11th Edition Tool";
+const description =
+    "Free AMA citation generator following the AMA Manual of Style, 11th edition. Build superscript in-text numbers and a numbered reference list in seconds.";
+
+const faqs = [
+    {
+        question: "What edition of AMA does this generator follow?",
+        answer: "<p>This generator follows the <em>AMA Manual of Style: A Guide for Authors and Editors</em>, 11th edition (Oxford University Press, 2020) — the house style at <em>JAMA</em> and the <em>JAMA Network</em> journals. Full rules, with worked examples for every source type, are in our <a href='/guides/ama'>AMA citation guide</a>.</p>",
+    },
+    {
+        question: "What does an AMA in-text citation look like?",
+        answer: "<p>AMA uses a <strong>superscript Arabic numeral</strong> placed after the punctuation it follows — for example, “Working memory predicts reading comprehension.¹” Numbers are assigned in the order sources first appear, and you reuse a source's original number every time you cite it again. See our <a href='/guides/in-text-citations'>in-text citations guide</a> for more.</p>",
+    },
+    {
+        question: "How many authors does AMA list before “et al.”?",
+        answer: "<p>AMA 11th edition lists the <strong>first three authors</strong> and then appends <em>et al</em> once a source has seven or more authors. For six or fewer authors, list everyone. This is tighter than Vancouver's first-six rule — see <a href='/guides/vancouver'>how AMA compares to Vancouver</a>.</p>",
+    },
+    {
+        question: "Does the generator look up NLM journal abbreviations automatically?",
+        answer: "<p>No. AMA italicizes the abbreviated journal name from the NLM Catalog (for example, <em>N Engl J Med</em>). The generator italicizes whatever journal name you supply, so enter the abbreviated form yourself. The canonical lookup is the <a href='https://www.ncbi.nlm.nih.gov/nlmcatalog/journals' rel='nofollow'>NLM Catalog</a>.</p>",
+    },
+    {
+        question: "Is the AMA citation generator free?",
+        answer: "<p>Yes. The AMA citation generator is completely free, with no account required. Need a different style? Use our main <a href='/'>citation generator</a> for APA, MLA, Chicago, Harvard, Vancouver, and IEEE.</p>",
+    },
+];
+
+const siteBase = new URL("/", Astro.site).toString();
+const pageUrl = new URL("/ama-citation-generator", Astro.site).toString();
+
+const extraSchemas = [
+    buildSoftwareApplication(),
+    buildFaqPage(faqs),
+    buildBreadcrumbList([
+        { name: "Home", url: siteBase },
+        { name: "AMA Citation Generator", url: pageUrl },
+    ]),
+];
+---
+
+<Layout title={title} description={description} extraSchemas={extraSchemas}>
+    <section id="tool">
+        <div class="tool-intro">
+            <h1 class="heading-1">AMA Citation Generator</h1>
+            <p class="subtitle">
+                Build accurate AMA references following the AMA Manual of
+                Style, 11th edition. Paste a URL, DOI, or ISBN — or cite
+                manually — and copy a numbered, AMA-formatted reference in
+                seconds.
+            </p>
+        </div>
+        <CitationSearch includeDropdown includeManualCite client:load />
+    </section>
+
+    <article class="page-body">
+        <h2>How to cite in AMA</h2>
+        <p>
+            AMA is the citation style of American medical publishing. It is a
+            numeric system: a <strong>superscript number</strong> appears in
+            the text (for example, reading comprehension.<sup>1</sup>), and a
+            <strong>numbered reference list</strong> at the end of the document
+            is ordered by the sequence in which sources are first cited — not
+            alphabetically. The first source you cite becomes reference 1, and
+            you reuse that number every time you cite the same source.
+        </p>
+        <p>
+            Reference entries list authors by <strong>surname plus initials</strong>
+            with no comma between them (Chen MS), set article titles in sentence
+            case, and <strong>italicize the abbreviated journal name</strong>
+            from the NLM Catalog (<em>J Cogn Dev</em>). Bibliographic detail is
+            packed into a compact block — <code>2024;19(2):87-104</code> — with a
+            <strong>hyphen</strong> in the page range and a DOI in the form
+            <code>doi:10.xxxx/xxxxx</code> when one is available.
+        </p>
+        <p>
+            This page covers the essentials so you can generate a citation
+            quickly. For the full rules — author truncation, source-type
+            examples, common mistakes, and how AMA differs from its sibling
+            styles — read the complete guides:
+        </p>
+        <ul>
+            <li>
+                <a href="/guides/ama">AMA citation guide</a> — the full AMA
+                Manual of Style 11th edition reference with worked examples.
+            </li>
+            <li>
+                <a href="/guides/how-to-cite-a-journal-article"
+                    >How to cite a journal article</a
+                > — the source type AMA is built around.
+            </li>
+            <li>
+                <a href="/guides/vancouver">Vancouver style guide</a> — AMA's
+                closest numeric cousin, and how to tell them apart.
+            </li>
+            <li>
+                <a href="/guides/in-text-citations">In-text citations</a> — how
+                superscript numbers are placed and reused.
+            </li>
+        </ul>
+        <p>
+            Need a style other than AMA? The main
+            <a href="/">citation generator</a> produces APA, MLA, Chicago,
+            Harvard, Vancouver, and IEEE references too.
+        </p>
+    </article>
+
+    <section class="page-body faq-section">
+        <h2>AMA citation generator FAQs</h2>
+        <div class="faq-container">
+            {
+                faqs.map((faq, i) => (
+                    <details class="faq" open={i === 0}>
+                        <summary>{faq.question}</summary>
+                        <div set:html={faq.answer} class="faq-content" />
+                    </details>
+                ))
+            }
+        </div>
+    </section>
+</Layout>
+
+<style>
+    #tool {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0 var(--page-inline-padding);
+    }
+    .tool-intro {
+        text-align: center;
+        margin: 4rem 0;
+        max-width: 48ch;
+    }
+    .tool-intro .heading-1 {
+        margin-bottom: 1rem;
+    }
+    .tool-intro .subtitle {
+        color: var(--color-text-light);
+    }
+
+    .page-body {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 3rem var(--page-inline-padding);
+        color: var(--color-text-medium);
+        line-height: 1.6;
+        overflow-wrap: break-word;
+    }
+    .page-body h2 {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+        color: var(--color-text-dark);
+    }
+    .page-body p,
+    .page-body ul {
+        margin-bottom: 1rem;
+    }
+    .page-body ul {
+        padding-left: 1.5rem;
+        list-style: disc;
+    }
+    .page-body li {
+        margin-bottom: 0.5rem;
+    }
+    .page-body a {
+        color: var(--color-text-dark);
+        text-decoration: underline;
+    }
+    .page-body code {
+        background-color: var(--color-background-3);
+        padding: 0.1em 0.35em;
+        border-radius: 6px;
+        font-size: 0.9em;
+    }
+
+    .faq-section {
+        padding-top: 0;
+    }
+    .faq-container {
+        display: grid;
+        gap: 1rem;
+    }
+    .faq {
+        padding: 1.3rem;
+        border-radius: 1rem;
+        background-color: var(--color-background-3);
+        text-align: left;
+    }
+    .faq summary {
+        font-size: 1.2rem;
+        cursor: pointer;
+        user-select: none;
+        line-height: 1.3;
+        color: var(--color-text-dark);
+    }
+    .faq[open] summary {
+        margin-bottom: 1rem;
+    }
+    .faq-content {
+        color: var(--color-text-light);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .faq-content :global(a) {
+        text-decoration: underline;
+        color: var(--color-text-dark);
+    }
+</style>

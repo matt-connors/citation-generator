@@ -1,0 +1,217 @@
+---
+import Layout from "../layouts/page.astro";
+import CitationSearch from "../components/react/CitationSearch";
+import {
+    buildSoftwareApplication,
+    buildFaqPage,
+    buildBreadcrumbList,
+} from "../lib/schema-org";
+
+export const prerender = true;
+
+const title = "APA Citation Generator — Free APA 7 Format Tool";
+const description =
+    "Free APA citation generator. Create accurate APA 7th edition references and in-text citations from a URL, DOI, or ISBN in seconds — built for students and researchers.";
+
+const faqs = [
+    {
+        question: "Is this APA citation generator free?",
+        answer: "Yes. The APA citation generator is completely free, with no account required and no limit on how many references you can create. Paste a URL, DOI, or ISBN, choose APA, and copy the formatted citation into your paper.",
+    },
+    {
+        question: "Which edition of APA does the generator use?",
+        answer: "It formats references in APA 7th edition — the Publication Manual of the American Psychological Association, 7th Edition (2020). That means no \"Retrieved from\" before most URLs, italicized volume numbers, and up to 20 authors before an ellipsis in the reference list.",
+    },
+    {
+        question: "How many authors before I use \"et al.\" in APA 7?",
+        answer: "In APA 7 in-text citations, use \"et al.\" from the very first citation for any source with three or more authors. In the reference list, list up to 20 authors, then use an ellipsis before the final author's name.",
+    },
+    {
+        question: "Do I need page numbers in APA in-text citations?",
+        answer: "Only for direct quotations. Paraphrases need just the author and year, though a page or paragraph number is encouraged when it helps the reader. For sources without pages, such as websites, use paragraph numbers, section headings, or timestamps.",
+    },
+    {
+        question: "Can I edit a citation after the generator creates it?",
+        answer: "Yes. Every generated reference is fully editable, so you can correct an author name, add a missing date, or adjust a title before copying it. You can also save references and revisit them on the My References page.",
+    },
+];
+
+const siteBase = new URL("/", Astro.site).toString().replace(/\/$/, "");
+const extraSchemas = [
+    buildSoftwareApplication(),
+    buildFaqPage(faqs),
+    buildBreadcrumbList([
+        { name: "Home", url: `${siteBase}/` },
+        {
+            name: "APA Citation Generator",
+            url: `${siteBase}/apa-citation-generator`,
+        },
+    ]),
+];
+---
+
+<Layout title={title} description={description} extraSchemas={extraSchemas}>
+    <section id="tool">
+        <div id="text-container">
+            <h1 class="heading-1">APA Citation Generator</h1>
+            <p class="subtitle">
+                Create accurate APA 7th edition references and in-text
+                citations from a URL, DOI, or ISBN. Free, fast, and editable —
+                built for students and researchers who need APA done right.
+            </p>
+        </div>
+        <CitationSearch includeDropdown includeManualCite client:load />
+    </section>
+
+    <article class="apa-content">
+        <h2>How to cite in APA</h2>
+        <p>
+            APA is the author–date style used across psychology, education,
+            nursing, and the social sciences. Each source appears two ways: a
+            brief <a href="/guides/in-text-citations">in-text citation</a> with
+            the author's surname and the year, and a full entry in an
+            alphabetized reference list at the end of your paper. The generator
+            above builds the reference list entry for you; you add the short
+            in-text citation where you cite the source.
+        </p>
+        <p>
+            For a parenthetical in-text citation, place the author and year in
+            parentheses — for example, <em>(Chen, 2021)</em>. For a narrative
+            citation, name the author in your sentence and put the year in
+            parentheses after it: <em>Chen (2021) found…</em>. For three or more
+            authors, use the first author's surname followed by <em>et al.</em>
+            from the very first citation.
+        </p>
+        <p>
+            APA reference entries use sentence case for article and book titles,
+            title case for journal names, italics for journal and book titles, a
+            hanging indent, and double spacing throughout. APA 7 dropped "Retrieved from" before
+            most URLs and lists up to 20 authors before an ellipsis. The
+            generator applies these rules automatically — review the result and
+            edit any field the tool could not detect.
+        </p>
+        <p>
+            This page covers the essentials. For worked examples of every common
+            source type, read the full <a href="/guides/apa">APA citation
+            guide</a>. Related references that help with specific sources:
+        </p>
+        <ul>
+            <li>
+                <a href="/guides/how-to-cite-a-website">How to cite a website in APA</a>
+            </li>
+            <li>
+                <a href="/guides/how-to-cite-a-journal-article">How to cite a journal article in APA</a>
+            </li>
+            <li>
+                <a href="/guides/mla-vs-apa">APA vs MLA: which style to use</a>
+            </li>
+        </ul>
+        <p class="other-styles">
+            Need a different style or a general tool? Use the main
+            <a href="/">citation generator</a> for APA, MLA, Chicago, Harvard,
+            Vancouver, IEEE, and AMA.
+        </p>
+    </article>
+
+    <section class="apa-faq" aria-labelledby="apa-faq-heading">
+        <h2 id="apa-faq-heading">APA citation generator FAQs</h2>
+        <div class="faq-list">
+            {
+                faqs.map((faq, i) => (
+                    <details class="faq" open={i === 0}>
+                        <summary>{faq.question}</summary>
+                        <p class="faq-answer">{faq.answer}</p>
+                    </details>
+                ))
+            }
+        </div>
+    </section>
+</Layout>
+
+<style>
+    #tool {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0 var(--page-inline-padding);
+    }
+    #text-container {
+        text-align: center;
+        margin: 4rem 0;
+    }
+    #text-container .heading-1 {
+        margin-bottom: 1rem;
+    }
+    #text-container .subtitle {
+        max-width: 52ch;
+        margin: 0 auto;
+        color: var(--color-text-light);
+    }
+    .apa-content {
+        max-width: 720px;
+        margin: 4rem auto 0;
+        padding: 0 var(--page-inline-padding);
+        color: var(--color-text-medium);
+        line-height: 1.6;
+        overflow-wrap: break-word;
+    }
+    .apa-content h2 {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+        color: var(--color-text-dark);
+    }
+    .apa-content p,
+    .apa-content ul {
+        margin-bottom: 1rem;
+    }
+    .apa-content ul {
+        padding-left: 1.5rem;
+        list-style: disc;
+    }
+    .apa-content li {
+        margin-bottom: 0.4rem;
+    }
+    .apa-content a {
+        color: var(--color-text-dark);
+        text-decoration: underline;
+    }
+    .apa-content .other-styles {
+        margin-top: 1.5rem;
+    }
+    .apa-faq {
+        max-width: 720px;
+        margin: 3.5rem auto;
+        padding: 0 var(--page-inline-padding);
+    }
+    .apa-faq h2 {
+        font-size: 1.6rem;
+        margin-bottom: 1.5rem;
+        color: var(--color-text-dark);
+        text-align: center;
+    }
+    .faq-list {
+        display: grid;
+        gap: 1rem;
+    }
+    .faq {
+        padding: 1.3rem;
+        border-radius: 1rem;
+        background-color: var(--color-background-3);
+        text-align: left;
+    }
+    .faq summary {
+        font-size: 1.2rem;
+        cursor: pointer;
+        user-select: none;
+        line-height: 1.3;
+        color: var(--color-text-dark);
+    }
+    .faq[open] summary {
+        margin-bottom: 0.75rem;
+    }
+    .faq-answer {
+        color: var(--color-text-light);
+        line-height: 1.6;
+    }
+</style>

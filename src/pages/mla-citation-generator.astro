@@ -1,0 +1,220 @@
+---
+import Layout from "../layouts/page.astro";
+import CitationSearch from "../components/react/CitationSearch";
+import {
+    buildSoftwareApplication,
+    buildFaqPage,
+    buildBreadcrumbList,
+} from "../lib/schema-org";
+
+export const prerender = true;
+
+const title = "MLA Citation Generator — Free & Accurate MLA 9 Format";
+const description =
+    "Generate accurate MLA 9th edition citations and Works Cited entries from a URL, DOI, or ISBN. Free MLA citation generator built for students and researchers.";
+
+const faqs = [
+    {
+        question: "Does this MLA citation generator use the 9th edition?",
+        answer: "<p>Yes. Every MLA reference is formatted against the <em>MLA Handbook</em>, 9th edition (Modern Language Association, 2021) — the current edition since April 2021. The generator follows the nine core elements in their fixed order and uses author–page in-text citations, so the output matches what a humanities instructor expects today.</p>",
+    },
+    {
+        question: "How do I create an MLA citation from a website URL?",
+        answer: "<p>Paste the page URL into the box above, choose MLA as your style, and select cite. The generator fetches the page, reads the author, title, container, publisher, and publication date, and assembles a Works Cited entry. Review the fields — especially the author and date — and edit anything the page did not expose before copying the citation. See <a href='/guides/how-to-cite-a-website'>how to cite a website</a> for the full walkthrough.</p>",
+    },
+    {
+        question: "Do MLA in-text citations include the year?",
+        answer: "<p>No. MLA in-text citations use the author's surname and a page number — for example, <em>(Chen 47)</em> — with no comma and no year. The year appears only in the Works Cited entry. If your instructor wants <em>Author, Year</em> inside the parentheses, they are asking for APA, not MLA. Our <a href='/guides/mla-vs-apa'>MLA vs APA guide</a> breaks down the differences.</p>",
+    },
+    {
+        question: "What is the Works Cited page in MLA?",
+        answer: "<p>The Works Cited page is the alphabetized list of every source you cite, placed at the end of your paper. Entries use a half-inch hanging indent, are double-spaced, and follow the nine core elements. It differs from a bibliography, which can include sources you read but did not cite — see <a href='/guides/works-cited-vs-bibliography'>Works Cited vs bibliography</a> for the distinction.</p>",
+    },
+    {
+        question: "Is the MLA citation generator free?",
+        answer: "<p>Yes. The MLA citation generator is completely free, with no account required. You can generate citations for websites, books, and journal articles, then save and manage them on the <a href='/my-references'>My References</a> page.</p>",
+    },
+];
+
+const siteBase = new URL("/", Astro.site).toString();
+const pageUrl = new URL("/mla-citation-generator", Astro.site).toString();
+
+const extraSchemas = [
+    buildSoftwareApplication(),
+    buildFaqPage(faqs),
+    buildBreadcrumbList([
+        { name: "Home", url: siteBase },
+        { name: "MLA Citation Generator", url: pageUrl },
+    ]),
+];
+---
+
+<Layout title={title} description={description} extraSchemas={extraSchemas}>
+    <section id="tool">
+        <div id="text-container">
+            <h1 class="heading-1">MLA Citation Generator</h1>
+            <p class="subtitle">
+                Build accurate MLA 9th edition citations and Works Cited entries
+                from a URL, DOI, or ISBN. Free, fast, and formatted to the
+                current <em>MLA Handbook</em> — paste a link below to start.
+            </p>
+        </div>
+        <CitationSearch includeDropdown includeManualCite client:load />
+    </section>
+
+    <article class="mla-content">
+        <h2>How to cite in MLA</h2>
+        <p>
+            MLA is the citation style of literature, languages, and the wider
+            humanities, and the current edition is the ninth (Modern Language
+            Association, 2021). Instead of a separate template for every source
+            type, MLA 9 asks you to assemble each Works Cited entry from nine
+            <strong>core elements</strong> in a fixed order: Author. Title of
+            source. Title of container, Other contributors, Version, Number,
+            Publisher, Publication date, Location.
+        </p>
+        <p>
+            In the body of your paper, MLA uses <strong>author–page</strong>
+            in-text citations — the author's surname and a page number with no
+            comma between them, such as <em>(Chen 47)</em>. There is no year and
+            no <em>p.</em> abbreviation. Each source then gets a full entry on
+            the alphabetized, double-spaced Works Cited page, with a half-inch
+            hanging indent.
+        </p>
+        <p>
+            This page is a quick start; the
+            <a href="/guides/mla">full MLA citation guide</a> covers every rule
+            with worked examples. For specific topics, see
+            <a href="/guides/in-text-citations">MLA in-text citations</a>,
+            <a href="/guides/works-cited-vs-bibliography"
+                >Works Cited vs bibliography</a
+            >, and
+            <a href="/guides/mla-vs-apa">MLA vs APA</a> if you need to tell the
+            two styles apart.
+        </p>
+        <p class="generic-note">
+            Need a different style, or just exploring? The
+            <a href="/">free citation generator on the homepage</a> handles APA,
+            Chicago, Harvard, Vancouver, IEEE, and AMA alongside MLA.
+        </p>
+    </article>
+
+    <section class="faq-section">
+        <h2>MLA citation generator FAQs</h2>
+        <div class="faq-container">
+            {
+                faqs.map((faq, i) => {
+                    const open = i === 0;
+                    return (
+                        <details class="faq" open={open}>
+                            <summary>{faq.question}</summary>
+                            <div set:html={faq.answer} class="faq-content" />
+                        </details>
+                    );
+                })
+            }
+        </div>
+    </section>
+</Layout>
+
+<style is:global>
+    #tool {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0 var(--page-inline-padding);
+    }
+    #tool #text-container {
+        text-align: center;
+        margin: 4rem 0;
+    }
+    #tool #text-container .heading-1 {
+        margin-bottom: 1rem;
+    }
+    #tool #text-container .subtitle {
+        max-width: 50ch;
+        color: var(--color-text-light);
+    }
+    .mla-content {
+        max-width: 720px;
+        margin: 4rem auto 0;
+        padding: 0 var(--page-inline-padding);
+        color: var(--color-text-light);
+        line-height: 1.6;
+        overflow-wrap: break-word;
+    }
+    .mla-content h2 {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+        color: var(--color-text-dark);
+    }
+    .mla-content p {
+        margin-bottom: 1rem;
+    }
+    .mla-content a {
+        text-decoration: underline;
+        color: var(--color-text-dark);
+    }
+    .mla-content .generic-note {
+        font-size: 0.95rem;
+        color: var(--color-text-light);
+    }
+    .faq-section {
+        padding: 4rem 0;
+    }
+    .faq-section h2 {
+        text-align: center;
+        font-size: 1.6rem;
+        margin-bottom: 2rem;
+        color: var(--color-text-dark);
+    }
+    .faq-section .faq-container {
+        display: grid;
+        gap: 1rem;
+        max-width: calc(720px + var(--page-inline-padding) * 2);
+        padding: 0 var(--page-inline-padding);
+        margin: auto;
+    }
+    .faq-section .faq {
+        padding: 1.3rem;
+        border-radius: 1rem;
+        background-color: var(--color-background-3);
+        text-align: left;
+    }
+    .faq-section .faq summary {
+        font-size: 1.2rem;
+        cursor: pointer;
+        user-select: none;
+        line-height: 1.2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+    .faq-section .faq[open] summary {
+        margin-bottom: 1rem;
+    }
+    .faq-section .faq[open] summary::after {
+        content: url("/icons/close.svg");
+        transform: translate(0, 2px);
+    }
+    .faq-section .faq summary::after {
+        content: url("/icons/open.svg");
+        display: flex;
+        align-items: center;
+        transform: translate(-1px, 2px);
+        width: 20px;
+        height: 20px;
+    }
+    .faq-section .faq-content {
+        color: var(--color-text-light);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .faq-section .faq-content a {
+        text-decoration: underline;
+        color: var(--color-text-dark);
+    }
+</style>
