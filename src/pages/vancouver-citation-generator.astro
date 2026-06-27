@@ -229,13 +229,25 @@ const extraSchemas = [
     .faq[open] summary {
         margin-bottom: 1rem;
     }
+    .faq[open] summary::after {
+        content: url("/icons/close.svg");
+        transform: translate(0, 2px);
+    }
+    .faq summary::after {
+        content: url("/icons/open.svg");
+        display: flex;
+        align-items: center;
+        transform: translate(-1px, 2px);
+        width: 20px;
+        height: 20px;
+    }
     .faq-content {
         color: var(--color-text-light);
         display: flex;
         flex-direction: column;
         gap: 1rem;
     }
-    .faq-content a {
+    .faq-content :global(a) {
         text-decoration: underline;
         color: var(--color-text-dark);
     }

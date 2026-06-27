@@ -9,9 +9,9 @@ import {
 
 export const prerender = true;
 
-const title = "Harvard Referencing Generator — Free Harvard Citation Generator";
+const title = "Free Harvard Referencing Generator — Cite Them Right";
 const description =
-    "Free Harvard referencing generator following Cite Them Right 12th edition. Build accurate author–date in-text citations and reference list entries from a URL, DOI, or ISBN.";
+    "Free Harvard referencing generator following Cite Them Right 12th edition. Create author–date in-text citations and reference list entries from a URL or DOI.";
 
 const faqs = [
     {
@@ -236,5 +236,27 @@ const extraSchemas = [
     }
     .faq[open] summary {
         margin-bottom: 1rem;
+    }
+    .faq[open] summary::after {
+        content: url("/icons/close.svg");
+        transform: translate(0, 2px);
+    }
+    .faq summary::after {
+        content: url("/icons/open.svg");
+        display: flex;
+        align-items: center;
+        transform: translate(-1px, 2px);
+        width: 20px;
+        height: 20px;
+    }
+    .faq-content {
+        color: var(--color-text-light);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .faq-content :global(a) {
+        text-decoration: underline;
+        color: var(--color-text-dark);
     }
 </style>

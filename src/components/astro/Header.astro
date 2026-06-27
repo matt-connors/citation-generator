@@ -24,27 +24,27 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
       <li><a href={`${site}my-references`}>My References</a></li>
       <li class="sub-menu-trigger">
         <button type="button" aria-haspopup="true" aria-expanded="false" aria-controls="guides-submenu">Citation Guides</button>
+        <ul class="sub-menu" id="guides-submenu" role="menu">
+          <li role="none"><a role="menuitem" href={`${site}guides`}>All Guides</a></li>
+          <li role="none"><a role="menuitem" href={`${site}guides/research-and-works-cited`}>Mastering Your Sources</a></li>
+          <li role="none"><a role="menuitem" href={`${site}guides/mla`}>MLA Format Guide</a></li>
+          <li role="none"><a role="menuitem" href={`${site}guides/apa`}>APA Format Guide</a></li>
+          <li role="none"><a role="menuitem" href={`${site}guides/chicago`}>Chicago Format Guide</a></li>
+          <li role="none"><a role="menuitem" href={`${site}guides/harvard`}>Harvard Format Guide</a></li>
+        </ul>
       </li>
-      <ul class="sub-menu" id="guides-submenu" role="menu">
-        <li role="none"><a role="menuitem" href={`${site}guides`}>All Guides</a></li>
-        <li role="none"><a role="menuitem" href={`${site}guides/research-and-works-cited`}>Mastering Your Sources</a></li>
-        <li role="none"><a role="menuitem" href={`${site}guides/mla`}>MLA Format Guide</a></li>
-        <li role="none"><a role="menuitem" href={`${site}guides/apa`}>APA Format Guide</a></li>
-        <li role="none"><a role="menuitem" href={`${site}guides/chicago`}>Chicago Format Guide</a></li>
-        <li role="none"><a role="menuitem" href={`${site}guides/harvard`}>Harvard Format Guide</a></li>
-      </ul>
       <li class="sub-menu-trigger">
         <button type="button" aria-haspopup="true" aria-expanded="false" aria-controls="generators-submenu">Citation Generators</button>
+        <ul class="sub-menu" id="generators-submenu" role="menu">
+          <li role="none"><a role="menuitem" href={`${site}apa-citation-generator`}>APA Generator</a></li>
+          <li role="none"><a role="menuitem" href={`${site}mla-citation-generator`}>MLA Generator</a></li>
+          <li role="none"><a role="menuitem" href={`${site}chicago-citation-generator`}>Chicago Generator</a></li>
+          <li role="none"><a role="menuitem" href={`${site}harvard-referencing-generator`}>Harvard Generator</a></li>
+          <li role="none"><a role="menuitem" href={`${site}ieee-citation-generator`}>IEEE Generator</a></li>
+          <li role="none"><a role="menuitem" href={`${site}ama-citation-generator`}>AMA Generator</a></li>
+          <li role="none"><a role="menuitem" href={`${site}vancouver-citation-generator`}>Vancouver Generator</a></li>
+        </ul>
       </li>
-      <ul class="sub-menu" id="generators-submenu" role="menu">
-        <li role="none"><a role="menuitem" href={`${site}apa-citation-generator`}>APA Generator</a></li>
-        <li role="none"><a role="menuitem" href={`${site}mla-citation-generator`}>MLA Generator</a></li>
-        <li role="none"><a role="menuitem" href={`${site}chicago-citation-generator`}>Chicago Generator</a></li>
-        <li role="none"><a role="menuitem" href={`${site}harvard-referencing-generator`}>Harvard Generator</a></li>
-        <li role="none"><a role="menuitem" href={`${site}ieee-citation-generator`}>IEEE Generator</a></li>
-        <li role="none"><a role="menuitem" href={`${site}ama-citation-generator`}>AMA Generator</a></li>
-        <li role="none"><a role="menuitem" href={`${site}vancouver-citation-generator`}>Vancouver Generator</a></li>
-      </ul>
     </ul>
   </nav>
   <div id="obscure"></div>
@@ -106,6 +106,9 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
       display: flex;
       align-items: center;
     }
+    .sub-menu-trigger {
+      position: relative;
+    }
     .sub-menu {
       display: none !important;
       flex-direction: column;
@@ -139,8 +142,8 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
     .sub-menu a:hover {
       background-color: var(--color-background-2);
     }
-    .sub-menu-trigger:hover + .sub-menu,
-    .sub-menu-trigger:focus-within + .sub-menu,
+    .sub-menu-trigger:hover .sub-menu,
+    .sub-menu-trigger:focus-within .sub-menu,
     .sub-menu:hover,
     .sub-menu.open {
       display: flex !important;
@@ -159,7 +162,7 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
       flex-direction: column;
       align-items: flex-start !important;
     }
-    .sub-menu-trigger {
+    .sub-menu-trigger button {
         display: none;
     }
     #menu-content {
