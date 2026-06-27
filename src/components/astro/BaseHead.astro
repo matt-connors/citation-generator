@@ -19,7 +19,8 @@ interface Props {
     extraSchemas?: object[];
 }
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const canonicalPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const canonicalURL = new URL(canonicalPath, Astro.site);
 
 const {
     title,

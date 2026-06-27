@@ -33,6 +33,18 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
         <li role="none"><a role="menuitem" href={`${site}guides/chicago`}>Chicago Format Guide</a></li>
         <li role="none"><a role="menuitem" href={`${site}guides/harvard`}>Harvard Format Guide</a></li>
       </ul>
+      <li class="sub-menu-trigger">
+        <button type="button" aria-haspopup="true" aria-expanded="false" aria-controls="generators-submenu">Citation Generators</button>
+      </li>
+      <ul class="sub-menu" id="generators-submenu" role="menu">
+        <li role="none"><a role="menuitem" href={`${site}apa-citation-generator`}>APA Generator</a></li>
+        <li role="none"><a role="menuitem" href={`${site}mla-citation-generator`}>MLA Generator</a></li>
+        <li role="none"><a role="menuitem" href={`${site}chicago-citation-generator`}>Chicago Generator</a></li>
+        <li role="none"><a role="menuitem" href={`${site}harvard-referencing-generator`}>Harvard Generator</a></li>
+        <li role="none"><a role="menuitem" href={`${site}ieee-citation-generator`}>IEEE Generator</a></li>
+        <li role="none"><a role="menuitem" href={`${site}ama-citation-generator`}>AMA Generator</a></li>
+        <li role="none"><a role="menuitem" href={`${site}vancouver-citation-generator`}>Vancouver Generator</a></li>
+      </ul>
     </ul>
   </nav>
   <div id="obscure"></div>
@@ -270,19 +282,25 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
     mobileMenuToggle!.setAttribute("aria-expanded", "false");
   });
 
-  // Sub-menu trigger: toggle aria-expanded on the button so screen readers
-  // know the popover state. Visual show/hide remains driven by CSS.
-  const subMenuTriggerBtn = document.querySelector('.sub-menu-trigger button');
-  const subMenu = document.getElementById('guides-submenu');
-  subMenuTriggerBtn?.addEventListener('click', () => {
-    const expanded = subMenuTriggerBtn.getAttribute('aria-expanded') === 'true';
-    subMenuTriggerBtn.setAttribute('aria-expanded', String(!expanded));
-    subMenu?.classList.toggle('open');
+  // Sub-menu triggers: toggle aria-expanded on each button so screen readers
+  // know the popover state. Visual show/hide remains driven by CSS. Each
+  // trigger controls the sub-menu named by its aria-controls attribute.
+  const subMenuTriggerBtns = document.querySelectorAll('.sub-menu-trigger button');
+  const subMenuFor = (btn: Element) => document.getElementById(btn.getAttribute('aria-controls') ?? '');
+  subMenuTriggerBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      subMenuFor(btn)?.classList.toggle('open');
+    });
   });
   document.addEventListener('click', (e) => {
-    if (!subMenuTriggerBtn?.contains(e.target as Node) && !subMenu?.contains(e.target as Node)) {
-      subMenuTriggerBtn?.setAttribute('aria-expanded', 'false');
-      subMenu?.classList.remove('open');
-    }
+    subMenuTriggerBtns.forEach((btn) => {
+      const subMenu = subMenuFor(btn);
+      if (!btn.contains(e.target as Node) && !subMenu?.contains(e.target as Node)) {
+        btn.setAttribute('aria-expanded', 'false');
+        subMenu?.classList.remove('open');
+      }
+    });
   });
 </script>

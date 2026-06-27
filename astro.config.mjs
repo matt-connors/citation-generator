@@ -49,6 +49,7 @@ export default defineConfig({
     site: "https://mlagenerator.com",
     // site: "http://localhost:4321",
     output: "server",
+    trailingSlash: 'never',
     adapter: cloudflare({
         mode: "directory",
         routes: {
@@ -108,6 +109,9 @@ export default defineConfig({
                     item.changefreq = 'monthly';
                 } else if (pathname === '/about') {
                     item.priority = 0.6;
+                    item.changefreq = 'monthly';
+                } else if (pathname.endsWith('-citation-generator') || pathname.endsWith('-referencing-generator')) {
+                    item.priority = 0.9;
                     item.changefreq = 'monthly';
                 } else {
                     item.priority = 0.5;
