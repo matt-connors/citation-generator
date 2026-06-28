@@ -21,7 +21,7 @@ const SearchPanel = ({ label, placeholder, name }) => {
 }
 
 // Main CitationSearch component
-const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeManualCite: Boolean }, ref: Ref<HTMLInputElement>) => {
+const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeManualCite: Boolean, defaultStyle?: string }, ref: Ref<HTMLInputElement>) => {
     // State for managing active tab index
     const [tabIndex, setTabIndex] = useState(0);
 
@@ -57,6 +57,7 @@ const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeMan
                 {props.includeDropdown ? <Dropdown
                     options={citationStyles}
                     className={clsx(styles.label, styles.dropdown)}
+                    defaultStyle={props.defaultStyle}
                 /> : <input type="hidden" name="citationStyle" ref={ref} />}
 
                 {/* Render tab panels dynamically */}

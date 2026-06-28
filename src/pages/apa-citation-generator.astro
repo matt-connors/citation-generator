@@ -44,7 +44,7 @@ const extraSchemas = [
         { name: "Home", url: `${siteBase}/` },
         {
             name: "APA Citation Generator",
-            url: `${siteBase}/apa-citation-generator`,
+            url: `${siteBase}/apa-citation-generator/`,
         },
     ]),
 ];
@@ -60,7 +60,7 @@ const extraSchemas = [
                 built for students and researchers who need APA done right.
             </p>
         </div>
-        <CitationSearch includeDropdown includeManualCite client:load />
+        <CitationSearch includeDropdown includeManualCite defaultStyle="apa-7" client:load />
     </section>
 
     <article class="apa-content">

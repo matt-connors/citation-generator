@@ -49,7 +49,7 @@ export default defineConfig({
     site: "https://mlagenerator.com",
     // site: "http://localhost:4321",
     output: "server",
-    trailingSlash: 'never',
+    trailingSlash: 'always',
     adapter: cloudflare({
         mode: "directory",
         routes: {

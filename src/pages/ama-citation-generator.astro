@@ -37,7 +37,7 @@ const faqs = [
 ];
 
 const siteBase = new URL("/", Astro.site).toString();
-const pageUrl = new URL("/ama-citation-generator", Astro.site).toString();
+const pageUrl = new URL("/ama-citation-generator/", Astro.site).toString();
 
 const extraSchemas = [
     buildSoftwareApplication(),
@@ -60,7 +60,7 @@ const extraSchemas = [
                 seconds.
             </p>
         </div>
-        <CitationSearch includeDropdown includeManualCite client:load />
+        <CitationSearch includeDropdown includeManualCite defaultStyle="ama-11" client:load />
     </section>
 
     <article class="page-body">

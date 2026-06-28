@@ -37,7 +37,7 @@ const faqs = [
 ];
 
 const homeUrl = new URL("/", Astro.site).toString();
-const pageUrl = new URL("/harvard-referencing-generator", Astro.site).toString();
+const pageUrl = new URL("/harvard-referencing-generator/", Astro.site).toString();
 
 const extraSchemas = [
     buildSoftwareApplication(),
@@ -61,7 +61,7 @@ const extraSchemas = [
                 DOI, or ISBN.
             </p>
         </div>
-        <CitationSearch includeDropdown includeManualCite client:load />
+        <CitationSearch includeDropdown includeManualCite defaultStyle="harvard" client:load />
     </section>
 
     <article class="harvard-page">
