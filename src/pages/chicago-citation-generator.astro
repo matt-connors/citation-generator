@@ -37,7 +37,7 @@ const faqs = [
 ];
 
 const siteBase = new URL("/", Astro.site).toString();
-const pageUrl = new URL("/chicago-citation-generator", Astro.site).toString();
+const pageUrl = new URL("/chicago-citation-generator/", Astro.site).toString();
 
 const extraSchemas = [
     buildSoftwareApplication(),
@@ -60,7 +60,7 @@ const extraSchemas = [
                 punctuation, italics, and hanging indent for you.
             </p>
         </div>
-        <CitationSearch includeDropdown includeManualCite client:load />
+        <CitationSearch includeDropdown includeManualCite defaultStyle="chicago-18" client:load />
     </section>
 
     <article class="cite-guide">

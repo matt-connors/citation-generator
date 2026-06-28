@@ -37,7 +37,7 @@ const faqs = [
 ];
 
 const siteBase = new URL("/", Astro.site).toString();
-const pageUrl = new URL("/mla-citation-generator", Astro.site).toString();
+const pageUrl = new URL("/mla-citation-generator/", Astro.site).toString();
 
 const extraSchemas = [
     buildSoftwareApplication(),
@@ -59,7 +59,7 @@ const extraSchemas = [
                 current <em>MLA Handbook</em> — paste a link below to start.
             </p>
         </div>
-        <CitationSearch includeDropdown includeManualCite client:load />
+        <CitationSearch includeDropdown includeManualCite defaultStyle="mla-9" client:load />
     </section>
 
     <article class="mla-content">

@@ -46,7 +46,7 @@ const extraSchemas = [
         { name: "Home", url: siteBase.toString() },
         {
             name: "IEEE Citation Generator",
-            url: new URL("/ieee-citation-generator", siteBase).toString(),
+            url: new URL("/ieee-citation-generator/", siteBase).toString(),
         },
     ]),
 ];
@@ -63,7 +63,7 @@ const extraSchemas = [
                 writing.
             </p>
         </div>
-        <CitationSearch includeDropdown includeManualCite client:load />
+        <CitationSearch includeDropdown includeManualCite defaultStyle="ieee" client:load />
     </section>
 
     <PageSegment title="How to cite in IEEE" background>

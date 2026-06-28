@@ -12,7 +12,7 @@ const description =
 
 const breadcrumbSchema = buildBreadcrumbList([
     { name: 'Home', url: new URL('/', Astro.site).href },
-    { name: 'Guides', url: new URL('/guides', Astro.site).href },
+    { name: 'Guides', url: new URL('/guides/', Astro.site).href },
 ]);
 
 const all = await getCollection("guides");
