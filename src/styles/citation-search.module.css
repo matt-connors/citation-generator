@@ -87,6 +87,13 @@
     color: var(--color-text-light);
 }
 
+/* Left-align the dropdown's "Citation Style" label, which otherwise inherits the
+   centered text-align of the homepage tool. Scoped to the dropdown so the
+   Website/Book input labels are unaffected. */
+.dropdown .inputLabel {
+    text-align: left;
+}
+
 .smallButton {
     font-size: 15px;
     font-weight: 440;
