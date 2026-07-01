@@ -14,7 +14,7 @@ faq:
   - question: 'What source types can the generator handle?'
     answer: 'URLs (any web page), DOIs (for journal articles), ISBNs (for books), and manual entry for any source type that doesn''t have a discoverable identifier. The URL extractor reads multiple signal sources in parallel — JSON-LD, Open Graph, Twitter cards, microdata, meta tags, and HTML heuristics — and merges them into a best-confidence reference. ISBNs are resolved against Google Books and Open Library; DOIs are resolved against Crossref and OpenAlex. For source types the automatic extractors do not cover (interviews you conducted, in-class lectures, archived material), use the manual-entry form.'
   - question: 'Can I save my citations?'
-    answer: 'Yes. The [My References](/my-references) page stores every citation you generate, so you can come back to them later without re-entering the source data. References are saved locally in your browser — there is no account and no server-side storage of your reference list. If you switch browsers or clear your browser data, you will need to regenerate the references; an export feature is on the roadmap.'
+    answer: 'Yes. The [My References](/my-references/) page stores every citation you generate, so you can come back to them later without re-entering the source data. References are saved locally in your browser — there is no account and no server-side storage of your reference list. If you switch browsers or clear your browser data, you will need to regenerate the references; an export feature is on the roadmap.'
   - question: 'Is the generator free? Do I need to sign up?'
     answer: 'Yes, free. No account, no sign-up, no paywall. Premium features that other citation tools paywall — multiple styles, full source-type coverage, saved references — are free here because the underlying CSL project is open source and accuracy does not need to be locked behind a subscription.'
 ---
@@ -48,7 +48,7 @@ Output that comes from a complete set of source metadata is accurate to the styl
 
 Output from incomplete metadata is only as accurate as the metadata available. A web page that does not expose its author, its publication date, or a canonical URL produces a partial citation. The generator fills the gaps it can identify (using the URL as a partial publication date proxy, the domain as a partial publisher hint) and flags the rest for you to fill in. The shortest reliable rule for any submission: verify the generated entry against the source itself before submission, especially for any source the extractor could not fully extract.
 
-If you find an entry where the generator's output disagrees with the official style manual — not just incomplete because of source metadata, but actively wrong — that is a bug. The [About page](/about) lists how to report it; corrections are treated as priority work.
+If you find an entry where the generator's output disagrees with the official style manual — not just incomplete because of source metadata, but actively wrong — that is a bug. The [About page](/about/) lists how to report it; corrections are treated as priority work.
 
 ## What to do if a citation looks wrong
 
@@ -64,7 +64,7 @@ In all three cases the same principle applies: a citation is only useful if it m
 
 ## What "My References" does
 
-The [My References](/my-references) page stores every citation you generate, in your browser's local storage. There is no account, no sign-up, and no server-side reference storage. When you generate a citation, it is saved locally and visible on the references page; when you return to the site, the saved references are still there as long as you have not cleared your browser data.
+The [My References](/my-references/) page stores every citation you generate, in your browser's local storage. There is no account, no sign-up, and no server-side reference storage. When you generate a citation, it is saved locally and visible on the references page; when you return to the site, the saved references are still there as long as you have not cleared your browser data.
 
 The feature exists so a research project that takes weeks does not require re-entering source URLs every session. Each saved reference includes the source data, the rendered citation in your selected style, and a timestamp. You can switch the style on the references page to re-render all saved entries in a different style.
 

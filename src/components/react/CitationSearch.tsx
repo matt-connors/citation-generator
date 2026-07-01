@@ -51,7 +51,7 @@ const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeMan
             {/* Form containing search inputs and citation options */}
             <form className={`${styles.searchBox} ${clsx(
                 props.includeDropdown && styles.withDropdown
-            )}`} action="/my-references">
+            )}`} action="/my-references/">
 
                 {/* Dropdown for selecting citation style */}
                 {props.includeDropdown ? <Dropdown
@@ -73,7 +73,7 @@ const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeMan
                 </button>
             </form>
             {props.includeManualCite && (
-                <a href="/my-references" className={styles.smallButton}>
+                <a href="/my-references/" className={styles.smallButton}>
                     <span>Cite Manually</span>
                     <ChevronRightIcon className={styles.icon} aria-hidden="true" />
                 </a>
