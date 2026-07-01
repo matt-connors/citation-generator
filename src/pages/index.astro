@@ -13,9 +13,11 @@ import {
 
 import { buildSoftwareApplication, buildFaqPage } from "../lib/schema-org";
 
-const title = "Free Citation Generator — APA, MLA, Chicago, Harvard, Vancouver, IEEE & AMA";
+export const prerender = true;
+
+const title = "Free Citation Generator for APA, MLA, Chicago & More";
 const description =
-    "Generate accurate citations in APA 7, MLA 9, Chicago 18, Harvard, Vancouver, IEEE, and AMA formats from a URL, DOI, or ISBN. Free, fast, trusted by students worldwide.";
+    "Create APA, MLA, Chicago, Harvard, Vancouver, IEEE, and AMA citations from a URL, DOI, or ISBN. Free, editable, and built for student papers.";
 
 const extraSchemas = [buildSoftwareApplication(), buildFaqPage(faqs)];
 ---
@@ -84,61 +86,55 @@ const extraSchemas = [buildSoftwareApplication(), buildFaqPage(faqs)];
             </nav> -->
             <div id="guide-snippet-content">
                 <p>
-                    Working with sources is a fundamental aspect of academic
-                    writing and research. It involves acknowledging the ideas,
-                    information, and words of others that you use in your work.
-                    Properly citing sources is crucial for maintaining academic
-                    integrity, avoiding plagiarism, and allowing readers to
-                    verify your claims and explore further.
+                    Citation work usually falls apart in small places: a missing
+                    publication date, a title copied in the wrong capitalization,
+                    a URL saved without the article author, or a source entered
+                    in APA when the assignment asked for MLA. MLA Generator is
+                    built around those details. Paste a URL, DOI, or ISBN, pick
+                    the style your paper requires, then review the editable
+                    fields before you copy the finished reference.
                 </p>
 
                 <h3 class="heading-3">Why Cite Sources?</h3>
 
                 <p>
-                    Citing sources is not just about following rules; it's about
-                    respecting intellectual property and contributing to a
-                    scholarly conversation. Here are some key reasons why
-                    citations are essential:
+                    A citation does three jobs at once: it credits the person or
+                    organization behind the source, lets a reader verify the
+                    exact work you used, and shows your instructor which claims
+                    are yours versus borrowed. The format changes by style, but
+                    the underlying evidence trail is the same.
                 </p>
 
                 <ul>
                     <li>
-                        Avoiding Plagiarism: Plagiarism, whether intentional or
-                        accidental, is a serious academic offense. It involves
-                        presenting someone else's work as your own. By citing
-                        your sources, you clearly distinguish between your own
-                        ideas and those of others.
+                        Avoiding plagiarism: a cited paraphrase still needs your
+                        own sentence structure, but the citation makes the
+                        source boundary visible.
                     </li>
                     <li>
-                        Credibility and Authority: Properly cited sources lend
-                        credibility to your work. They demonstrate that your
-                        arguments are supported by evidence and that you have
-                        engaged with relevant literature.
+                        Making verification easy: a reader should be able to
+                        find the same article, book, video, or report you used.
                     </li>
                     <li>
-                        Transparency and Verifiability: Citations allow readers
-                        to trace the origins of your information and verify your
-                        claims. This transparency is crucial for maintaining the
-                        integrity of research.
+                        Matching the assignment: APA, MLA, Chicago, Harvard,
+                        Vancouver, IEEE, and AMA each signal a different field
+                        and set of expectations.
                     </li>
                     <li>
-                        Giving Credit: Citing sources gives credit where credit
-                        is due. It acknowledges the intellectual contributions
-                        of others and helps build a community of knowledge.
-                    </li>
-                    <li>
-                        Further Research: Citations provide a roadmap for
-                        readers who want to delve deeper into a particular
-                        topic. They can follow your citations to explore related
-                        sources and expand their understanding.
+                        Preserving your research trail: saving references while
+                        you work is much easier than reconstructing them the
+                        night before the paper is due.
                     </li>
                 </ul>
 
                 <h3 class="heading-3">What Needs to be Cited?</h3>
 
                 <p>
-                    Any information that is not common knowledge or your own
-                    original idea should be cited. This includes:
+                    Cite anything you learned from a source unless it is common
+                    knowledge for the audience reading your paper. When a fact
+                    surprises you, when wording matters, or when a claim is
+                    specific enough that another writer could dispute it, cite
+                    the source.
                 </p>
 
                 <ul>
@@ -175,48 +171,47 @@ const extraSchemas = [buildSoftwareApplication(), buildFaqPage(faqs)];
                 <h3 class="heading-3">Popular Citation Styles</h3>
 
                 <p>
-                    Different academic disciplines and publications often prefer
-                    specific citation styles. Some of the most common styles
-                    include:
+                    Style choice usually comes from the assignment sheet or the
+                    discipline. These are the patterns students run into most:
                 </p>
 
                 <ul>
                     <li>
-                        <a href="/guides/mla">MLA (Modern Language Association)</a>:
+                        <a href="/guides/mla/">MLA (Modern Language Association)</a>:
                         Widely used in the humanities, particularly in
                         literature, language, and cultural studies.
                     </li>
                     <li>
-                        <a href="/guides/apa">APA (American Psychological Association)</a>:
+                        <a href="/guides/apa/">APA (American Psychological Association)</a>:
                         Common in social sciences, education, and psychology.
                     </li>
                     <li>
-                        <a href="/guides/chicago">Chicago/Turabian</a>: Used in
+                        <a href="/guides/chicago/">Chicago/Turabian</a>: Used in
                         history, art history, and other disciplines.
                     </li>
                     <li>
-                        <a href="/guides/ieee">IEEE</a>: Often used in
+                        <a href="/guides/ieee/">IEEE</a>: Often used in
                         engineering and computer science.
                     </li>
                     <li>
-                        <a href="/guides/harvard">Harvard</a>: A commonly used
+                        <a href="/guides/harvard/">Harvard</a>: A commonly used
                         style across multiple disciplines.
                     </li>
                     <li>
-                        <a href="/guides/vancouver">Vancouver</a>: Often used in
+                        <a href="/guides/vancouver/">Vancouver</a>: Often used in
                         medical and scientific fields.
                     </li>
                     <li>
-                        <a href="/guides/ama">AMA (American Medical Association)</a>:
+                        <a href="/guides/ama/">AMA (American Medical Association)</a>:
                         Used in medicine and the health sciences.
                     </li>
                 </ul>
 
                 <p>
-                    Each citation style has its own specific rules for
-                    formatting in-text citations and the bibliography or works
-                    cited list. You can learn more about these styles in our <a
-                        href="/guides">citation style guides</a
+                    Each citation style has its own rules for in-text citations,
+                    title capitalization, author order, dates, and the final
+                    source list. You can learn more about these styles in our <a
+                        href="/guides/">citation style guides</a
                     >.
                 </p>
 
@@ -226,9 +221,10 @@ const extraSchemas = [buildSoftwareApplication(), buildFaqPage(faqs)];
 
                 <p>
                     <cite>MLA Generator</cite> simplifies the process of creating
-                    citations. Our citation generator can help you quickly format
-                    citations for websites and books in various popular styles, including
-                    MLA, APA, Chicago, and more.
+                    citations by pulling source metadata where it is available
+                    and leaving every field editable when it is not. The tool can
+                    format websites, books, and journal articles in MLA, APA,
+                    Chicago, Harvard, Vancouver, IEEE, and AMA.
                 </p>
 
                 <p>Here's how to use it:</p>
@@ -259,7 +255,7 @@ const extraSchemas = [buildSoftwareApplication(), buildFaqPage(faqs)];
                     </li>
                     <li>
                         Manage your references: You can add and manage your
-                        generated citations on the <a href="/my-references"
+                        generated citations on the <a href="/my-references/"
                             >My References</a
                         > page.
                     </li>
@@ -293,13 +289,11 @@ const extraSchemas = [buildSoftwareApplication(), buildFaqPage(faqs)];
                 <h3 class="heading-3">Conclusion</h3>
 
                 <p>
-                    Working with sources is an integral part of academic
-                    writing. By understanding the principles of citation and
-                    utilizing tools like
-                    <a href="/">MLA Generator</a>, you
-                    can ensure that your work is ethical, credible, and
-                    well-supported. Remember to cite your sources diligently and
-                    accurately to contribute to a culture of academic integrity.
+                    The generator handles the punctuation and ordering; the
+                    academic judgment is still yours. Check that the source is
+                    reliable, confirm the detected fields, and keep enough notes
+                    that every quote or paraphrase in your paper can be traced
+                    back to the right reference.
                 </p>
             </div>
         </div>
@@ -317,7 +311,7 @@ const extraSchemas = [buildSoftwareApplication(), buildFaqPage(faqs)];
                     );
                 })
             }
-            <a href="/my-references" class="button-primary">
+            <a href="/my-references/" class="button-primary">
                 <span>View My References</span>
                 <ArrowUpRightIcon className="button-icon" />
             </a>

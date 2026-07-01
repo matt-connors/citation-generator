@@ -12,7 +12,9 @@
     "watch": "nodemon --ext tsx,astro,html,css --exec npm run build-tailwind",
     "build-tailwind": "tailwindcss -i ./src/styles/tailwind.css -o ./src/styles/tailwind-output.css",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "indexnow:dry-run": "node scripts/submit-indexnow.mjs --dry-run",
+    "indexnow:submit": "node scripts/submit-indexnow.mjs"
   },
   "author": "",
   "license": "ISC",

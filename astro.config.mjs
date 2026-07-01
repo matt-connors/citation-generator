@@ -87,6 +87,7 @@ export default defineConfig({
             serialize(item) {
                 const pathname = new URL(item.url).pathname.replace(/\/$/, '') || '/';
                 if (pathname.startsWith('/admin')) return undefined;
+                if (pathname === '/privacy' || pathname === '/terms') return undefined;
                 // Honest per-guide last-modified date from frontmatter, where we have one.
                 if (GUIDE_LASTMOD[pathname]) item.lastmod = GUIDE_LASTMOD[pathname];
                 // Tier priority to match the link-graph emphasis: the generator,
