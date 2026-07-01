@@ -5,7 +5,7 @@ const faqs = [
     },
     {
         question: "What elements are included in an MLA citation?",
-        answer: "<p>An MLA citation typically consists of the author's information, the title of the work you're referencing, publication details (publisher, date), and sometimes additional elements depending on the source type. For instance, you might need to include page numbers for books or website URLs for online sources.</p><p>If you're unsure about a specific source type, don't worry! Our comprehensive <a href=''>MLA formatting guide</a> dives deeper into various citation formats and provides clear instructions to ensure you get it right every time.</p>",
+        answer: "<p>An MLA citation typically consists of the author's information, the title of the work you're referencing, publication details (publisher, date), and sometimes additional elements depending on the source type. For instance, you might need to include page numbers for books or website URLs for online sources.</p><p>If you're unsure about a specific source type, don't worry! Our comprehensive <a href='/guides/mla/'>MLA formatting guide</a> dives deeper into various citation formats and provides clear instructions to ensure you get it right every time.</p>",
     },
     {
         question: "How does MLA Generator work?",
