@@ -14,8 +14,8 @@ function frontmatterField(source: string, key: string): string {
 }
 
 function pageConstant(source: string, key: 'title' | 'description'): string | null {
-  const match = source.match(new RegExp(`const ${key} =\\s*["']([^"']+)["'];`, 'm'));
-  return match?.[1] ?? null;
+  const match = source.match(new RegExp(`const ${key} =\\s*(["'])((?:(?!\\1).)*)\\1;`, 'm'));
+  return match?.[2] ?? null;
 }
 
 describe('SEO metadata', () => {
