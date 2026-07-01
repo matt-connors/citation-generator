@@ -17,6 +17,7 @@ interface Props {
         tags?: string[];
     };
     extraSchemas?: object[];
+    robots?: string;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -28,7 +29,11 @@ const {
     pageType = 'website',
     article,
     extraSchemas = [],
+    robots = 'index, follow',
 } = Astro.props;
+const googlebot = robots.startsWith('noindex')
+    ? robots
+    : 'index, follow, max-image-preview:large, max-snippet:-1';
 
 // One connected JSON-LD graph per page: the Organization + WebSite are the
 // shared root, and page-specific nodes (Article, BreadcrumbList, FAQPage, …)
@@ -54,8 +59,8 @@ const schemaGraph = buildGraph([buildOrganization(), buildWebSite(), ...extraSch
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 
-<meta name="robots" content="index, follow" />
-<meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="robots" content={robots} />
+<meta name="googlebot" content={googlebot} />
 
 <meta property="og:type" content={pageType} />
 <meta property="og:url" content={canonicalURL} />

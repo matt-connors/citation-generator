@@ -1,12 +1,14 @@
 ---
 import Layout from "../layouts/page.astro";
 
+export const prerender = true;
+
 const title = "Terms of Service — MLA Generator";
 const description =
     "Terms of Service for MLA Generator, a free citation generation website.";
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} robots="noindex, follow">
     <article class="legal">
         <h1>Terms of Service</h1>
 

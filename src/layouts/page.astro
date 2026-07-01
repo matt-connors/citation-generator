@@ -17,9 +17,10 @@ interface Props {
         tags?: string[];
     };
     extraSchemas?: object[];
+    robots?: string;
 }
 
-const { title, description, image, pageType, article, extraSchemas } = Astro.props;
+const { title, description, image, pageType, article, extraSchemas, robots } = Astro.props;
 ---
 
 <!doctype html>
@@ -32,6 +33,7 @@ const { title, description, image, pageType, article, extraSchemas } = Astro.pro
             pageType={pageType}
             article={article}
             extraSchemas={extraSchemas}
+            robots={robots}
         />
     </head>
     <body style="margin: 0 !important;">
