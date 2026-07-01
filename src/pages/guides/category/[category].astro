@@ -29,7 +29,7 @@ const description = cat.description;
 const breadcrumbSchema = buildBreadcrumbList([
     { name: 'Home', url: new URL('/', Astro.site).href },
     { name: 'Guides', url: new URL('/guides/', Astro.site).href },
-    { name: cat.label, url: new URL(`${categoryPath(cat.key)}/`, Astro.site).href },
+    { name: cat.label, url: new URL(categoryPath(cat.key), Astro.site).href },
 ]);
 ---
 

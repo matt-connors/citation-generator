@@ -61,7 +61,7 @@ const category = categoryByKey(entry.data.category);
 const breadcrumbSchema = buildBreadcrumbList([
     { name: 'Home', url: `${site}/` },
     { name: 'Guides', url: `${site}/guides/` },
-    ...(category ? [{ name: category.label, url: `${site}${categoryPath(category.key)}/` }] : []),
+    ...(category ? [{ name: category.label, url: `${site}${categoryPath(category.key)}` }] : []),
     { name: entry.data.title, url: pageUrl },
 ]);
 
