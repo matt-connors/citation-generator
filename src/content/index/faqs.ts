@@ -1,37 +1,27 @@
 const faqs = [
     {
         question: "What is MLA format?",
-        answer: "<p>MLA (Modern Language Association) format is a widely used citation style within the humanities and liberal arts. It offers a standardized method for documenting sources you use in research papers. Following MLA format ensures your citations are clear, consistent, and easily understood by readers and educators.</p>",
+        answer: "<p>MLA (Modern Language Association) format is the citation style used across the humanities — literature, languages, and cultural studies. The current <a href='/guides/mla/'>MLA 9th edition</a> standardizes two things: brief in-text citations (an author's surname and a page number) and a full Works Cited list, so any reader can trace exactly where your information came from.</p>",
     },
     {
         question: "What elements are included in an MLA citation?",
-        answer: "<p>An MLA citation typically consists of the author's information, the title of the work you're referencing, publication details (publisher, date), and sometimes additional elements depending on the source type. For instance, you might need to include page numbers for books or website URLs for online sources.</p><p>If you're unsure about a specific source type, don't worry! Our comprehensive <a href='/guides/mla/'>MLA formatting guide</a> dives deeper into various citation formats and provides clear instructions to ensure you get it right every time.</p>",
+        answer: "<p>MLA 9 builds every Works Cited entry from the same nine core elements, used in a fixed order and only when they apply: author; title of source; title of container (the larger work it sits in); other contributors; version; number; publisher; publication date; and location (a page range, URL, or DOI). Our <a href='/guides/mla/'>MLA formatting guide</a> shows how each source type maps onto them, with a worked example for every one.</p>",
     },
     {
         question: "How does MLA Generator work?",
-        answer: "<p>Our MLA Generator is designed to simplify the process of creating citations in MLA format. It's a user-friendly tool that allows you to generate citations for a wide range of sources, including books, journal articles, and websites. Simply select the source type, fill in the required fields, and our MLA citation generator will do the rest!</p>",
+        answer: "<p>Paste a website's URL or a book's ISBN and choose your style. The tool fetches the page and reads the metadata publishers embed — or looks the ISBN up in book databases — then a structured citation engine formats the full reference. Every field stays editable, so you can correct or add anything the source didn't provide before you copy it. It works in all seven major styles, not just MLA.</p>",
     },
     {
         question: "What types of sources can your generator handle?",
-        answer: `
-            <p>Our MLA Generator can handle a wide range of source types, including:</p>
-            <ul>
-                <li>Books</li>
-                <li>Journal articles</li>
-                <li>Websites</li>
-                <li>eBooks</li>
-                <li>Videos</li>
-                <li>And more!</li>
-            </ul>
-        `,
+        answer: "<p>Automatically, from a link or ISBN: websites and books. Journal articles can be added by hand in the editor. For other source types — videos, images, and more — our <a href='/guides/'>citation guides</a> show you exactly how to format each one in every style.</p>",
     },
     {
         question: "Is MLA Generator accurate?",
-        answer: "<p>Yes! Our MLA Generator is designed to produce accurate citations that comply with the latest MLA guidelines. We stay up-to-date with any changes to the MLA format to ensure our tool consistently delivers reliable results.</p>",
+        answer: "<p>The formatting is deterministic: punctuation, italics, and author order are applied by a structured citation engine against the published style manuals, not guessed. What still needs a human eye is the source data — automatically detected fields, especially the author and date on web pages, can be incomplete or wrong, so review them before you cite. Every guide on this site is written and reviewed against its style's current edition.</p>",
     },
     {
         question: "Is MLA Generator free to use?",
-        answer: "<p>Yes! Our MLA Generator is completely free to use. We believe that everyone should have access to the tools they need to succeed, which is why we offer our citation generator at no cost.</p><p>Whether you're a student, educator, or researcher, our MLA Generator is here to help you create accurate citations in a matter of seconds.</p>",
+        answer: "<p>Yes — completely free, with no account or sign-up. Every citation you generate is saved to your <a href='/my-references/'>My References</a> list in your browser's local storage, so it is still there when you come back. Clearing your browser data clears the list.</p>",
     },
 ];
 
