@@ -63,7 +63,7 @@ const category = categoryByKey(frontmatter.category);
                     { name: 'Home', href: '/' },
                     { name: 'Guides', href: '/guides/' },
                     ...(category ? [{ name: category.label, href: categoryPath(category.key) }] : []),
-                    { name: frontmatter.title, href: `/guides/${slug}`, current: true },
+                    { name: frontmatter.title, href: `/guides/${slug}/`, current: true },
                 ]}
             />
             <h1>{frontmatter.title}</h1>

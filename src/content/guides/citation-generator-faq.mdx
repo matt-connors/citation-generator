@@ -10,7 +10,7 @@ faq:
   - question: 'How accurate are the generated citations?'
     answer: 'Every citation is rendered using the official Citation Style Language (CSL) definitions through citeproc-js — the same engine used by Zotero, Mendeley, and Pandoc. Output that comes from a complete set of source metadata (a DOI for a journal article, an ISBN for a book, full JSON-LD on a web page) is accurate to the style manual. Output from incomplete metadata is only as accurate as the metadata available — a web page with no author, no publication date, and no canonical URL produces a partial citation that needs manual review. The shortest reliable rule: verify the generated entry against the source itself before submission, especially for any source the generator could not fully extract.'
   - question: 'Which citation styles do you support?'
-    answer: 'Seven styles, each current as of 2026: APA 7th Edition (2020), MLA 9th Edition (2021), Chicago Manual of Style 18th Edition, Harvard (Cite Them Right 12th Edition), Vancouver (ICMJE recommendations), IEEE (current edition of the IEEE Editorial Style Manual), and AMA Manual of Style 11th Edition. Each style produces output that follows its current edition''s rules. Style updates are tracked on the [What''s New](/guides/whats-new) page.'
+    answer: 'Seven styles, each current as of 2026: APA 7th Edition (2020), MLA 9th Edition (2021), Chicago Manual of Style 18th Edition, Harvard (Cite Them Right 12th Edition), Vancouver (ICMJE recommendations), IEEE (current edition of the IEEE Editorial Style Manual), and AMA Manual of Style 11th Edition. Each style produces output that follows its current edition''s rules. Style updates are tracked on the [What''s New](/guides/whats-new/) page.'
   - question: 'What source types can the generator handle?'
     answer: 'URLs (any web page), DOIs (for journal articles), ISBNs (for books), and manual entry for any source type that doesn''t have a discoverable identifier. The URL extractor reads multiple signal sources in parallel — JSON-LD, Open Graph, Twitter cards, microdata, meta tags, and HTML heuristics — and merges them into a best-confidence reference. ISBNs are resolved against Google Books and Open Library; DOIs are resolved against Crossref and OpenAlex. For source types the automatic extractors do not cover (interviews you conducted, in-class lectures, archived material), use the manual-entry form.'
   - question: 'Can I save my citations?'
@@ -72,7 +72,7 @@ What the feature does not do: sync across devices, back up to a server, export t
 
 ## Privacy
 
-There is no account, no email signup, and no server-side storage of your reference list — references live in your browser's local storage. Standard web logging (IP address, browser type, referring URL) applies, and we use privacy-friendly, cookieless Cloudflare analytics; the site does not currently serve ads or use advertising cookies. The full details — what is collected, how long it is retained, and your rights — are documented on the [privacy page](/privacy).
+There is no account, no email signup, and no server-side storage of your reference list — references live in your browser's local storage. Standard web logging (IP address, browser type, referring URL) applies, and we use privacy-friendly, cookieless Cloudflare analytics; the site does not currently serve ads or use advertising cookies. The full details — what is collected, how long it is retained, and your rights — are documented on the [privacy page](/privacy/).
 
 ## Browser and device support
 

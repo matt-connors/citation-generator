@@ -1,0 +1,25 @@
+# MLA Generator
+
+> Free citation generator for APA, MLA, Chicago, Harvard, Vancouver, IEEE, and AMA. Create accurate references and in-text citations from a URL, DOI, or ISBN — formatted by a deterministic CSL/citeproc engine and editable before you copy.
+
+MLA Generator builds citations from real source metadata (fetched from a URL, or looked up by DOI/ISBN), formats them with a structured citation engine rather than free-text generation, and saves references locally in the browser. It supports the seven major academic citation styles and each edition-accurate guide is written and reviewed by the MLA Generator Editorial Team.
+
+## Citation generators
+- [APA Citation Generator](https://mlagenerator.com/apa-citation-generator/): APA 7th edition references and in-text citations.
+- [MLA Citation Generator](https://mlagenerator.com/mla-citation-generator/): MLA 9th edition Works Cited entries.
+- [Chicago Citation Generator](https://mlagenerator.com/chicago-citation-generator/): Chicago 18th edition (author–date).
+- [Harvard Referencing Generator](https://mlagenerator.com/harvard-referencing-generator/): Cite Them Right 12th edition.
+- [IEEE Citation Generator](https://mlagenerator.com/ieee-citation-generator/): numeric IEEE reference style.
+- [AMA Citation Generator](https://mlagenerator.com/ama-citation-generator/): AMA 11th edition.
+- [Vancouver Citation Generator](https://mlagenerator.com/vancouver-citation-generator/): NLM/Vancouver numeric style.
+
+## Guides
+- [Citation Guides hub](https://mlagenerator.com/guides/): edition-accurate guides for every style and source type.
+- [How to Cite a Website](https://mlagenerator.com/guides/how-to-cite-a-website/)
+- [How to Cite a Book](https://mlagenerator.com/guides/how-to-cite-a-book/)
+- [How to Cite a Journal Article](https://mlagenerator.com/guides/how-to-cite-a-journal-article/)
+- [In-Text Citations](https://mlagenerator.com/guides/in-text-citations/)
+- [Research and Works Cited](https://mlagenerator.com/guides/research-and-works-cited/)
+
+## About
+- [About & editorial methodology](https://mlagenerator.com/about/): how citations are built, the manuals followed, and how accuracy is maintained.
