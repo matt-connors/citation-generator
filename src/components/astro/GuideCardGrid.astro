@@ -15,7 +15,7 @@ const { items } = Astro.props;
 <ul class="guide-grid">
     {items.map((g) => (
         <li>
-            <a href={`/guides/${g.slug}`}>
+            <a href={`/guides/${g.slug}/`}>
                 <span class="guide-title">{g.data.title}</span>
                 <span class="guide-desc">{g.data.description}</span>
             </a>
