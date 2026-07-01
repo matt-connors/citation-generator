@@ -1,12 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { onRequest } from '../functions/_middleware';
 
-// onRequest = [errorHandling, adminAuth, cors]; compose them the way Cloudflare
-// Pages does: errorHandling wraps adminAuth wraps cors wraps the route handler.
+// onRequest = [errorHandling, adminAuth, trailingSlash, cors]; compose them the
+// way Cloudflare Pages does: each wraps the next, out to the route handler.
 function run(request: Request, route: () => Promise<Response>, env: Record<string, unknown> = {}) {
-  const [errorHandling, adminAuth, cors] = onRequest as any[];
+  const [errorHandling, adminAuth, trailingSlash, cors] = onRequest as any[];
   const corsCtx = { request, env, next: route };
-  const authCtx = { request, env, next: () => cors(corsCtx) };
+  const tsCtx = { request, env, next: () => cors(corsCtx) };
+  const authCtx = { request, env, next: () => trailingSlash(tsCtx) };
   const errCtx = { request, env, next: () => adminAuth(authCtx) };
   return errorHandling(errCtx) as Promise<Response>;
 }
@@ -50,5 +51,45 @@ describe('_middleware', () => {
     const res = await run(new Request('https://m.com/admin'), async () => new Response('admin'), {});
     expect(res.status).toBe(503);
     expect(res.headers.get('Access-Control-Allow-Origin')).toBeNull();
+  });
+
+  it('308-redirects a no-slash SSR page path to add the trailing slash, skipping the route', async () => {
+    let routeHit = false;
+    const res = await run(
+      new Request('https://m.com/guides'),
+      async () => { routeHit = true; return new Response('x'); },
+    );
+    expect(res.status).toBe(308);
+    expect(res.headers.get('location')).toBe('https://m.com/guides/');
+    expect(routeHit).toBe(false);
+  });
+
+  it('preserves the query string when adding the trailing slash', async () => {
+    const res = await run(
+      new Request('https://m.com/about?ref=x'),
+      async () => new Response('x'),
+    );
+    expect(res.status).toBe(308);
+    expect(res.headers.get('location')).toBe('https://m.com/about/?ref=x');
+  });
+
+  it('leaves paths that already end in a slash alone', async () => {
+    const res = await run(
+      new Request('https://m.com/guides/'),
+      async () => new Response('ok', { status: 200 }),
+    );
+    expect(res.status).toBe(200);
+    expect(await res.text()).toBe('ok');
+  });
+
+  it('does not add a trailing slash to API, Astro-internal, or file paths', async () => {
+    for (const path of ['/api/format', '/_image', '/robots.txt']) {
+      const res = await run(
+        new Request(`https://m.com${path}`),
+        async () => new Response('passed', { status: 200 }),
+      );
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe('passed');
+    }
   });
 });

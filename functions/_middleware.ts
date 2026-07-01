@@ -152,4 +152,32 @@ const cors: PagesFunction<Env> = async (context) => {
     return response;
 }
 
-export const onRequest = [errorHandling, adminAuth, cors];
+/**
+ * Trailing-slash canonicalization for SSR routes. The site is
+ * trailingSlash:'always', and Cloudflare Pages already 308s no-slash requests
+ * for prerendered (static) assets. But SSR routes served by this worker
+ * (/about, /guides, /my-references, /admin/analytics) get a 404 from Astro for
+ * their no-slash form instead of a redirect, so add the slash here. Runs after
+ * adminAuth (so /admin stays gated), and skips the API, Astro's internal
+ * endpoints (/_image, /_astro), file paths, and paths that already end in '/'.
+ */
+const trailingSlash: PagesFunction<Env> = async (context) => {
+    const url = new URL(context.request.url);
+    const { pathname } = url;
+    const lastSegment = pathname.slice(pathname.lastIndexOf('/') + 1);
+    if (
+        !pathname.endsWith('/') &&
+        !pathname.startsWith('/api/') &&
+        !pathname.startsWith('/_') &&
+        !lastSegment.includes('.')
+    ) {
+        url.pathname = `${pathname}/`;
+        return new Response(null, {
+            status: 308,
+            headers: { location: url.toString() },
+        });
+    }
+    return context.next();
+};
+
+export const onRequest = [errorHandling, adminAuth, trailingSlash, cors];

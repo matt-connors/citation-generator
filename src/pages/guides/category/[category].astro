@@ -29,7 +29,7 @@ const description = cat.description;
 const breadcrumbSchema = buildBreadcrumbList([
     { name: 'Home', url: new URL('/', Astro.site).href },
     { name: 'Guides', url: new URL('/guides/', Astro.site).href },
-    { name: cat.label, url: new URL(`${categoryPath(cat.key)}/`, Astro.site).href },
+    { name: cat.label, url: new URL(categoryPath(cat.key), Astro.site).href },
 ]);
 ---
 
@@ -38,7 +38,7 @@ const breadcrumbSchema = buildBreadcrumbList([
         <Breadcrumbs
             items={[
                 { name: 'Home', href: '/' },
-                { name: 'Guides', href: '/guides' },
+                { name: 'Guides', href: '/guides/' },
                 { name: cat.label, href: categoryPath(cat.key), current: true },
             ]}
         />
@@ -49,7 +49,7 @@ const breadcrumbSchema = buildBreadcrumbList([
 
         <GuideCardGrid items={items} />
 
-        <p class="back-link"><a href="/guides">← All citation guides</a></p>
+        <p class="back-link"><a href="/guides/">← All citation guides</a></p>
     </article>
 </Layout>
 

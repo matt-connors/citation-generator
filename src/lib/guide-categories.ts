@@ -64,5 +64,5 @@ export function categoryByKey(key: string): GuideCategory | undefined {
 }
 
 export function categoryPath(key: string): string {
-    return `/guides/category/${key}`;
+    return `/guides/category/${key}/`;
 }

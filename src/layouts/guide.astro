@@ -61,7 +61,7 @@ const category = categoryByKey(frontmatter.category);
             <Breadcrumbs
                 items={[
                     { name: 'Home', href: '/' },
-                    { name: 'Guides', href: '/guides' },
+                    { name: 'Guides', href: '/guides/' },
                     ...(category ? [{ name: category.label, href: categoryPath(category.key) }] : []),
                     { name: frontmatter.title, href: `/guides/${slug}`, current: true },
                 ]}
@@ -82,7 +82,7 @@ const category = categoryByKey(frontmatter.category);
                 <RelatedGuides slugs={frontmatter.relatedGuides} />
             )}
             <p class="editorial-link">
-                <a href="/about">Editorial methodology and sources</a>
+                <a href="/about/">Editorial methodology and sources</a>
             </p>
         </div>
     </article>
