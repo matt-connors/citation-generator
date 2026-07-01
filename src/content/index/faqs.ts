@@ -9,11 +9,11 @@ const faqs = [
     },
     {
         question: "How does MLA Generator work?",
-        answer: "<p>Paste a website's URL or a book's ISBN and choose your style. The tool fetches the page and reads the metadata publishers embed — or looks the ISBN up in book databases — then a structured citation engine formats the reference and the matching in-text citation. Every field stays editable, so you can correct or add anything the source didn't provide before you copy it. It works in all seven major styles, not just MLA.</p>",
+        answer: "<p>Paste a website's URL or a book's ISBN and choose your style. The tool fetches the page and reads the metadata publishers embed — or looks the ISBN up in book databases — then a structured citation engine formats the full reference. Every field stays editable, so you can correct or add anything the source didn't provide before you copy it. It works in all seven major styles, not just MLA.</p>",
     },
     {
         question: "What types of sources can your generator handle?",
-        answer: "<p>Automatically, from a link or ISBN: websites and books. For any other source type — journal articles, videos, images, reports, and more — you can enter the details by hand, and the <a href='/guides/'>citation guides</a> walk through exactly which fields each type needs in every style.</p>",
+        answer: "<p>Automatically, from a link or ISBN: websites and books. Journal articles can be added by hand in the editor. For other source types — videos, images, and more — our <a href='/guides/'>citation guides</a> show you exactly how to format each one in every style.</p>",
     },
     {
         question: "Is MLA Generator accurate?",
