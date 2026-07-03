@@ -49,11 +49,103 @@ export interface CSLItem {
   abstract?: string;
 }
 
+export type AcquisitionSource =
+  | 'fetch'
+  | 'render'
+  | 'ai'
+  | 'authority'
+  | 'extension'
+  | 'paste'
+  | 'input'
+  | 'user';
+
+export type EvidenceSource =
+  | 'input'
+  | 'jsonld'
+  | 'microdata'
+  | 'opengraph'
+  | 'twitter'
+  | 'meta'
+  | 'heuristic'
+  | 'fetch-html'
+  | 'rendered-html'
+  | 'browser-extension'
+  | 'pasted-text'
+  | 'crossref'
+  | 'openalex'
+  | 'openlibrary'
+  | 'google-books'
+  | 'ai-extract'
+  | 'user-edit';
+
+export interface FieldEvidence {
+  field: keyof CSLItem;
+  normalizedValue: unknown;
+  rawValue?: string;
+  source: EvidenceSource;
+  acquisition?: AcquisitionSource;
+  locator?: string;
+  snippet?: string;
+  confidence: number;
+  acquiredAt?: string;
+}
+
+export interface FieldProvenance {
+  winner?: FieldEvidence;
+  candidates: FieldEvidence[];
+  conflicts: FieldEvidence[];
+}
+
+export type AcquisitionStatus =
+  | 'success'
+  | 'partial'
+  | 'blocked'
+  | 'timeout'
+  | 'error'
+  | 'skipped';
+
+export interface AcquisitionAttempt {
+  source: AcquisitionSource;
+  status: AcquisitionStatus;
+  reason?: string;
+  url?: string;
+  finalUrl?: string;
+  durationMs?: number;
+  htmlSizeKb?: number;
+  browserMs?: number;
+  fieldsFound?: string[];
+}
+
+export interface CitationQualityWarning {
+  code: string;
+  field?: keyof CSLItem;
+  severity: 'info' | 'review' | 'warning' | 'error';
+  message: string;
+  action:
+    | 'none'
+    | 'review-field'
+    | 'choose-source-type'
+    | 'confirm-no-listed-author'
+    | 'try-rendered-page'
+    | 'use-extension'
+    | 'paste-text'
+    | 'enter-manually';
+  evidence?: FieldEvidence[];
+}
+
+export interface ExtractQuality {
+  score: number;
+  warnings: CitationQualityWarning[];
+  acquisition?: Partial<Record<AcquisitionSource, AcquisitionAttempt>>;
+}
+
 export interface ExtractEnvelope {
   uuid: string;
   type: CSLType;
   csl: CSLItem;
   _signals?: Record<string, string>;
+  _provenance?: Partial<Record<keyof CSLItem, FieldProvenance>>;
+  _quality?: ExtractQuality;
   _cached?: boolean;
 }
 

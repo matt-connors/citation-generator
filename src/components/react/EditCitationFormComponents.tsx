@@ -2,17 +2,19 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "./Input";
 import { cn } from "./utils";
 import { Button } from "./Button";
-import { Building2, Calendar, ChevronDown, Trash2, UserRound } from "lucide-react";
+import { AlertTriangle, Building2, Calendar, ChevronDown, Trash2, UserRound, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./Tabs";
 import type { CSLDate, CSLName } from "../../lib/citations/csl-types";
 import type { Option } from './Dropdown';
 import SimpleDropdown from './SimpleDropdown';
+import styles from '../../styles/references.module.css';
 
 interface TextComponentProps {
     value: string;
     onChange: (value: string) => void;
     isRequired?: boolean;
     isRecommended?: boolean;
+    warning?: FieldWarning;
 }
 
 interface DateComponentProps {
@@ -20,6 +22,14 @@ interface DateComponentProps {
     onChange: (value: CSLDate | undefined) => void;
     isRequired?: boolean;
     isRecommended?: boolean;
+    warning?: FieldWarning;
+}
+
+export interface FieldWarning {
+    message: string;
+    severity?: 'info' | 'review' | 'warning' | 'error';
+    dismissible?: boolean;
+    onDismiss?: () => void;
 }
 
 // Add months array at the top level
@@ -47,6 +57,7 @@ export const Line = ({ className }: { className?: string }) => <div className={c
 interface ContributorsProps {
     authors: CSLName[];
     onChange: (authors: CSLName[]) => void;
+    warning?: FieldWarning;
 }
 
 const isPerson = (n: CSLName): n is Exclude<CSLName, { literal: string }> => !('literal' in n);
@@ -54,7 +65,7 @@ const isPerson = (n: CSLName): n is Exclude<CSLName, { literal: string }> => !('
 /**
  * Contributors component — operates on CSL-JSON `author` arrays.
  */
-export const Contributors = ({ authors, onChange }: ContributorsProps) => {
+export const Contributors = ({ authors, onChange, warning }: ContributorsProps) => {
     // Stable per-row ids kept parallel to `authors`, used as React keys and to
     // track the expanded row. Index keys + an uncontrolled <details> meant that
     // deleting a middle contributor left the wrong row expanded showing another
@@ -171,6 +182,7 @@ export const Contributors = ({ authors, onChange }: ContributorsProps) => {
                         <span className="leading-none">Add Organization</span>
                     </Button>
                 </div>
+                <FieldWarningText warning={warning} />
             </div>
         </div>
     );
@@ -186,6 +198,42 @@ const LabelledInput = ({ label, value, onChange, recommended }: { label: string;
     </label>
 );
 
+const FieldWarningText = ({ warning }: { warning?: FieldWarning }) => {
+    if (!warning) return null;
+    const handleDismiss = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        warning.onDismiss?.();
+    };
+    return (
+        <p
+            className={cn("m-0 flex items-center gap-1.5 text-xs leading-5", styles.fieldWarningText)}
+            data-severity={warning.severity || 'review'}
+        >
+            <AlertTriangle size={13} strokeWidth={1.7} className="shrink-0" aria-hidden="true" />
+            <span className={styles.fieldWarningMessage}>{warning.message}</span>
+            {warning.dismissible && warning.onDismiss && (
+                <button
+                    type="button"
+                    className={styles.fieldWarningDismiss}
+                    onClick={handleDismiss}
+                    aria-label={`Dismiss warning: ${warning.message}`}
+                    title="Dismiss warning"
+                >
+                    <X className={styles.fieldWarningDismissIcon} aria-hidden="true" />
+                </button>
+            )}
+        </p>
+    );
+};
+
+const FieldInputStack = ({ children, warning }: { children: React.ReactNode; warning?: FieldWarning }) => (
+    <div className="flex min-w-0 flex-col gap-1.5">
+        {children}
+        <FieldWarningText warning={warning} />
+    </div>
+);
+
 /**
  * Title component
  * @param value - The value to display
@@ -193,7 +241,7 @@ const LabelledInput = ({ label, value, onChange, recommended }: { label: string;
  * @param isRequired - Whether the field is required
  * @param isRecommended - Whether the field is recommended
  */
-export const Title = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+export const Title = ({ value, onChange, isRequired, isRecommended, warning }: TextComponentProps) => {
     return (
         <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
@@ -201,12 +249,14 @@ export const Title = ({ value, onChange, isRequired, isRecommended }: TextCompon
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
-            <Input
-                placeholder="Title"
-                type="text"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-            />
+            <FieldInputStack warning={warning}>
+                <Input
+                    placeholder="Title"
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                />
+            </FieldInputStack>
         </label>
     )
 }
@@ -218,7 +268,7 @@ export const Title = ({ value, onChange, isRequired, isRecommended }: TextCompon
  * @param isRequired - Whether the field is required
  * @param isRecommended - Whether the field is recommended
  */
-export const Name = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+export const Name = ({ value, onChange, isRequired, isRecommended, warning }: TextComponentProps) => {
     return (
         <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
@@ -226,12 +276,14 @@ export const Name = ({ value, onChange, isRequired, isRecommended }: TextCompone
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
-            <Input
-                placeholder="Name"
-                type="text"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-            />
+            <FieldInputStack warning={warning}>
+                <Input
+                    placeholder="Name"
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                />
+            </FieldInputStack>
         </label>
     )
 }
@@ -243,7 +295,7 @@ export const Name = ({ value, onChange, isRequired, isRecommended }: TextCompone
  * @param isRequired - Whether the field is required
  * @param isRecommended - Whether the field is recommended
  */
-export const WebsiteName = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+export const WebsiteName = ({ value, onChange, isRequired, isRecommended, warning }: TextComponentProps) => {
     return (
         <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
@@ -251,12 +303,14 @@ export const WebsiteName = ({ value, onChange, isRequired, isRecommended }: Text
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
-            <Input
-                placeholder="Website Name"
-                type="text"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-            />
+            <FieldInputStack warning={warning}>
+                <Input
+                    placeholder="Website Name"
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                />
+            </FieldInputStack>
         </label>
     )
 }
@@ -268,7 +322,7 @@ export const WebsiteName = ({ value, onChange, isRequired, isRecommended }: Text
  * @param isRequired - Whether the field is required
  * @param isRecommended - Whether the field is recommended
  */
-export const Edition = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+export const Edition = ({ value, onChange, isRequired, isRecommended, warning }: TextComponentProps) => {
     return (
         <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
@@ -276,12 +330,14 @@ export const Edition = ({ value, onChange, isRequired, isRecommended }: TextComp
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
-            <Input
-                placeholder="e.g., 3"
-                type="text"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-            />
+            <FieldInputStack warning={warning}>
+                <Input
+                    placeholder="e.g., 3"
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                />
+            </FieldInputStack>
         </label>
     )
 }
@@ -293,7 +349,7 @@ export const Edition = ({ value, onChange, isRequired, isRecommended }: TextComp
  * @param isRequired - Whether the field is required
  * @param isRecommended - Whether the field is recommended
  */
-export const VolumeNumber = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+export const VolumeNumber = ({ value, onChange, isRequired, isRecommended, warning }: TextComponentProps) => {
     return (
         <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
@@ -301,12 +357,74 @@ export const VolumeNumber = ({ value, onChange, isRequired, isRecommended }: Tex
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
-            <Input
-                placeholder="Volume number"
-                type="text"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-            />
+            <FieldInputStack warning={warning}>
+                <Input
+                    placeholder="Volume number"
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                />
+            </FieldInputStack>
+        </label>
+    )
+}
+
+export const IssueNumber = ({ value, onChange, isRequired, isRecommended, warning }: TextComponentProps) => {
+    return (
+        <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
+            <span className="flex flex-col leading-4 text-sm">
+                Issue Number
+                {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
+                {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
+            </span>
+            <FieldInputStack warning={warning}>
+                <Input
+                    placeholder="Issue number"
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                />
+            </FieldInputStack>
+        </label>
+    )
+}
+
+export const PageRange = ({ value, onChange, isRequired, isRecommended, warning }: TextComponentProps) => {
+    return (
+        <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
+            <span className="flex flex-col leading-4 text-sm">
+                Page Range
+                {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
+                {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
+            </span>
+            <FieldInputStack warning={warning}>
+                <Input
+                    placeholder="Page range"
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                />
+            </FieldInputStack>
+        </label>
+    )
+}
+
+export const JournalName = ({ value, onChange, isRequired, isRecommended, warning }: TextComponentProps) => {
+    return (
+        <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
+            <span className="flex flex-col leading-4 text-sm">
+                Journal Name
+                {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
+                {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
+            </span>
+            <FieldInputStack warning={warning}>
+                <Input
+                    placeholder="Journal name"
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                />
+            </FieldInputStack>
         </label>
     )
 }
@@ -318,7 +436,7 @@ export const VolumeNumber = ({ value, onChange, isRequired, isRecommended }: Tex
  * @param isRequired - Whether the field is required
  * @param isRecommended - Whether the field is recommended
  */
-export const Publisher = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+export const Publisher = ({ value, onChange, isRequired, isRecommended, warning }: TextComponentProps) => {
     return (
         <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
@@ -326,12 +444,14 @@ export const Publisher = ({ value, onChange, isRequired, isRecommended }: TextCo
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
-            <Input
-                placeholder="Publisher"
-                type="text"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-            />
+            <FieldInputStack warning={warning}>
+                <Input
+                    placeholder="Publisher"
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                />
+            </FieldInputStack>
         </label>
     )
 }
@@ -343,7 +463,7 @@ export const Publisher = ({ value, onChange, isRequired, isRecommended }: TextCo
  * @param isRequired - Whether the field is required
  * @param isRecommended - Whether the field is recommended
  */
-export const Medium = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+export const Medium = ({ value, onChange, isRequired, isRecommended, warning }: TextComponentProps) => {
     return (
         <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
@@ -351,12 +471,14 @@ export const Medium = ({ value, onChange, isRequired, isRecommended }: TextCompo
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
-            <Input
-                placeholder="Medium"
-                type="text"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-            />
+            <FieldInputStack warning={warning}>
+                <Input
+                    placeholder="Medium"
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                />
+            </FieldInputStack>
         </label>
     )
 }
@@ -368,7 +490,7 @@ export const Medium = ({ value, onChange, isRequired, isRecommended }: TextCompo
  * @param isRequired - Whether the field is required
  * @param isRecommended - Whether the field is recommended
  */
-export const DOI = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+export const DOI = ({ value, onChange, isRequired, isRecommended, warning }: TextComponentProps) => {
     return (
         <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
@@ -376,12 +498,14 @@ export const DOI = ({ value, onChange, isRequired, isRecommended }: TextComponen
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
-            <Input
-                placeholder="DOI"
-                type="text"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-            />
+            <FieldInputStack warning={warning}>
+                <Input
+                    placeholder="DOI"
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                />
+            </FieldInputStack>
         </label>
     )
 }
@@ -393,7 +517,7 @@ export const DOI = ({ value, onChange, isRequired, isRecommended }: TextComponen
  * @param isRequired - Whether the field is required
  * @param isRecommended - Whether the field is recommended
  */
-export const URL = ({ value, onChange, isRequired, isRecommended }: TextComponentProps) => {
+export const URL = ({ value, onChange, isRequired, isRecommended, warning }: TextComponentProps) => {
     return (
         <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
@@ -401,12 +525,14 @@ export const URL = ({ value, onChange, isRequired, isRecommended }: TextComponen
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
-            <Input
-                placeholder="Website URL"
-                type="text"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-            />
+            <FieldInputStack warning={warning}>
+                <Input
+                    placeholder="Website URL"
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                />
+            </FieldInputStack>
         </label>
     )
 }
@@ -547,27 +673,31 @@ const DateInput = ({ value, onChange, showSetToday }: {
 /**
  * Publication Date component — emits CSL-JSON `date-parts` shape.
  */
-export const PublicationDate = ({ value, onChange, isRequired, isRecommended }: DateComponentProps) => (
+export const PublicationDate = ({ value, onChange, isRequired, isRecommended, warning }: DateComponentProps) => (
     <div className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
         <span className="flex flex-col leading-4 text-sm">
             Publication Date
             {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
             {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
         </span>
-        <DateInput value={value} onChange={onChange} />
+        <FieldInputStack warning={warning}>
+            <DateInput value={value} onChange={onChange} />
+        </FieldInputStack>
     </div>
 );
 
 /**
  * Access Date component — emits CSL-JSON `date-parts` shape.
  */
-export const AccessDate = ({ value, onChange, isRequired, isRecommended }: DateComponentProps) => (
+export const AccessDate = ({ value, onChange, isRequired, isRecommended, warning }: DateComponentProps) => (
     <div className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:gap-4">
         <span className="flex flex-col leading-4 text-sm h-9 justify-center">
             Access Date
             {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
             {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
         </span>
-        <DateInput value={value} onChange={onChange} showSetToday />
+        <FieldInputStack warning={warning}>
+            <DateInput value={value} onChange={onChange} showSetToday />
+        </FieldInputStack>
     </div>
 );

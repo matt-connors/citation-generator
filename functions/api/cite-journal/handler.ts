@@ -29,10 +29,11 @@ export async function handleCiteJournal(
     writeEvent(analytics, 'error', { endpoint: 'cite_journal', code: 'invalid_doi' }, { count: 1 });
     return errorResponse(400, 'invalid_doi', 'Malformed DOI');
   }
+  if (!doi && rawUrl) doi = validateDoi(rawUrl);
 
   if (!doi) {
     writeEvent(analytics, 'error', { endpoint: 'cite_journal', code: 'invalid_doi' }, { count: 1 });
-    return errorResponse(400, 'invalid_doi', 'cite-journal currently requires a doi parameter; use cite-website for non-DOI articles');
+    return errorResponse(400, 'invalid_doi', 'cite-journal currently requires a DOI value or doi.org URL; use cite-website for non-DOI articles');
   }
 
   const cacheKey = `https://cache.mlagenerator/journal/${doi}`;

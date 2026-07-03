@@ -2,7 +2,7 @@ import type { CSLItem, FormatRequest, FormatResponse, SupportedStyle } from '../
 import { formatCitation } from '../../lib/format/citeproc';
 import { writeEvent, type AnalyticsBinding } from '../../lib/analytics';
 
-const SUPPORTED: SupportedStyle[] = ['mla-9', 'apa-7', 'chicago-18', 'ama-11', 'harvard', 'ieee', 'vancouver'];
+export const SUPPORTED_STYLES: SupportedStyle[] = ['mla-9', 'apa-7', 'chicago-18', 'ama-11', 'harvard', 'ieee', 'vancouver'];
 
 export async function handleFormat(req: Request, analytics?: AnalyticsBinding): Promise<Response> {
   const start = Date.now();
@@ -21,9 +21,9 @@ export async function handleFormat(req: Request, analytics?: AnalyticsBinding): 
     writeEvent(analytics, 'error', { endpoint: 'format', code: 'bad_request' }, { count: 1 });
     return error(400, 'bad_request', 'Missing csl');
   }
-  if (!parsed.style || !SUPPORTED.includes(parsed.style)) {
+  if (!parsed.style || !SUPPORTED_STYLES.includes(parsed.style)) {
     writeEvent(analytics, 'error', { endpoint: 'format', code: 'bad_request' }, { count: 1 });
-    return error(400, 'bad_request', `Unsupported style. Allowed: ${SUPPORTED.join(', ')}`);
+    return error(400, 'bad_request', `Unsupported style. Allowed: ${SUPPORTED_STYLES.join(', ')}`);
   }
   try {
     const formatted = formatCitation(parsed.csl as CSLItem, parsed.style);

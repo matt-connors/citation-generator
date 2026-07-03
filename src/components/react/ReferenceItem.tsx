@@ -4,9 +4,10 @@ import { useFormattedCitation } from '../../lib/citations/useFormattedCitation';
 import type { StoredSource } from '../../lib/references/storage';
 import type { SupportedStyle } from '../../lib/citations/csl-types';
 import styles from '../../styles/references.module.css';
-import { Clipboard, Globe } from 'lucide-react';
+import { AlertTriangle, Clipboard, Globe } from 'lucide-react';
 import { escapeHtml, richTextToHtml, richTextToPlain } from './richText';
 import { copyRichText } from './clipboard';
+import { visibleCitationWarnings } from '../../lib/references/warnings';
 
 interface Props {
     source: StoredSource;
@@ -20,6 +21,13 @@ interface Props {
 function ReferenceItem({ source, checked, onToggle, citationFormat, setSources, autoOpenEdit }: Props) {
     const editButtonRef = useRef<HTMLButtonElement>(null);
     const { formatted, loading, error } = useFormattedCitation(source, citationFormat);
+    const visibleWarnings = visibleCitationWarnings(source.quality?.warnings, source.dismissedWarningKeys);
+    const fieldWarnings = visibleWarnings.filter((warning) => warning.field && warning.severity !== 'info');
+    const topFieldWarning = fieldWarnings[0];
+    const hasFieldWarnings = fieldWarnings.length > 0;
+    const warningLabel = topFieldWarning?.severity === 'error'
+        ? 'Citation is missing required information'
+        : 'Citation has fields to review';
 
     useEffect(() => {
         if (autoOpenEdit && editButtonRef.current) editButtonRef.current.click();
@@ -62,6 +70,17 @@ function ReferenceItem({ source, checked, onToggle, citationFormat, setSources, 
                                     : richTextToHtml(formatted),
                         }}
                     />
+                    {hasFieldWarnings && (
+                        <span
+                            className={styles.qualityIndicator}
+                            data-severity={topFieldWarning?.severity || 'review'}
+                            role="img"
+                            aria-label={warningLabel}
+                            title={warningLabel}
+                        >
+                            <AlertTriangle className={styles.qualityIcon} aria-hidden="true" />
+                        </span>
+                    )}
                 </div>
             </label>
             <div className={styles.citationSourceButtons}>

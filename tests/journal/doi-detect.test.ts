@@ -10,8 +10,20 @@ describe('validateDoi', () => {
     expect(validateDoi('https://doi.org/10.1038/s41586-021-03828-1'))
       .toBe('10.1038/s41586-021-03828-1');
   });
+  it('strips copied URL wrappers, query strings, and trailing sentence punctuation', () => {
+    expect(validateDoi('<https://doi.org/10.1038/s41586-021-03828-1?utm_source=x>.'))
+      .toBe('10.1038/s41586-021-03828-1');
+    expect(validateDoi('10.1038/s41586-021-03828-1,'))
+      .toBe('10.1038/s41586-021-03828-1');
+  });
   it('strips a "doi:" prefix', () => {
     expect(validateDoi('doi:10.1038/foo')).toBe('10.1038/foo');
+  });
+  it('keeps balanced suffix punctuation but removes unmatched closing wrappers', () => {
+    expect(validateDoi('10.1002/(SICI)1097-4571(199505)46:4<327::AID-ASI5>3.0.CO;2-0'))
+      .toBe('10.1002/(SICI)1097-4571(199505)46:4<327::AID-ASI5>3.0.CO;2-0');
+    expect(validateDoi('(10.1038/foo)')).toBe('10.1038/foo');
+    expect(validateDoi('10.1038/foo).')).toBe('10.1038/foo');
   });
   it('returns null for garbage', () => {
     expect(validateDoi('not a doi')).toBeNull();
@@ -30,6 +42,10 @@ describe('extractDoi (from HTML)', () => {
   });
   it('falls back to scanning text content for a DOI pattern', () => {
     const $ = cheerio.load(`<p>See https://doi.org/10.1038/baz for details.</p>`);
+    expect(extractDoi($)).toBe('10.1038/baz');
+  });
+  it('removes sentence punctuation from DOI text matches', () => {
+    const $ = cheerio.load(`<p>DOI: 10.1038/baz.</p>`);
     expect(extractDoi($)).toBe('10.1038/baz');
   });
   it('returns null when no DOI present', () => {

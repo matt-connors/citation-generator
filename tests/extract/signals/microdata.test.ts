@@ -28,6 +28,39 @@ describe('microdataSignal', () => {
     expect(r.fields.issued).toEqual({ 'date-parts': [[2024, 1, 15]] });
   });
 
+  it('collects repeated author itemprops', () => {
+    const $ = cheerio.load(`
+      <span itemprop="author">Jane Doe</span>
+      <span itemprop="author">John Smith</span>
+    `);
+    expect(microdataSignal($).fields.author).toEqual([
+      { family: 'Doe', given: 'Jane' },
+      { family: 'Smith', given: 'John' },
+    ]);
+  });
+
+  it('extracts scholarly metadata itemprops', () => {
+    const $ = cheerio.load(`<article itemscope itemtype="https://schema.org/ScholarlyArticle">
+      <h1 itemprop="headline">A Microdata Paper</h1>
+      <meta itemprop="identifier" content="https://doi.org/10.5555/micro.2026.001." />
+      <div itemprop="isPartOf" itemscope>
+        <span itemprop="name">Journal of Structured Data</span>
+      </div>
+      <meta itemprop="volumeNumber" content="8" />
+      <meta itemprop="issueNumber" content="4" />
+      <meta itemprop="pageStart" content="44" />
+      <meta itemprop="pageEnd" content="59" />
+      <meta itemprop="abstract" content="A microdata extraction abstract." />
+    </article>`);
+    const r = microdataSignal($);
+    expect(r.fields.DOI).toBe('10.5555/micro.2026.001');
+    expect(r.fields['container-title']).toBe('Journal of Structured Data');
+    expect(r.fields.volume).toBe('8');
+    expect(r.fields.issue).toBe('4');
+    expect(r.fields.page).toBe('44-59');
+    expect(r.fields.abstract).toBe('A microdata extraction abstract.');
+  });
+
   it('returns empty when nothing matches', () => {
     const $ = cheerio.load(`<html><body><p>plain</p></body></html>`);
     const r = microdataSignal($);

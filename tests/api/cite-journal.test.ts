@@ -36,6 +36,18 @@ describe('handleCiteJournal', () => {
     expect(env.csl.title).toBeTruthy();
   });
 
+  it('accepts a doi.org URL via the url parameter', async () => {
+    const body = loadFixtureFile(CR_FIX, '10.1038_s41586-021-03828-1.json');
+    seqMock(new Response(body, { status: 200 }));
+    const res = await handleCiteJournal(
+      new URL('https://m.com/api/cite-journal?url=https%3A%2F%2Fdoi.org%2F10.1038%2Fs41586-021-03828-1%3Futm_source%3Dcopy'),
+      null,
+    );
+    expect(res.status).toBe(200);
+    const env = await res.json() as any;
+    expect(env.uuid).toBe('10.1038/s41586-021-03828-1');
+  });
+
   it('falls back to OpenAlex when Crossref 404s', async () => {
     const oa = loadFixtureFile(OA_FIX, '10.1038_s41586-021-03828-1.json');
     seqMock(new Response('nope', { status: 404 }), new Response(oa, { status: 200 }));
