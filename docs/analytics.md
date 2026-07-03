@@ -34,22 +34,25 @@ After the next deploy, every `/api/cite-website`, `/api/cite-book`, `/api/cite-j
 
 ## Excluding test traffic from analytics
 
-Any request that includes **either** of these signals skips analytics emission entirely — no row is written to the dataset, so the dashboard and SQL queries don't need to filter test traffic out:
+Any request that includes this signal skips analytics emission entirely — no row is written to the dataset, so the dashboard and SQL queries don't need to filter test traffic out:
 
 - HTTP header **`X-Mla-Test: 1`** (works for GET and POST)
-- Query param **`?nocache=1`** (reuses the existing cache-bypass convention)
 
-Use either for smoke tests, CI scripts, or any one-off curl probes against the production endpoints. Example:
+Use it for smoke tests, CI scripts, or any one-off curl probes against the production endpoints. Example:
 
 ```bash
-# Both of these are filtered from analytics
-curl 'https://mlagenerator.com/api/cite-website?url=https://en.wikipedia.org/wiki/Citation&nocache=1'
+curl 'https://mlagenerator.com/api/cite-website?url=https://en.wikipedia.org/wiki/Citation' \
+  -H 'X-Mla-Test: 1'
 curl 'https://mlagenerator.com/api/format' -X POST \
   -H 'X-Mla-Test: 1' -H 'content-type: application/json' \
   --data '{"csl":{"id":"u","type":"webpage","title":"smoke"},"style":"mla-9"}'
 ```
 
-Real user traffic never carries either signal, so this filter is operator-only.
+Real user traffic should never carry this header, so this filter is
+operator-only. Website cache bypasses and acquisition-mode overrides require the
+separate `CITATION_INTERNAL_DEBUG_TOKEN` flow documented in
+`docs/citation-reliability.md`; public query parameters do not control rendered
+acquisition or AI behavior.
 
 ## Querying
 

@@ -1,8 +1,21 @@
 export interface OpenAlexWork {
+  display_name?: string;
   title?: string;
   authorships?: Array<{ author?: { display_name?: string } }>;
   host_venue?: { display_name?: string };
+  primary_location?: {
+    id?: string;
+    raw_source_name?: string | null;
+    source?: { display_name?: string | null } | null;
+  };
+  biblio?: {
+    volume?: string | null;
+    issue?: string | null;
+    first_page?: string | null;
+    last_page?: string | null;
+  };
   publication_date?: string;
+  publication_year?: number;
   doi?: string;
   volume?: string;
   issue?: string;

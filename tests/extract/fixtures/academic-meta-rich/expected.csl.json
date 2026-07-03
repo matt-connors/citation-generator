@@ -1,0 +1,17 @@
+{
+  "type": "article-journal",
+  "title": "A Reliable Metadata Extraction Study",
+  "author": [
+    { "family": "Smith", "given": "John" },
+    { "family": "Doe", "given": "Jane" }
+  ],
+  "issued": { "date-parts": [[2026, 5, 26]] },
+  "publisher": "Example University Press",
+  "container-title": "Journal of Citation Testing",
+  "DOI": "10.5555/jct.2026.001",
+  "volume": "18",
+  "issue": "2",
+  "page": "45-62",
+  "abstract": "A study fixture for rich scholarly metadata extraction.",
+  "URL": "https://example.edu/research/reliable-metadata"
+}

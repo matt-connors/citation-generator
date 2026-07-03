@@ -24,9 +24,27 @@ describe('heuristicSignal', () => {
     expect(heuristicSignal($).fields.author).toEqual([{ family: 'Doe', given: 'Jane' }]);
   });
 
+  it('reads multiple authors from flexible byline selectors', () => {
+    const $ = cheerio.load(`<div data-testid="article-author">By Jane Doe and John Smith</div>`);
+    expect(heuristicSignal($).fields.author).toEqual([
+      { family: 'Doe', given: 'Jane' },
+      { family: 'Smith', given: 'John' },
+    ]);
+  });
+
+  it('strips trailing published text from bylines', () => {
+    const $ = cheerio.load(`<div class="article-author">By Jane Doe Published May 26, 2026</div>`);
+    expect(heuristicSignal($).fields.author).toEqual([{ family: 'Doe', given: 'Jane' }]);
+  });
+
   it('reads <time datetime>', () => {
     const $ = cheerio.load(`<time datetime="2026-05-26">May 26</time>`);
     expect(heuristicSignal($).fields.issued).toEqual({ 'date-parts': [[2026, 5, 26]] });
+  });
+
+  it('reads a canonical link URL', () => {
+    const $ = cheerio.load(`<link rel="canonical" href="/articles/canonical" />`);
+    expect(heuristicSignal($).fields.URL).toBe('/articles/canonical');
   });
 
   it('returns empty when nothing present', () => {

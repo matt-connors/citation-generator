@@ -161,9 +161,12 @@ describe('analytics integration', () => {
 
       await handleCiteWebsite(url, cache, binding);   // miss → populates cache
       await handleCiteWebsite(url, cache, binding);   // hit
-      const hitPoint = shapeOf(writeDataPoint.mock.calls[1][0]);
-      expect(hitPoint.event).toBe('cite_website');
-      expect(hitPoint.metrics[2]).toBe(1);
+      const hitPoint = writeDataPoint.mock.calls
+        .map((call) => shapeOf(call[0]))
+        .find((point) => point.event === 'cite_website' && point.metrics[2] === 1);
+      expect(hitPoint).toBeTruthy();
+      expect(hitPoint?.event).toBe('cite_website');
+      expect(hitPoint?.metrics[2]).toBe(1);
     });
 
     it('emits error event on fetch_failed', async () => {
