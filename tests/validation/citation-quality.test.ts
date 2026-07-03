@@ -58,4 +58,55 @@ describe('validateCitationQuality', () => {
 
     expect(quality.warnings.some((w) => w.code === 'issued_conflict')).toBe(true);
   });
+
+  it('flags an AI-filled field so the user verifies it', () => {
+    const winner: FieldEvidence = {
+      field: 'publisher',
+      normalizedValue: 'Example Press',
+      source: 'ai-extract',
+      acquisition: 'ai',
+      confidence: 0.82,
+    };
+    const provenance: Partial<Record<keyof CSLItem, FieldProvenance>> = {
+      publisher: { winner, candidates: [winner], conflicts: [] },
+    };
+    const quality = validateCitationQuality({
+      id: 'https://example.com/p',
+      type: 'webpage',
+      title: 'Example',
+      URL: 'https://example.com/p',
+      publisher: 'Example Press',
+      author: [{ family: 'Doe', given: 'Jane' }],
+      issued: { 'date-parts': [[2026, 1, 15]] },
+    }, { provenance });
+
+    const warning = quality.warnings.find((w) => w.code === 'publisher_ai_suggested');
+    expect(warning).toBeDefined();
+    expect(warning?.field).toBe('publisher');
+    expect(warning?.severity).toBe('review');
+  });
+
+  it('does not flag AI-suggested for a normally-extracted winner', () => {
+    const winner: FieldEvidence = {
+      field: 'publisher',
+      normalizedValue: 'Example Press',
+      source: 'jsonld',
+      acquisition: 'fetch',
+      confidence: 0.9,
+    };
+    const provenance: Partial<Record<keyof CSLItem, FieldProvenance>> = {
+      publisher: { winner, candidates: [winner], conflicts: [] },
+    };
+    const quality = validateCitationQuality({
+      id: 'https://example.com/p',
+      type: 'webpage',
+      title: 'Example',
+      URL: 'https://example.com/p',
+      publisher: 'Example Press',
+      author: [{ family: 'Doe', given: 'Jane' }],
+      issued: { 'date-parts': [[2026, 1, 15]] },
+    }, { provenance });
+
+    expect(quality.warnings.some((w) => w.code.endsWith('_ai_suggested'))).toBe(false);
+  });
 });

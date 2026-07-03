@@ -100,6 +100,19 @@ export function validateCitationQuality(csl: CSLItem, options: ValidateCitationO
         evidence: compactEvidence([item.winner, ...item.conflicts]),
       });
     }
+    // Flag any field an LLM filled so the user knows to verify it against the
+    // source (AI proposes only empty fields, low-trust). Keyed on the winner
+    // source, so it is inert until AI field-assist is enabled.
+    if (item.winner?.source === 'ai-extract') {
+      warnings.push({
+        code: `${String(field)}_ai_suggested`,
+        field,
+        severity: 'review',
+        message: 'This value was suggested by AI. Verify it against the source before relying on this citation.',
+        action: 'review-field',
+        evidence: compactEvidence([item.winner]),
+      });
+    }
   }
 
   for (const attempt of Object.values(options.acquisition ?? {})) {
