@@ -8,6 +8,13 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+function utcDay(value) {
+    const date = new Date(`${value}T00:00:00.000Z`);
+    return Math.floor(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) / MS_PER_DAY);
+}
+
 // Build a map of /guides/<slug> -> last-significant-change date, read straight
 // from each guide's frontmatter (updatedDate, else pubDate). This feeds honest
 // per-guide <lastmod> values into the sitemap. Pages without a real change date
@@ -17,11 +24,13 @@ const GUIDE_LASTMOD = (() => {
     const map = {};
     try {
         const dir = join(dirname(fileURLToPath(import.meta.url)), 'src/content/guides');
+        const publishDate = process.env.CONTENT_PUBLISH_AT || new Date().toISOString().slice(0, 10);
         for (const file of readdirSync(dir)) {
             if (!file.endsWith('.mdx')) continue;
             const src = readFileSync(join(dir, file), 'utf8');
             const updated = src.match(/^updatedDate:\s*['"]?(\d{4}-\d{2}-\d{2})/m)?.[1];
             const published = src.match(/^pubDate:\s*['"]?(\d{4}-\d{2}-\d{2})/m)?.[1];
+            if (published && utcDay(published) > utcDay(publishDate)) continue;
             const date = updated || published;
             if (date) map[`/guides/${file.replace(/\.mdx$/, '')}`] = new Date(`${date}T00:00:00.000Z`).toISOString();
         }
@@ -49,6 +58,7 @@ export default defineConfig({
     site: "https://mlagenerator.com",
     // site: "http://localhost:4321",
     output: "server",
+    trailingSlash: 'always',
     adapter: cloudflare({
         mode: "directory",
         routes: {
@@ -86,6 +96,7 @@ export default defineConfig({
             serialize(item) {
                 const pathname = new URL(item.url).pathname.replace(/\/$/, '') || '/';
                 if (pathname.startsWith('/admin')) return undefined;
+                if (pathname === '/privacy' || pathname === '/terms') return undefined;
                 // Honest per-guide last-modified date from frontmatter, where we have one.
                 if (GUIDE_LASTMOD[pathname]) item.lastmod = GUIDE_LASTMOD[pathname];
                 // Tier priority to match the link-graph emphasis: the generator,
@@ -108,6 +119,9 @@ export default defineConfig({
                     item.changefreq = 'monthly';
                 } else if (pathname === '/about') {
                     item.priority = 0.6;
+                    item.changefreq = 'monthly';
+                } else if (pathname.endsWith('-citation-generator') || pathname.endsWith('-referencing-generator')) {
+                    item.priority = 0.9;
                     item.changefreq = 'monthly';
                 } else {
                     item.priority = 0.5;

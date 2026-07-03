@@ -18,9 +18,9 @@ describe('isTestRequest', () => {
     expect(isTestRequest(r)).toBe(true);
   });
 
-  it('returns true on ?nocache=1 query param', () => {
+  it('ignores ?nocache=1 query param', () => {
     const r = new Request('https://m.com/api/cite-website?url=https://x.com&nocache=1');
-    expect(isTestRequest(r)).toBe(true);
+    expect(isTestRequest(r)).toBe(false);
   });
 
   it('returns false on a normal request', () => {
@@ -40,7 +40,7 @@ describe('isTestRequest', () => {
     expect(isTestRequest(r)).toBe(false);
   });
 
-  it('header takes priority over query (either signal sufficient)', () => {
+  it('returns true when the test header is present', () => {
     const r = new Request('https://m.com/api/cite-website?url=https://x.com', {
       headers: { 'x-mla-test': '1' },
     });

@@ -27,21 +27,21 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
         label: 'Style guides',
         blurb: 'Complete reference for each major citation style.',
         description:
-            'Edition-accurate reference guides for each major citation style — APA 7, MLA 9, Chicago 18, Harvard (Cite Them Right), Vancouver, IEEE, and AMA 11 — covering in-text citations, the reference list, and worked examples for every common source type.',
+            'Reference guides for APA 7, MLA 9, Chicago 18, Harvard, Vancouver, IEEE, and AMA, covering in-text citations, source lists, and examples.',
     },
     {
         key: 'how-to',
         label: 'How to cite',
         blurb: 'Format common source types across every style.',
         description:
-            'Step-by-step guides for citing specific source types — websites, books, journal articles, PDFs, interviews, and videos — formatted correctly in APA, MLA, Chicago, Harvard, Vancouver, IEEE, and AMA.',
+            'Step-by-step guides for citing websites, books, journal articles, PDFs, interviews, videos, podcasts, images, reports, quotes, and other sources.',
     },
     {
         key: 'concept',
         label: 'Concepts',
         blurb: 'Core citation concepts and how they apply.',
         description:
-            'The core ideas behind citing sources well: in-text citations, hanging indents, annotated bibliographies, the difference between a works-cited list and a bibliography, and how to avoid plagiarism.',
+            'Core citation concepts: in-text citations, hanging indents, annotated bibliographies, works cited vs bibliography, plagiarism, and style choice.',
     },
     {
         key: 'comparison',
@@ -64,5 +64,5 @@ export function categoryByKey(key: string): GuideCategory | undefined {
 }
 
 export function categoryPath(key: string): string {
-    return `/guides/category/${key}`;
+    return `/guides/category/${key}/`;
 }

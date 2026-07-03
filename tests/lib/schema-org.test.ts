@@ -5,6 +5,7 @@ import {
   buildSoftwareApplication,
   buildArticle,
   buildBreadcrumbList,
+  buildItemList,
   buildFaqPage,
   buildAboutPage,
   buildGraph,
@@ -103,6 +104,48 @@ describe('buildBreadcrumbList', () => {
       item: 'https://mlagenerator.com/',
     });
     expect(b.itemListElement[2].position).toBe(3);
+  });
+});
+
+describe('buildItemList', () => {
+  it('numbers linked guide entries and preserves item metadata', () => {
+    const list = buildItemList(
+      [
+        {
+          name: 'APA Citation Guide',
+          url: 'https://mlagenerator.com/guides/apa',
+          description: 'APA 7 guide',
+        },
+        {
+          name: 'MLA Citation Guide',
+          url: 'https://mlagenerator.com/guides/mla',
+          description: 'MLA 9 guide',
+        },
+      ],
+      'Citation Guides',
+      'https://mlagenerator.com/guides',
+    );
+
+    expect(list['@type']).toBe('ItemList');
+    expect(list.name).toBe('Citation Guides');
+    expect(list.url).toBe('https://mlagenerator.com/guides');
+    expect(list.numberOfItems).toBe(2);
+    expect(list.itemListElement).toEqual([
+      {
+        '@type': 'ListItem',
+        position: 1,
+        url: 'https://mlagenerator.com/guides/apa',
+        name: 'APA Citation Guide',
+        description: 'APA 7 guide',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        url: 'https://mlagenerator.com/guides/mla',
+        name: 'MLA Citation Guide',
+        description: 'MLA 9 guide',
+      },
+    ]);
   });
 });
 

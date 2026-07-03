@@ -2,6 +2,7 @@
 import { BookOpenIcon } from "@heroicons/react/24/outline";
 import Logo from "../../../public/images/logo.svg";
 const site = Astro.site;
+const siteUrl = (path: string) => new URL(path, site).toString();
 
 import { Bars3Icon } from "@heroicons/react/24/outline";
 ---
@@ -13,26 +14,37 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
  -->
 <header>
   <div class="logo">
-    <a href={`${site}`} aria-label="MLA Generator">
+    <a href={siteUrl('/')} aria-label="MLA Generator">
       <!-- <p>MLA Generator</p> -->
       <img src={Logo.src} alt="MLA Generator" title="MLA Generator" width="213" height="35" />
     </a>
   </div>
   <nav aria-label="Primary" id="primary-nav">
     <ul id="menu-content">
-      <li><a href={`${site}`}>Citation Generator</a></li>
-      <li><a href={`${site}my-references`}>My References</a></li>
+      <li><a href={siteUrl('/my-references/')}>My References</a></li>
       <li class="sub-menu-trigger">
-        <button type="button" aria-haspopup="true" aria-expanded="false" aria-controls="guides-submenu">Citation Guides</button>
+        <button type="button" aria-haspopup="true" aria-expanded="false" aria-controls="guides-submenu">Citation Guides<svg class="nav-chevron" width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+        <ul class="sub-menu" id="guides-submenu" role="menu">
+          <li role="none"><a role="menuitem" href={siteUrl('/guides/')}>All Guides</a></li>
+          <li role="none"><a role="menuitem" href={siteUrl('/guides/research-and-works-cited/')}>Mastering Your Sources</a></li>
+          <li role="none"><a role="menuitem" href={siteUrl('/guides/mla/')}>MLA Format Guide</a></li>
+          <li role="none"><a role="menuitem" href={siteUrl('/guides/apa/')}>APA Format Guide</a></li>
+          <li role="none"><a role="menuitem" href={siteUrl('/guides/chicago/')}>Chicago Format Guide</a></li>
+          <li role="none"><a role="menuitem" href={siteUrl('/guides/harvard/')}>Harvard Format Guide</a></li>
+        </ul>
       </li>
-      <ul class="sub-menu" id="guides-submenu" role="menu">
-        <li role="none"><a role="menuitem" href={`${site}guides`}>All Guides</a></li>
-        <li role="none"><a role="menuitem" href={`${site}guides/research-and-works-cited`}>Mastering Your Sources</a></li>
-        <li role="none"><a role="menuitem" href={`${site}guides/mla`}>MLA Format Guide</a></li>
-        <li role="none"><a role="menuitem" href={`${site}guides/apa`}>APA Format Guide</a></li>
-        <li role="none"><a role="menuitem" href={`${site}guides/chicago`}>Chicago Format Guide</a></li>
-        <li role="none"><a role="menuitem" href={`${site}guides/harvard`}>Harvard Format Guide</a></li>
-      </ul>
+      <li class="sub-menu-trigger">
+        <button type="button" aria-haspopup="true" aria-expanded="false" aria-controls="generators-submenu">Citation Generators<svg class="nav-chevron" width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+        <ul class="sub-menu" id="generators-submenu" role="menu">
+          <li role="none"><a role="menuitem" href={siteUrl('/apa-citation-generator/')}>APA Generator</a></li>
+          <li role="none"><a role="menuitem" href={siteUrl('/mla-citation-generator/')}>MLA Generator</a></li>
+          <li role="none"><a role="menuitem" href={siteUrl('/chicago-citation-generator/')}>Chicago Generator</a></li>
+          <li role="none"><a role="menuitem" href={siteUrl('/harvard-referencing-generator/')}>Harvard Generator</a></li>
+          <li role="none"><a role="menuitem" href={siteUrl('/ieee-citation-generator/')}>IEEE Generator</a></li>
+          <li role="none"><a role="menuitem" href={siteUrl('/ama-citation-generator/')}>AMA Generator</a></li>
+          <li role="none"><a role="menuitem" href={siteUrl('/vancouver-citation-generator/')}>Vancouver Generator</a></li>
+        </ul>
+      </li>
     </ul>
   </nav>
   <div id="obscure"></div>
@@ -94,6 +106,9 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
       display: flex;
       align-items: center;
     }
+    .sub-menu-trigger {
+      position: relative;
+    }
     .sub-menu {
       display: none !important;
       flex-direction: column;
@@ -127,8 +142,8 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
     .sub-menu a:hover {
       background-color: var(--color-background-2);
     }
-    .sub-menu-trigger:hover + .sub-menu,
-    .sub-menu-trigger:focus-within + .sub-menu,
+    .sub-menu-trigger:hover .sub-menu,
+    .sub-menu-trigger:focus-within .sub-menu,
     .sub-menu:hover,
     .sub-menu.open {
       display: flex !important;
@@ -147,7 +162,7 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
       flex-direction: column;
       align-items: flex-start !important;
     }
-    .sub-menu-trigger {
+    .sub-menu-trigger button {
         display: none;
     }
     #menu-content {
@@ -165,6 +180,10 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
       right: 0;
       box-sizing: border-box;
       z-index: 9999;
+      max-height: calc(100dvh - 70px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
       box-shadow:
         rgba(0, 0, 0, 0.04) 0 24px 48px -4px,
         rgba(0, 0, 0, 0.02) 0 12px 24px -4px,
@@ -253,6 +272,26 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
     outline-offset: 2px;
     border-radius: 4px;
   }
+  /* Dropdown indicator: points down when closed, rotates up when the menu is
+     open via hover (desktop), keyboard focus, or aria-expanded (click). */
+  .nav-chevron {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 0.25rem;
+    color: var(--color-text-light);
+    transition: transform 0.2s ease;
+  }
+  .sub-menu-trigger:hover .nav-chevron,
+  .sub-menu-trigger:focus-within .nav-chevron,
+  .sub-menu-trigger button[aria-expanded="true"] .nav-chevron {
+    transform: rotate(180deg);
+    color: var(--color-text-dark);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav-chevron {
+      transition: none;
+    }
+  }
 </style>
 
 <script>
@@ -270,19 +309,25 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
     mobileMenuToggle!.setAttribute("aria-expanded", "false");
   });
 
-  // Sub-menu trigger: toggle aria-expanded on the button so screen readers
-  // know the popover state. Visual show/hide remains driven by CSS.
-  const subMenuTriggerBtn = document.querySelector('.sub-menu-trigger button');
-  const subMenu = document.getElementById('guides-submenu');
-  subMenuTriggerBtn?.addEventListener('click', () => {
-    const expanded = subMenuTriggerBtn.getAttribute('aria-expanded') === 'true';
-    subMenuTriggerBtn.setAttribute('aria-expanded', String(!expanded));
-    subMenu?.classList.toggle('open');
+  // Sub-menu triggers: toggle aria-expanded on each button so screen readers
+  // know the popover state. Visual show/hide remains driven by CSS. Each
+  // trigger controls the sub-menu named by its aria-controls attribute.
+  const subMenuTriggerBtns = document.querySelectorAll('.sub-menu-trigger button');
+  const subMenuFor = (btn: Element) => document.getElementById(btn.getAttribute('aria-controls') ?? '');
+  subMenuTriggerBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      subMenuFor(btn)?.classList.toggle('open');
+    });
   });
   document.addEventListener('click', (e) => {
-    if (!subMenuTriggerBtn?.contains(e.target as Node) && !subMenu?.contains(e.target as Node)) {
-      subMenuTriggerBtn?.setAttribute('aria-expanded', 'false');
-      subMenu?.classList.remove('open');
-    }
+    subMenuTriggerBtns.forEach((btn) => {
+      const subMenu = subMenuFor(btn);
+      if (!btn.contains(e.target as Node) && !subMenu?.contains(e.target as Node)) {
+        btn.setAttribute('aria-expanded', 'false');
+        subMenu?.classList.remove('open');
+      }
+    });
   });
 </script>

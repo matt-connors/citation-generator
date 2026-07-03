@@ -2,14 +2,15 @@
 import Layout from "../../../layouts/page.astro";
 import Breadcrumbs from "../../../components/astro/Breadcrumbs.astro";
 import GuideCardGrid from "../../../components/astro/GuideCardGrid.astro";
-import { buildBreadcrumbList } from "../../../lib/schema-org";
+import { buildBreadcrumbList, buildItemList } from "../../../lib/schema-org";
 import { GUIDE_CATEGORIES, categoryPath } from "../../../lib/guide-categories";
 import { getCollection } from "astro:content";
+import { filterPublishedGuides } from "../../../lib/publication";
 
 export const prerender = true;
 
 export async function getStaticPaths() {
-    const all = await getCollection("guides");
+    const all = filterPublishedGuides(await getCollection("guides"));
     const sortByTitle = (a: typeof all[number], b: typeof all[number]) =>
         a.data.title.localeCompare(b.data.title);
     return GUIDE_CATEGORIES.map((cat) => ({
@@ -25,20 +26,30 @@ const { cat, items } = Astro.props;
 
 const title = `${cat.label} — Citation Guides`;
 const description = cat.description;
+const site = Astro.site!.toString().replace(/\/$/, '');
 
 const breadcrumbSchema = buildBreadcrumbList([
     { name: 'Home', url: new URL('/', Astro.site).href },
-    { name: 'Guides', url: new URL('/guides', Astro.site).href },
+    { name: 'Guides', url: new URL('/guides/', Astro.site).href },
     { name: cat.label, url: new URL(categoryPath(cat.key), Astro.site).href },
 ]);
+const itemListSchema = buildItemList(
+    items.map((g) => ({
+        name: g.data.title,
+        description: g.data.description,
+        url: `${site}/guides/${g.slug}/`,
+    })),
+    `${cat.label} Citation Guides`,
+    `${site}${categoryPath(cat.key)}`,
+);
 ---
 
-<Layout title={title} description={description} extraSchemas={[breadcrumbSchema]}>
+<Layout title={title} description={description} extraSchemas={[breadcrumbSchema, itemListSchema]}>
     <article class="category-hub">
         <Breadcrumbs
             items={[
                 { name: 'Home', href: '/' },
-                { name: 'Guides', href: '/guides' },
+                { name: 'Guides', href: '/guides/' },
                 { name: cat.label, href: categoryPath(cat.key), current: true },
             ]}
         />
@@ -49,7 +60,7 @@ const breadcrumbSchema = buildBreadcrumbList([
 
         <GuideCardGrid items={items} />
 
-        <p class="back-link"><a href="/guides">← All citation guides</a></p>
+        <p class="back-link"><a href="/guides/">← All citation guides</a></p>
     </article>
 </Layout>
 

@@ -1,0 +1,219 @@
+---
+export const prerender = true;
+
+import Layout from "../layouts/page.astro";
+import CitationSearch from "../components/react/CitationSearch";
+import PageSegment from "../components/astro/PageSegment.astro";
+
+import {
+    buildSoftwareApplication,
+    buildFaqPage,
+    buildBreadcrumbList,
+} from "../lib/schema-org";
+
+const title = "IEEE Citation Generator — Free IEEE Reference Tool";
+const description =
+    "Free IEEE citation generator for references from a URL, DOI, or ISBN, with numbered entries and square-bracket in-text citations.";
+
+const faqs = [
+    {
+        question: "What does an IEEE in-text citation look like?",
+        answer: "<p>An IEEE in-text citation is just a number in square brackets, such as [1], placed where the source supports your claim. Numbers are assigned in the order sources first appear, and you reuse a source's original number every time you cite it again. Several sources at once render as [1], [2], [3]; consecutive runs may be compressed to [1]–[3].</p>",
+    },
+    {
+        question: "How does this IEEE citation generator order the reference list?",
+        answer: "<p>The reference list is numbered in <strong>order of first citation</strong>, not alphabetically. The first source you cite becomes reference 1, the next new source becomes reference 2, and so on. Every numbered entry must be cited at least once in the body. See the <a href=\"/guides/ieee/\">IEEE guide</a> for the full mechanics.</p>",
+    },
+    {
+        question: "Does the generator abbreviate journal and conference names?",
+        answer: "<p>IEEE italicizes <em>and</em> abbreviates journal and conference names — for example, <em>Journal of Cognitive Development</em> becomes <em>J. Cogn. Dev.</em> The generator italicizes the container automatically but does not auto-abbreviate. Paste the IEEE short form into the journal field, or edit the title after generation. When in doubt, use ISO 4 conventions or the full name.</p>",
+    },
+    {
+        question: "Are DOIs included in IEEE references?",
+        answer: "<p>Yes, when one is available. IEEE appends a DOI in the compact form <code>doi: 10.xxxx/xxxxx.</code> — lowercase prefix, a space after the colon, and a terminal period, with no <code>https://</code>. For online sources without a DOI, the entry carries an <code>[Online]. Available:</code> URL and an <code>Accessed:</code> date instead.</p>",
+    },
+    {
+        question: "How is IEEE different from Vancouver?",
+        answer: "<p>Both are numeric citation-sequence styles, but the typography differs: IEEE uses square brackets [1] while Vancouver uses parentheses (1); IEEE italicizes journal names and Vancouver does not; and IEEE lists authors initials-first (A. Goldstein) while Vancouver puts the surname first (Goldstein A). Compare them in the <a href=\"/guides/ieee/\">IEEE</a> and <a href=\"/guides/vancouver/\">Vancouver</a> guides.</p>",
+    },
+];
+
+const siteBase = new URL("/", Astro.site);
+const extraSchemas = [
+    buildSoftwareApplication(),
+    buildFaqPage(faqs),
+    buildBreadcrumbList([
+        { name: "Home", url: siteBase.toString() },
+        {
+            name: "IEEE Citation Generator",
+            url: new URL("/ieee-citation-generator/", siteBase).toString(),
+        },
+    ]),
+];
+---
+
+<Layout title={title} description={description} extraSchemas={extraSchemas}>
+    <section id="tool">
+        <div id="text-container">
+            <h1 class="heading-1">IEEE Citation Generator</h1>
+            <p class="subtitle">
+                Build accurate IEEE references from a URL, DOI, or ISBN —
+                numbered entries and square-bracket in-text numbers, formatted
+                in seconds. Free, and built for engineering and computer science
+                writing.
+            </p>
+        </div>
+        <CitationSearch includeDropdown includeManualCite defaultStyle="ieee" client:load />
+    </section>
+
+    <PageSegment title="How to cite in IEEE" background>
+        <div class="prose">
+            <p>
+                IEEE is the citation style of electrical engineering, computer
+                science, telecommunications, and signal processing. It is a
+                <strong>numeric</strong> style: each source gets a number in
+                square brackets in the text — <code>[1]</code> — and a matching
+                entry in a numbered reference list at the end of the paper.
+                Numbers are assigned in the order sources first appear, and you
+                reuse a source's original number every time you cite it again.
+            </p>
+            <p>
+                In the reference list, authors are listed
+                <strong>initials first, then surname</strong>
+                (<code>A. Goldstein</code>). Article and chapter titles go in
+                double quotation marks, while journal and conference names are
+                italicized and abbreviated (<em>J. Cogn. Dev.</em>). The list is
+                numbered by order of first citation — not alphabetized — so the
+                in-text numbers and the back-of-paper entries always line up.
+            </p>
+            <p>
+                Paste a link, DOI, or ISBN into the generator above and it
+                assembles the brackets, labels, italics, and DOI prefix for you.
+                For the complete rules, worked examples for every source type,
+                and the common mistakes reviewers flag, read the full
+                <a href="/guides/ieee/">IEEE citation guide</a>. Related reading:
+                <a href="/guides/how-to-cite-a-journal-article/"
+                    >how to cite a journal article</a
+                >,
+                <a href="/guides/vancouver/">Vancouver (the numeric sibling)</a>,
+                and
+                <a href="/guides/in-text-citations/">in-text citations</a>.
+            </p>
+            <p>
+                Need a different style, or just exploring? The same tool covers
+                APA, MLA, Chicago, Harvard, Vancouver, and AMA from the
+                <a href="/">free citation generator</a> homepage.
+            </p>
+        </div>
+    </PageSegment>
+
+    <PageSegment title="IEEE Citation Generator FAQs" background>
+        <div class="faq-container">
+            {
+                faqs.map((faq, i) => {
+                    const open = i === 0;
+                    return (
+                        <details class="faq" open={open}>
+                            <summary>{faq.question}</summary>
+                            <div set:html={faq.answer} class="faq-content" />
+                        </details>
+                    );
+                })
+            }
+        </div>
+    </PageSegment>
+</Layout>
+
+<style is:global>
+    #tool {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0 var(--page-inline-padding);
+    }
+    #text-container {
+        text-align: center;
+        margin: 4rem 0;
+    }
+    #text-container .heading-1 {
+        margin-bottom: 1rem;
+    }
+    #text-container .subtitle {
+        max-width: 52ch;
+        margin: 0 auto;
+        color: var(--color-text-light);
+    }
+    .prose {
+        max-width: calc(950px + var(--page-inline-padding) * 2);
+        padding: 0 var(--page-inline-padding);
+        margin: auto;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        color: var(--color-text-light);
+        line-height: 1.5;
+    }
+    .prose a {
+        text-decoration: underline;
+        color: var(--color-text-dark);
+    }
+    .prose code {
+        font-size: 0.95em;
+    }
+    /* FAQ */
+    .faq-container {
+        display: grid;
+        gap: 1rem;
+        max-width: calc(950px + var(--page-inline-padding) * 2);
+        padding: 0 var(--page-inline-padding);
+        margin: auto;
+    }
+    .faq {
+        padding: 1.3rem;
+        border-radius: 1rem;
+        background-color: var(--color-background-3);
+        text-align: left;
+    }
+    .faq summary {
+        font-size: 1.3rem;
+        cursor: pointer;
+        user-select: none;
+        line-height: 1.2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+    .faq[open] summary {
+        margin-bottom: 1rem;
+    }
+    .faq[open] summary::after {
+        content: url("/icons/close.svg");
+        transform: translate(0, 2px);
+    }
+    .faq summary::after {
+        content: url("/icons/open.svg");
+        display: flex;
+        align-items: center;
+        transform: translate(-1px, 2px);
+        width: 20px;
+        height: 20px;
+    }
+    .faq-content a {
+        text-decoration: underline;
+        color: var(--color-text-dark);
+    }
+    .faq-content {
+        color: var(--color-text-light);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    @media (max-width: 700px) {
+        .faq summary {
+            font-size: 1.2rem;
+        }
+    }
+</style>

@@ -5,7 +5,7 @@ import type { SignalResult } from './jsonld';
 const CONF = 0.55;
 
 function meta($: CheerioAPI, name: string): string | null {
-  const v = $(`meta[name="twitter:${name}"]`).attr('content');
+  const v = $(`meta[name="twitter:${name}" i], meta[property="twitter:${name}" i]`).attr('content');
   return v ? v.trim() || null : null;
 }
 

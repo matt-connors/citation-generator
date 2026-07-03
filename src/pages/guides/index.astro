@@ -2,20 +2,24 @@
 import Layout from "../../layouts/page.astro";
 import Breadcrumbs from "../../components/astro/Breadcrumbs.astro";
 import GuideCardGrid from "../../components/astro/GuideCardGrid.astro";
-import { buildBreadcrumbList } from "../../lib/schema-org";
+import { buildBreadcrumbList, buildItemList } from "../../lib/schema-org";
 import { GUIDE_CATEGORIES, categoryPath } from "../../lib/guide-categories";
 import { getCollection } from "astro:content";
+import { filterPublishedGuides } from "../../lib/publication";
 
 const title = "Citation Guides — APA, MLA, Chicago, Harvard, Vancouver, IEEE, AMA";
 const description =
     "In-depth citation guides for APA, MLA, Chicago, Harvard, Vancouver, IEEE, and AMA — plus how-to guides for citing websites, books, journal articles, and more.";
 
+export const prerender = true;
+
+const site = Astro.site!.toString().replace(/\/$/, '');
 const breadcrumbSchema = buildBreadcrumbList([
     { name: 'Home', url: new URL('/', Astro.site).href },
-    { name: 'Guides', url: new URL('/guides', Astro.site).href },
+    { name: 'Guides', url: new URL('/guides/', Astro.site).href },
 ]);
 
-const all = await getCollection("guides");
+const all = filterPublishedGuides(await getCollection("guides"));
 const sortByTitle = (a: typeof all[number], b: typeof all[number]) =>
     a.data.title.localeCompare(b.data.title);
 
@@ -23,11 +27,21 @@ const grouped = GUIDE_CATEGORIES.map((cat) => ({
     ...cat,
     items: all.filter((g) => g.data.category === cat.key).sort(sortByTitle),
 }));
+
+const itemListSchema = buildItemList(
+    all.sort(sortByTitle).map((g) => ({
+        name: g.data.title,
+        description: g.data.description,
+        url: `${site}/guides/${g.slug}/`,
+    })),
+    'Citation Guides',
+    `${site}/guides/`,
+);
 ---
 
-<Layout title={title} description={description} extraSchemas={[breadcrumbSchema]}>
+<Layout title={title} description={description} extraSchemas={[breadcrumbSchema, itemListSchema]}>
     <article class="guides-hub">
-        <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: 'Guides', href: '/guides', current: true }]} />
+        <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: 'Guides', href: '/guides/', current: true }]} />
         <header>
             <h1>Citation Guides</h1>
             <p class="lede">
@@ -52,7 +66,7 @@ const grouped = GUIDE_CATEGORIES.map((cat) => ({
 
 <style>
     .guides-hub {
-        max-width: 900px;
+        max-width: 1080px;
         margin: 0 auto;
         padding: 4.5rem 2rem 3rem;
         color: var(--color-text-medium);

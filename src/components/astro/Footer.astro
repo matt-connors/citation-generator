@@ -1,11 +1,11 @@
 ---
-const site = Astro.site;
+const siteUrl = (path: string) => new URL(path, Astro.site).toString();
 import Logo from '../../../public/images/logo.svg';
 ---
 
 <footer>
     <figure>
-        <a href={`${site}`} aria-label="MLA Generator">
+        <a href={siteUrl('/')} aria-label="MLA Generator">
             <img src={Logo.src} alt="MLA Generator" width="213" height="35" />
         </a>
         <figcaption>
@@ -16,39 +16,39 @@ import Logo from '../../../public/images/logo.svg';
     <nav aria-label="Site navigation">
         <p class="heading-3">MLA Generator</p>
         <ul>
-            <li><a href={`${site}`}>Citation Generator</a></li>
-            <li><a href={`${site}my-references`}>My References</a></li>
-            <li><a href={`${site}about`}>About</a></li>
-            <li><a href={`${site}privacy`}>Privacy</a></li>
-            <li><a href={`${site}terms`}>Terms</a></li>
+            <li><a href={siteUrl('/')}>Citation Generator</a></li>
+            <li><a href={siteUrl('/my-references/')}>My References</a></li>
+            <li><a href={siteUrl('/about/')}>About</a></li>
+            <li><a href={siteUrl('/privacy/')}>Privacy</a></li>
+            <li><a href={siteUrl('/terms/')}>Terms</a></li>
         </ul>
     </nav>
     <nav aria-label="Guide navigation">
         <p class="heading-3">Guides</p>
         <div class="grouping">
             <ul>
-                <li><a href={`${site}guides/apa`}>APA Format</a></li>
-                <li><a href={`${site}guides/mla`}>MLA Format</a></li>
-                <li><a href={`${site}guides/chicago`}>Chicago Format</a></li>
-                <li><a href={`${site}guides/harvard`}>Harvard Format</a></li>
-                <li><a href={`${site}guides/vancouver`}>Vancouver Format</a></li>
-                <li><a href={`${site}guides/ieee`}>IEEE Format</a></li>
-                <li><a href={`${site}guides/ama`}>AMA Format</a></li>
+                <li><a href={siteUrl('/guides/apa/')}>APA Format</a></li>
+                <li><a href={siteUrl('/guides/mla/')}>MLA Format</a></li>
+                <li><a href={siteUrl('/guides/chicago/')}>Chicago Format</a></li>
+                <li><a href={siteUrl('/guides/harvard/')}>Harvard Format</a></li>
+                <li><a href={siteUrl('/guides/vancouver/')}>Vancouver Format</a></li>
+                <li><a href={siteUrl('/guides/ieee/')}>IEEE Format</a></li>
+                <li><a href={siteUrl('/guides/ama/')}>AMA Format</a></li>
             </ul>
             <ul>
-                <li><a href={`${site}guides/how-to-cite-a-website`}>Cite a Website</a></li>
-                <li><a href={`${site}guides/how-to-cite-a-book`}>Cite a Book</a></li>
-                <li><a href={`${site}guides/how-to-cite-a-journal-article`}>Cite a Journal Article</a></li>
-                <li><a href={`${site}guides/how-to-cite-a-pdf`}>Cite a PDF</a></li>
+                <li><a href={siteUrl('/guides/how-to-cite-a-website/')}>Cite a Website</a></li>
+                <li><a href={siteUrl('/guides/how-to-cite-a-book/')}>Cite a Book</a></li>
+                <li><a href={siteUrl('/guides/how-to-cite-a-journal-article/')}>Cite a Journal Article</a></li>
+                <li><a href={siteUrl('/guides/how-to-cite-a-pdf/')}>Cite a PDF</a></li>
             </ul>
             <ul>
-                <li><a href={`${site}guides`}>All Guides</a></li>
-                <li><a href={`${site}guides/research-and-works-cited`}>Mastering Your Sources</a></li>
-                <li><a href={`${site}guides/in-text-citations`}>In-Text Citations</a></li>
-                <li><a href={`${site}guides/when-to-use-each-style`}>Which Style to Use</a></li>
-                <li><a href={`${site}guides/avoiding-plagiarism`}>Avoiding Plagiarism</a></li>
-                <li><a href={`${site}guides/citation-generator-faq`}>FAQ</a></li>
-                <li><a href={`${site}guides/whats-new`}>What's New</a></li>
+                <li><a href={siteUrl('/guides/')}>All Guides</a></li>
+                <li><a href={siteUrl('/guides/research-and-works-cited/')}>Mastering Your Sources</a></li>
+                <li><a href={siteUrl('/guides/in-text-citations/')}>In-Text Citations</a></li>
+                <li><a href={siteUrl('/guides/when-to-use-each-style/')}>Which Style to Use</a></li>
+                <li><a href={siteUrl('/guides/avoiding-plagiarism/')}>Avoiding Plagiarism</a></li>
+                <li><a href={siteUrl('/guides/citation-generator-faq/')}>FAQ</a></li>
+                <li><a href={siteUrl('/guides/whats-new/')}>What's New</a></li>
             </ul>
         </div>
     </nav>

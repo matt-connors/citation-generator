@@ -4,6 +4,8 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { useReferences } from '../../src/lib/references/useReferences';
 import { STORAGE_KEY } from '../../src/lib/references/storage';
 
+const extensionCore = await import('../../chrome-extension/popup-core.mjs');
+
 beforeEach(() => {
   localStorage.clear();
   Object.defineProperty(window, 'location', {
@@ -47,6 +49,116 @@ describe('useReferences', () => {
     const { result } = renderHook(() => useReferences());
     await waitFor(() => expect(result.current.sourceCount).toBe(1));
     expect((globalThis.fetch as any).mock.calls[0][0]).toContain('/api/cite-website');
+  });
+
+  it('stores citation quality metadata returned by cite endpoints', async () => {
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: new URL('http://localhost/my-references?website=https://x.com/p'),
+    });
+    globalThis.fetch = vi.fn(async () => new Response(JSON.stringify({
+      uuid: 'https://x.com/p',
+      type: 'webpage',
+      csl: { id: 'u', type: 'webpage', title: 'T' },
+      _quality: {
+        score: 90,
+        warnings: [{
+          code: 'author_not_found',
+          field: 'author',
+          severity: 'review',
+          message: 'No author was found.',
+          action: 'confirm-no-listed-author',
+        }],
+      },
+      _provenance: {
+        title: {
+          winner: { field: 'title', normalizedValue: 'T', source: 'heuristic', confidence: 0.4 },
+          candidates: [],
+          conflicts: [],
+        },
+      },
+    }), { status: 200 })) as any;
+
+    const { result } = renderHook(() => useReferences());
+    await waitFor(() => expect(result.current.sourceCount).toBe(1));
+
+    expect(result.current.sources[0].quality?.warnings[0].code).toBe('author_not_found');
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    expect(saved[0].quality.warnings[0].code).toBe('author_not_found');
+  });
+
+  it('creates a reviewable placeholder when website fetching is blocked', async () => {
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: new URL('http://localhost/my-references?website=https://blocked.example/p'),
+    });
+    globalThis.fetch = vi.fn(async () => new Response(JSON.stringify({
+      code: 'blocked',
+      error: 'Access denied',
+    }), { status: 400 })) as any;
+
+    const { result } = renderHook(() => useReferences());
+    await waitFor(() => expect(result.current.sourceCount).toBe(1));
+
+    expect(result.current.sources[0].csl.URL).toBe('https://blocked.example/p');
+    expect(result.current.sources[0].quality?.warnings[0].code).toBe('fetch_blocked');
+    expect(result.current.sources[0].quality?.warnings[0].action).toBe('use-extension');
+  });
+
+  it('imports extension-captured CSL without refetching the website', async () => {
+    const csl = {
+      id: 'https://example.com/story',
+      type: 'webpage',
+      title: 'Extension Captured Title',
+      URL: 'https://example.com/story',
+    };
+    const encoded = extensionCore.encodeInlineCslSource({ uuid: csl.id, csl });
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: new URL(`http://localhost/my-references?csl=${encoded}&citationStyle=apa-7`),
+    });
+    const replaceSpy = vi.spyOn(window.history, 'replaceState');
+
+    const { result } = renderHook(() => useReferences());
+    await waitFor(() => expect(result.current.sourceCount).toBe(1));
+
+    expect(result.current.citationFormat).toBe('apa-7');
+    expect(result.current.sources[0]).toEqual({ uuid: csl.id, csl });
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')).toEqual([{ uuid: csl.id, csl }]);
+    expect(replaceSpy).toHaveBeenCalledWith({}, '', '/my-references?citationStyle=apa-7');
+    replaceSpy.mockRestore();
+  });
+
+  it('fetches /api/cite-journal when ?journal= present', async () => {
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: new URL('http://localhost/my-references?journal=10.1038/s41586-021-03828-1'),
+    });
+    globalThis.fetch = vi.fn(async () => new Response(JSON.stringify({
+      uuid: '10.1038/s41586-021-03828-1',
+      type: 'article-journal',
+      csl: { id: 'j', type: 'article-journal', title: 'Journal Article' },
+    }), { status: 200 })) as any;
+    const { result } = renderHook(() => useReferences());
+    await waitFor(() => expect(result.current.sourceCount).toBe(1));
+    expect((globalThis.fetch as any).mock.calls[0][0])
+      .toBe('/api/cite-journal?doi=10.1038%2Fs41586-021-03828-1');
+  });
+
+  it('also accepts ?doi= as a journal lookup alias', async () => {
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: new URL('http://localhost/my-references?doi=10.1038/s41586-021-03828-1'),
+    });
+    globalThis.fetch = vi.fn(async () => new Response(JSON.stringify({
+      uuid: '10.1038/s41586-021-03828-1',
+      type: 'article-journal',
+      csl: { id: 'j', type: 'article-journal', title: 'Journal Article' },
+    }), { status: 200 })) as any;
+    const { result } = renderHook(() => useReferences());
+    await waitFor(() => expect(result.current.sourceCount).toBe(1));
+    expect((globalThis.fetch as any).mock.calls[0][0]).toContain('/api/cite-journal');
   });
 
   it('setCitationFormat updates state', async () => {

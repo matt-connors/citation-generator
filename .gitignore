@@ -22,6 +22,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# local web research scratch files
+.firecrawl/
+
 # environment variables
 .env
 .env.production

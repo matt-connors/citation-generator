@@ -3,13 +3,14 @@
 // Renders an accessible list of related guides given an array of slugs.
 // Looks up titles + descriptions from the guides collection.
 import { getCollection } from "astro:content";
+import { filterPublishedGuides } from "../../lib/publication";
 
 interface Props {
     slugs: string[];
 }
 
 const { slugs } = Astro.props;
-const all = await getCollection("guides");
+const all = filterPublishedGuides(await getCollection("guides"));
 const related = slugs
     .map((slug) => all.find((g) => g.slug === slug))
     .filter((g): g is NonNullable<typeof g> => g !== undefined);
@@ -21,7 +22,7 @@ const related = slugs
         <ul>
             {related.map((g) => (
                 <li>
-                    <a href={`/guides/${g.slug}`}>
+                    <a href={`/guides/${g.slug}/`}>
                         <span class="related-title">{g.data.title}</span>
                         <span class="related-desc">{g.data.description}</span>
                     </a>

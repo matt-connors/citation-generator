@@ -1,0 +1,18 @@
+# Canonical trailing-slash redirects for Cloudflare Pages.
+# Without these, extensionless top-level URLs such as /guides can return a
+# blank 404 response even though /guides/ exists.
+/guides /guides/ 301
+/about /about/ 301
+/privacy /privacy/ 301
+/terms /terms/ 301
+/my-references /my-references/ 301
+/admin/analytics /admin/analytics/ 301
+/ama-citation-generator /ama-citation-generator/ 301
+/apa-citation-generator /apa-citation-generator/ 301
+/chicago-citation-generator /chicago-citation-generator/ 301
+/harvard-referencing-generator /harvard-referencing-generator/ 301
+/ieee-citation-generator /ieee-citation-generator/ 301
+/mla-citation-generator /mla-citation-generator/ 301
+/vancouver-citation-generator /vancouver-citation-generator/ 301
+/guides/category/:category /guides/category/:category/ 301
+/guides/:slug /guides/:slug/ 301

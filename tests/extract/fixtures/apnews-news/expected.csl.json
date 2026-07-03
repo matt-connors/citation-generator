@@ -6,6 +6,6 @@
     { "family": "Boone", "given": "Rebecca" }
   ],
   "issued": { "date-parts": [[2026, 5, 26]] },
-  "publisher": "AP News",
+  "container-title": "AP News",
   "URL": "https://apnews.com/article/washington-pulp-paper-mill-implosion-nippon-af71c2cbf329336d84a3fd77fa251669"
 }

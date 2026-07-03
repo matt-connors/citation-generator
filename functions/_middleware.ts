@@ -35,6 +35,42 @@ const CORS_HEADERS: Record<string, string> = {
     'Access-Control-Max-Age': '86400',
 };
 
+const CANONICAL_SLASH_PATHS = new Set([
+    '/guides',
+    '/about',
+    '/privacy',
+    '/terms',
+    '/my-references',
+    '/ama-citation-generator',
+    '/apa-citation-generator',
+    '/chicago-citation-generator',
+    '/harvard-referencing-generator',
+    '/ieee-citation-generator',
+    '/mla-citation-generator',
+    '/vancouver-citation-generator',
+    '/admin/analytics',
+]);
+
+function isCanonicalSlashPath(pathname: string): boolean {
+    if (CANONICAL_SLASH_PATHS.has(pathname)) return true;
+    if (/^\/guides\/category\/[^/]+$/.test(pathname)) return true;
+    return /^\/guides\/[^/]+$/.test(pathname);
+}
+
+/**
+ * Worker-routed Astro pages do not reliably get the static _redirects
+ * trailing-slash rules. Redirect them here before route matching so
+ * /my-references and other SSR paths do not fall through to the 404 handler.
+ */
+const canonicalTrailingSlash: PagesFunction<Env> = async (context) => {
+    const url = new URL(context.request.url);
+    if ((context.request.method === 'GET' || context.request.method === 'HEAD') && isCanonicalSlashPath(url.pathname)) {
+        url.pathname = `${url.pathname}/`;
+        return Response.redirect(url.toString(), 301);
+    }
+    return context.next();
+};
+
 /**
  * HTTP basic auth gate on /admin/* paths.
  *
@@ -152,4 +188,4 @@ const cors: PagesFunction<Env> = async (context) => {
     return response;
 }
 
-export const onRequest = [errorHandling, adminAuth, cors];
+export const onRequest = [errorHandling, canonicalTrailingSlash, adminAuth, cors];

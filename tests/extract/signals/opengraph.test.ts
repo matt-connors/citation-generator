@@ -21,12 +21,28 @@ describe('openGraphSignal', () => {
     expect(r.fields.issued).toEqual({ 'date-parts': [[2026, 5, 26]] });
   });
 
+  it('falls back to modified/updated OpenGraph dates and freeform date text', () => {
+    const $ = cheerio.load(`<meta property="article:modified_time" content="May 26, 2026" />`);
+    expect(openGraphSignal($).fields.issued).toEqual({ 'date-parts': [[2026, 5, 26]] });
+  });
+
   it('reads article:author only when it is a name, not a URL', () => {
     const $1 = cheerio.load(`<meta property="article:author" content="Jane Doe" />`);
     expect(openGraphSignal($1).fields.author).toEqual([{ family: 'Doe', given: 'Jane' }]);
 
     const $2 = cheerio.load(`<meta property="article:author" content="https://example.com/author/jane" />`);
     expect(openGraphSignal($2).fields.author).toBeUndefined();
+  });
+
+  it('collects repeated article:author tags', () => {
+    const $ = cheerio.load(`
+      <meta property="article:author" content="Jane Doe" />
+      <meta property="article:author" content="John Smith" />
+    `);
+    expect(openGraphSignal($).fields.author).toEqual([
+      { family: 'Doe', given: 'Jane' },
+      { family: 'Smith', given: 'John' },
+    ]);
   });
 
   it('returns empty when no OG tags', () => {

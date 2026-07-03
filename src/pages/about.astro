@@ -2,11 +2,13 @@
 import Layout from "../layouts/page.astro";
 import { buildAboutPage } from "../lib/schema-org";
 
+export const prerender = true;
+
 const title = "About MLA Generator — Editorial Methodology & Sources";
 const description =
-    "How MLA Generator builds citations, the official style manuals we follow, our editorial process, and how we keep references accurate across APA, MLA, Chicago, Harvard, Vancouver, IEEE, and AMA.";
+    "How MLA Generator builds citations, follows official style manuals, reviews guides, and keeps APA, MLA, Chicago, Harvard, Vancouver, IEEE, and AMA accurate.";
 
-const pageUrl = new URL('/about', Astro.site).toString();
+const pageUrl = new URL('/about/', Astro.site).toString();
 const extraSchemas = [buildAboutPage(pageUrl)];
 ---
 
@@ -64,7 +66,7 @@ const extraSchemas = [buildAboutPage(pageUrl)];
         <p>
             Citation rules evolve. When a style organization publishes a new
             edition or clarification, we update the relevant guide and tag the
-            change in <a href="/guides/whats-new">What's new</a>.
+            change in <a href="/guides/whats-new/">What's new</a>.
         </p>
 
         <h2>Accuracy and corrections</h2>

@@ -1,15 +1,24 @@
 import type { CheerioAPI } from 'cheerio';
 import type { CSLItem } from '../../csl-types';
-import { parseAuthorName } from '../author-parse';
-import { parseIsoDate } from '../date-parse';
+import { parseAuthorList } from '../author-parse';
+import { parseDate } from '../date-parse';
 import type { SignalResult } from './jsonld';
 
 const CONF = 0.75;
 const AUTHOR_CONF = 0.6;
 
 function meta($: CheerioAPI, prop: string): string | null {
-  const v = $(`meta[property="${prop}"]`).attr('content');
+  const v = $(`meta[property="${prop}" i], meta[name="${prop}" i]`).attr('content');
   return v ? v.trim() || null : null;
+}
+
+function metaAll($: CheerioAPI, prop: string): string[] {
+  const out: string[] = [];
+  $(`meta[property="${prop}" i], meta[name="${prop}" i]`).each((_, el) => {
+    const v = $(el).attr('content');
+    if (v && v.trim()) out.push(v.trim());
+  });
+  return out;
 }
 
 export function openGraphSignal($: CheerioAPI): SignalResult {
@@ -25,16 +34,18 @@ export function openGraphSignal($: CheerioAPI): SignalResult {
   const url = meta($, 'og:url');
   if (url) { fields.URL = url; confidence.URL = CONF; }
 
-  const pub = meta($, 'article:published_time');
+  const pub = meta($, 'article:published_time') || meta($, 'article:modified_time') || meta($, 'og:updated_time');
   if (pub) {
-    const dp = parseIsoDate(pub);
+    const dp = parseDate(pub);
     if (dp) { fields.issued = { 'date-parts': [dp] }; confidence.issued = CONF; }
   }
 
-  const author = meta($, 'article:author');
-  if (author && !/^https?:\/\//i.test(author)) {
-    const parsed = parseAuthorName(author);
-    if (parsed) { fields.author = [parsed]; confidence.author = AUTHOR_CONF; }
+  const authors = metaAll($, 'article:author')
+    .filter((author) => !/^https?:\/\//i.test(author))
+    .flatMap((author) => parseAuthorList(author));
+  if (authors.length) {
+    fields.author = authors;
+    confidence.author = AUTHOR_CONF;
   }
 
   return { fields, confidence };

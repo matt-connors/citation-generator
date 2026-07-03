@@ -25,6 +25,9 @@ To preview the entire project locally prior to deployment, as if it were on Clou
 - `/**` - Statically generated files using Astro.
 - `/api/**` - Routes to the /functions directory for serverless functions via Cloudflare Functions.
 
+### Chrome extension
+The unpacked Chrome extension lives in `chrome-extension/`. Load that folder from `chrome://extensions` in Developer mode to test active-tab metadata extraction, citation formatting, rich copy, and the My References handoff.
+
 ### Speed Test Result
 ![speed test result](https://mlagenerator.com/images/speed-results.png)
 

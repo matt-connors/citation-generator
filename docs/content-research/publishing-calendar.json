@@ -1,0 +1,210 @@
+[
+  {
+    "publishDate": "2026-07-13",
+    "slug": "how-to-cite-a-doi",
+    "status": "expanded-in-repo",
+    "primaryKeyword": "how to cite a DOI",
+    "secondaryKeywords": ["DOI citation", "DOI in APA", "DOI in MLA", "journal article DOI citation"],
+    "notes": "First scheduled release. Emphasize DOI normalization, DOI vs URL, incomplete metadata, and generator proofing."
+  },
+  {
+    "publishDate": "2026-07-27",
+    "slug": "how-to-cite-a-website-with-no-author",
+    "status": "expanded-in-repo",
+    "primaryKeyword": "how to cite a website with no author",
+    "secondaryKeywords": ["APA website no author", "MLA website no author", "no author in text citation"],
+    "notes": "Anchor against APA and MLA official guidance. Position as a website edge-case spoke from the main website guide."
+  },
+  {
+    "publishDate": "2026-08-10",
+    "slug": "how-to-cite-a-website-with-no-date",
+    "status": "expanded-in-repo",
+    "primaryKeyword": "how to cite a website with no date",
+    "secondaryKeywords": ["APA website no date", "MLA website no date", "n.d. citation", "access date citation"],
+    "notes": "Cover page-specific dates, copyright-year traps, access dates, and source credibility."
+  },
+  {
+    "publishDate": "2026-08-24",
+    "slug": "how-to-cite-a-report",
+    "status": "drafted-in-repo",
+    "primaryKeyword": "how to cite a report",
+    "secondaryKeywords": ["government report citation", "annual report citation", "APA report citation", "technical report citation"],
+    "notes": "New long-tail guide drafted in repo. Covers government reports, report numbers, organization authors, PDFs, and seven-style examples."
+  },
+  {
+    "publishDate": "2026-09-07",
+    "slug": "how-to-cite-a-lecture",
+    "status": "drafted-in-repo",
+    "primaryKeyword": "how to cite a lecture",
+    "secondaryKeywords": ["lecture citation", "APA lecture citation", "MLA lecture citation", "cite lecture slides"],
+    "notes": "New classroom-intent guide drafted in repo. Covers live class lectures, LMS slides, recorded lectures, public lectures, private communication rules, timestamps, and seven-style examples."
+  },
+  {
+    "publishDate": "2026-09-21",
+    "slug": "apa-title-page",
+    "status": "live-only-sync-first",
+    "primaryKeyword": "APA title page",
+    "secondaryKeywords": ["APA title page format", "APA 7 title page", "student title page APA"],
+    "notes": "Production sitemap already lists this URL. Sync source before editing; enhance with student vs professional title page rules."
+  },
+  {
+    "publishDate": "2026-10-05",
+    "slug": "works-cited-page",
+    "status": "live-only-sync-first",
+    "primaryKeyword": "works cited page",
+    "secondaryKeywords": ["MLA works cited page", "works cited format", "works cited example"],
+    "notes": "Production sitemap already lists this URL. Focus on hanging indents, alphabetization, title, spacing, and generator export workflow."
+  },
+  {
+    "publishDate": "2026-10-19",
+    "slug": "mla-format-heading",
+    "status": "live-only-sync-first",
+    "primaryKeyword": "MLA heading",
+    "secondaryKeywords": ["MLA header", "MLA format heading", "MLA first page heading"],
+    "notes": "Production sitemap already lists this URL. Distinguish the first-page heading from the running header."
+  },
+  {
+    "publishDate": "2026-11-02",
+    "slug": "mla-format-example",
+    "status": "live-only-sync-first",
+    "primaryKeyword": "MLA format example",
+    "secondaryKeywords": ["MLA paper format", "MLA sample paper", "MLA works cited example"],
+    "notes": "Production sitemap already lists this URL. Keep examples as real HTML/text so they are accessible and crawlable."
+  },
+  {
+    "publishDate": "2026-11-16",
+    "slug": "apa-format-example",
+    "status": "live-only-sync-first",
+    "primaryKeyword": "APA format example",
+    "secondaryKeywords": ["APA paper format", "APA sample paper", "APA references page example"],
+    "notes": "Production sitemap already lists this URL. Connect title page, headings, in-text citations, and references page."
+  },
+  {
+    "publishDate": "2026-11-30",
+    "slug": "how-to-cite-a-quote",
+    "status": "live-only-sync-first",
+    "primaryKeyword": "how to cite a quote",
+    "secondaryKeywords": ["MLA quote citation", "APA direct quote", "block quote MLA", "quote within a quote"],
+    "notes": "Production sitemap already lists this URL. Use Purdue OWL and style manuals for short vs block quotation thresholds."
+  },
+  {
+    "publishDate": "2026-12-14",
+    "slug": "how-to-cite-an-image",
+    "status": "live-only-sync-first",
+    "primaryKeyword": "how to cite an image",
+    "secondaryKeywords": ["cite an image MLA", "cite an image APA", "cite a picture", "image citation"],
+    "notes": "Production sitemap already lists this URL. Cover artwork, online images, captions, alt text, and figure notes."
+  },
+  {
+    "publishDate": "2026-12-28",
+    "slug": "how-to-cite-a-podcast",
+    "status": "live-only-sync-first",
+    "primaryKeyword": "how to cite a podcast",
+    "secondaryKeywords": ["podcast citation APA", "podcast citation MLA", "podcast citation Chicago"],
+    "notes": "Production sitemap already lists this URL. Include episode vs whole podcast, host, guest, timestamp, and platform."
+  },
+  {
+    "publishDate": "2027-01-11",
+    "slug": "how-to-cite-a-movie",
+    "status": "live-only-sync-first",
+    "primaryKeyword": "how to cite a movie",
+    "secondaryKeywords": ["movie citation MLA", "movie citation APA", "film citation Chicago"],
+    "notes": "Production sitemap already lists this URL. Distinguish director, performer, streaming platform, version, and timestamp."
+  },
+  {
+    "publishDate": "2027-01-25",
+    "slug": "how-to-cite-a-dissertation",
+    "status": "new-brief",
+    "primaryKeyword": "how to cite a dissertation",
+    "secondaryKeywords": ["thesis citation APA", "dissertation citation MLA", "ProQuest dissertation citation"],
+    "notes": "Use published vs unpublished dissertation examples and database/archive fields."
+  },
+  {
+    "publishDate": "2027-02-08",
+    "slug": "how-to-cite-an-encyclopedia",
+    "status": "new-brief",
+    "primaryKeyword": "how to cite an encyclopedia",
+    "secondaryKeywords": ["dictionary citation", "encyclopedia citation APA", "encyclopedia citation MLA"],
+    "notes": "Cover signed entries, unsigned entries, online dictionaries, and reference works."
+  },
+  {
+    "publishDate": "2027-02-22",
+    "slug": "how-to-cite-social-media",
+    "status": "new-brief",
+    "primaryKeyword": "how to cite social media",
+    "secondaryKeywords": ["cite a tweet", "cite an Instagram post", "cite a TikTok video"],
+    "notes": "High student intent. Must verify current APA/MLA/Chicago guidance before writing."
+  },
+  {
+    "publishDate": "2027-03-08",
+    "slug": "how-to-cite-a-dataset",
+    "status": "new-brief",
+    "primaryKeyword": "how to cite a dataset",
+    "secondaryKeywords": ["dataset citation APA", "data citation", "DOI dataset citation"],
+    "notes": "Connect to DOI article and citation metadata. Include repository, version, DOI, and access date."
+  },
+  {
+    "publishDate": "2027-03-22",
+    "slug": "how-to-cite-a-government-website",
+    "status": "new-brief",
+    "primaryKeyword": "how to cite a government website",
+    "secondaryKeywords": ["government website citation APA", "CDC citation", "government report citation"],
+    "notes": "Bridge no-author, organization-author, website, and report rules."
+  },
+  {
+    "publishDate": "2027-04-05",
+    "slug": "how-to-cite-a-book-chapter",
+    "status": "new-brief",
+    "primaryKeyword": "how to cite a book chapter",
+    "secondaryKeywords": ["edited book chapter citation", "chapter citation APA", "chapter citation MLA"],
+    "notes": "Useful spoke from the book guide. Include edited volume vs single-author book distinction."
+  },
+  {
+    "publishDate": "2027-04-19",
+    "slug": "how-to-cite-an-online-article",
+    "status": "new-brief",
+    "primaryKeyword": "how to cite an online article",
+    "secondaryKeywords": ["online article citation", "news article citation", "magazine article citation"],
+    "notes": "Clarify website article vs journal article vs newspaper article. Link to website and journal article guides."
+  },
+  {
+    "publishDate": "2027-05-03",
+    "slug": "apa-running-head",
+    "status": "new-brief",
+    "primaryKeyword": "APA running head",
+    "secondaryKeywords": ["APA page header", "APA running head student paper", "APA professional paper"],
+    "notes": "Formatting page tied to APA title page. Verify current APA student/professional distinction."
+  },
+  {
+    "publishDate": "2027-05-17",
+    "slug": "apa-abstract",
+    "status": "new-brief",
+    "primaryKeyword": "APA abstract",
+    "secondaryKeywords": ["APA abstract format", "APA abstract example", "how to write an abstract APA"],
+    "notes": "Student intent page. Include when abstracts are required and how they differ from introductions."
+  },
+  {
+    "publishDate": "2027-05-31",
+    "slug": "mla-in-text-citations",
+    "status": "new-brief",
+    "primaryKeyword": "MLA in-text citations",
+    "secondaryKeywords": ["MLA parenthetical citation", "MLA page number citation", "MLA no author citation"],
+    "notes": "A focused MLA spoke can outperform the broader existing in-text citation comparison page."
+  },
+  {
+    "publishDate": "2027-06-14",
+    "slug": "apa-in-text-citations",
+    "status": "new-brief",
+    "primaryKeyword": "APA in-text citations",
+    "secondaryKeywords": ["APA parenthetical citation", "APA narrative citation", "APA et al"],
+    "notes": "A focused APA spoke can link back to the main APA guide and no-author/no-date articles."
+  },
+  {
+    "publishDate": "2027-06-28",
+    "slug": "citation-examples",
+    "status": "new-brief",
+    "primaryKeyword": "citation examples",
+    "secondaryKeywords": ["APA citation examples", "MLA citation examples", "citation examples by source type"],
+    "notes": "Create as a hub for the best worked examples across all source-type pages after the library is deeper."
+  }
+]

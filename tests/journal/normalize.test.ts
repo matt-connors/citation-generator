@@ -55,4 +55,34 @@ describe('normalizeOpenAlex', () => {
     expect(csl.volume).toBe('596');
     expect(csl.page).toBe('583-589');
   });
+
+  it('maps current OpenAlex primary_location and biblio fields', () => {
+    const csl = normalizeOpenAlex({
+      display_name: 'Highly accurate protein structure prediction for the human proteome',
+      authorships: [
+        { author: { display_name: 'Kathryn Tunyasuvunakool' } },
+      ],
+      primary_location: {
+        id: 'doi:10.1038/s41586-021-03828-1',
+        source: { display_name: 'Nature' },
+        raw_source_name: 'Nature',
+      },
+      publication_date: '2021-07-22',
+      biblio: {
+        volume: '596',
+        issue: '7873',
+        first_page: '590',
+        last_page: '596',
+      },
+    } as any);
+
+    expect(csl.title).toBe('Highly accurate protein structure prediction for the human proteome');
+    expect(csl.author).toEqual([{ family: 'Tunyasuvunakool', given: 'Kathryn' }]);
+    expect(csl['container-title']).toBe('Nature');
+    expect(csl.issued).toEqual({ 'date-parts': [[2021, 7, 22]] });
+    expect(csl.DOI).toBe('10.1038/s41586-021-03828-1');
+    expect(csl.volume).toBe('596');
+    expect(csl.issue).toBe('7873');
+    expect(csl.page).toBe('590-596');
+  });
 });

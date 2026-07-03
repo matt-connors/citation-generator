@@ -26,9 +26,9 @@ export function parseIsoDate(s: string | null | undefined): CSLDateParts | null 
   if (m[3]) {
     const month = parseInt(m[2], 10);
     const day = parseInt(m[3], 10);
-    // Reject impossible months/days (e.g. "2020-99-99") so we never emit a
-    // malformed CSL date that citeproc would render nonsensically.
-    if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+    // Reject impossible dates (including month-specific limits and leap years)
+    // so we never emit malformed CSL that citeproc would render nonsensically.
+    if (!isValidYmd(y, month, day)) return null;
     return [y, month, day];
   }
   if (m[2]) {
@@ -41,18 +41,60 @@ export function parseIsoDate(s: string | null | undefined): CSLDateParts | null 
 
 export function parseFreeformDate(s: string | null | undefined): CSLDateParts | null {
   if (!s) return null;
-  const text = s.trim();
-  let m = text.match(/^([A-Za-z]+)\.?\s+(\d{1,2}),?\s+(\d{4})$/);
+  const text = s.trim().replace(/\b(\d{1,2})(st|nd|rd|th)\b/gi, '$1');
+  let m = text.match(/^(?:[A-Za-z]+,\s*)?([A-Za-z]+)\.?\s+(\d{1,2}),?\s+(\d{4})$/);
   if (m) {
     const month = MONTHS[m[1].toLowerCase()];
     const day = parseInt(m[2], 10);
-    if (month && day >= 1 && day <= 31) return [parseInt(m[3], 10), month, day];
+    const year = parseInt(m[3], 10);
+    if (month && isValidYmd(year, month, day)) return [year, month, day];
   }
-  m = text.match(/^(\d{1,2})\s+([A-Za-z]+)\.?\s+(\d{4})$/);
+  m = text.match(/^(?:[A-Za-z]+,\s*)?(\d{1,2})\s+([A-Za-z]+)\.?\s+(\d{4})/);
   if (m) {
     const month = MONTHS[m[2].toLowerCase()];
     const day = parseInt(m[1], 10);
-    if (month && day >= 1 && day <= 31) return [parseInt(m[3], 10), month, day];
+    const year = parseInt(m[3], 10);
+    if (month && isValidYmd(year, month, day)) return [year, month, day];
+  }
+  m = text.match(/^([A-Za-z]+)\.?\s+(\d{4})$/);
+  if (m) {
+    const month = MONTHS[m[1].toLowerCase()];
+    const year = parseInt(m[2], 10);
+    if (month && isValidYear(year)) return [year, month];
   }
   return null;
+}
+
+export function parseDate(s: string | null | undefined): CSLDateParts | null {
+  return parseIsoDate(s) || parseFreeformDate(s) || parseNumericDate(s);
+}
+
+function parseNumericDate(s: string | null | undefined): CSLDateParts | null {
+  if (!s) return null;
+  const text = s.trim();
+  const m = text.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/);
+  if (!m) return null;
+
+  const first = parseInt(m[1], 10);
+  const second = parseInt(m[2], 10);
+  const year = parseInt(m[3], 10);
+  if (!isValidYear(year)) return null;
+
+  // Numeric dates are locale-ambiguous. Parse only when one side disambiguates
+  // the order, e.g. 5/26/2026 (US) or 26/5/2026 (day-first).
+  if (first > 12 && second <= 12 && isValidYmd(year, second, first)) return [year, second, first];
+  if (second > 12 && first <= 12 && isValidYmd(year, first, second)) return [year, first, second];
+  return null;
+}
+
+function isValidYear(year: number): boolean {
+  return Number.isFinite(year) && year >= 1000 && year <= 9999;
+}
+
+function isValidYmd(year: number, month: number, day: number): boolean {
+  if (!isValidYear(year) || month < 1 || month > 12 || day < 1 || day > 31) return false;
+  const d = new Date(Date.UTC(year, month - 1, day));
+  return d.getUTCFullYear() === year
+    && d.getUTCMonth() === month - 1
+    && d.getUTCDate() === day;
 }

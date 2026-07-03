@@ -1,8 +1,8 @@
 ---
-title: 'IEEE Citation Guide: Numeric Citation Style for Engineering and Computer Science'
+title: 'IEEE Citation Guide for Engineering and Computer Science'
 pubDate: 2026-05-27
-updatedDate: 2026-05-27
-description: 'Complete IEEE guide following the IEEE Reference Guide (current edition) — the variant this site generates. Numeric in-text citations in square brackets, numbered reference list, italicized abbreviated journal/conference names, worked examples for every common source type. Written and reviewed by the MLA Generator Editorial Team.'
+updatedDate: 2026-07-01
+description: 'Complete IEEE citation guide for bracketed in-text numbers, ordered references, technical source examples, and engineering paper formatting.'
 category: 'style-guide'
 keywords: ['IEEE citation', 'IEEE format', 'IEEE references', 'numeric citation', 'engineering citation', 'computer science citation', 'IEEE Reference Guide']
 tags: ['IEEE', 'engineering', 'computer science', 'numeric citations', 'references', 'technical writing']
@@ -20,7 +20,7 @@ faq:
     answer: 'Both use numeric citation-sequence (numbers in order of first appearance, reused on repeat citation). The visible differences: IEEE uses square brackets `[1]` for in-text citations; Vancouver uses parentheses `(1)`. IEEE italicizes and abbreviates journal/conference names; Vancouver doesn''t italicize but does abbreviate. IEEE uses initials before surname (`A. Goldstein`); Vancouver puts the surname first with attached initials (`Goldstein A`). The systems are siblings, descended from the same numeric tradition, but the typography is unmistakably different.'
 ---
 
-IEEE is the citation style of electrical engineering, computer science, telecommunications, and signal processing. The variant this site generates is **IEEE Reference Guide version 11.29.2023** — the current edition used in IEEE Transactions journals and at IEEE conferences. If your conference paper template, journal author kit, or course syllabus says "IEEE," this is the style you want.
+IEEE is the citation style of electrical engineering, computer science, telecommunications, and signal processing. The variant [this site generates](/ieee-citation-generator/) is **IEEE Reference Guide version 11.29.2023** — the current edition used in IEEE Transactions journals and at IEEE conferences. If your conference paper template, journal author kit, or course syllabus says "IEEE," this is the style you want.
 
 > The shortest version of IEEE: numbered citations in square brackets in the text — `[1]` — and a numbered reference list at the back, in the order sources first appeared. Authors are listed initials-first (`A. Goldstein`). Article and chapter titles go in quotation marks. Journal and conference names are italicized and abbreviated.
 
@@ -34,7 +34,7 @@ Why numeric rather than author–date? Engineering papers cite densely — half 
 
 ## In-text citations
 
-An IEEE [in-text citation](/guides/in-text-citations) is a **number in square brackets** placed where an author–date parenthetical would otherwise go. The number points the reader to the matching entry in the numbered reference list. There is no author name and no year inside the brackets — only the number, plus a page locator if you are quoting directly.
+An IEEE [in-text citation](/guides/in-text-citations/) is a **number in square brackets** placed where an author–date parenthetical would otherwise go. The number points the reader to the matching entry in the numbered reference list. There is no author name and no year inside the brackets — only the number, plus a page locator if you are quoting directly.
 
 ### One source
 
@@ -96,7 +96,7 @@ The references below use the same fixture data referenced throughout this guide,
 | Conference paper | [6] Y. Tanaka and M. Hoffmann, "A Unified Model of Attention in Dual-Task Performance," in *Proc. 63rd Annu. Meeting Psychonomic Soc.*, Nov. 2022, pp. 412–419. |
 | Doctoral dissertation | [7] E. R. Kowalski, "Memory Consolidation in Bilingual Speakers: An fMRI Investigation," Ph.D. dissertation, Univ. of Michigan, Ann Arbor, MI, USA, 2020. |
 
-A few details to notice. The book uses the place-colon-publisher form (`Cambridge, UK: Cambridge University Press`), which IEEE applies to books, chapters, and conference proceedings; theses and reports use a different form, with place following publisher as a separate comma-delimited element (`Univ. of Michigan, Ann Arbor, MI, USA`). The chapter uses `in` (no italics) followed by the italicized container, then the editor in initials-first form with the `Ed.` label after the name (`R. T. Morrison, Ed.`). The [journal entry](/guides/how-to-cite-a-journal-article) packs volume, issue, page range, month, year, and DOI in fixed order; the page range is written out in full and uses an en dash. The web article does **not** italicize the container — IEEE italicizes journal and conference titles but treats web container names as plain text — and the engine omits the issued date entirely; what survives are the title, container, accessed date, `[Online]` tag, and URL prefixed with `Available:`. The government report carries the genre and number together (`Tech. Rep. NCES 2023-145`) after the publisher and place. The conference entry shows the abbreviated proceedings title (`Proc. 63rd Annu. Meeting Psychonomic Soc.`) — this is the IEEE-standard form, but it's a string you supply when entering the source. The generator's CSL doesn't transform full conference names into IEEE abbreviations. Beyond the title, the entry carries month and year and page range — the host city is not rendered for published conference papers. The dissertation carries the degree genre (`Ph.D. dissertation`), the institution, the place, and the year. If you enter one of these into the [generator](/), the tool assembles the brackets, labels, italics, and DOI prefix for you.
+A few details to notice. The book uses the place-colon-publisher form (`Cambridge, UK: Cambridge University Press`), which IEEE applies to books, chapters, and conference proceedings; theses and reports use a different form, with place following publisher as a separate comma-delimited element (`Univ. of Michigan, Ann Arbor, MI, USA`). The chapter uses `in` (no italics) followed by the italicized container, then the editor in initials-first form with the `Ed.` label after the name (`R. T. Morrison, Ed.`). The [journal entry](/guides/how-to-cite-a-journal-article/) packs volume, issue, page range, month, year, and DOI in fixed order; the page range is written out in full and uses an en dash. The web article does **not** italicize the container — IEEE italicizes journal and conference titles but treats web container names as plain text — and the engine omits the issued date entirely; what survives are the title, container, accessed date, `[Online]` tag, and URL prefixed with `Available:`. The government report carries the genre and number together (`Tech. Rep. NCES 2023-145`) after the publisher and place. The conference entry shows the abbreviated proceedings title (`Proc. 63rd Annu. Meeting Psychonomic Soc.`) — this is the IEEE-standard form, but it's a string you supply when entering the source. The generator's CSL doesn't transform full conference names into IEEE abbreviations. Beyond the title, the entry carries month and year and page range — the host city is not rendered for published conference papers. The dissertation carries the degree genre (`Ph.D. dissertation`), the institution, the place, and the year. If you enter one of these into the [generator](/), the tool assembles the brackets, labels, italics, and DOI prefix for you.
 
 ## Common mistakes
 
@@ -134,7 +134,7 @@ The IEEE reference list is keyed to in-text numbers, which are themselves keyed 
 
 ## How IEEE differs from Vancouver and APA
 
-IEEE and [Vancouver](/guides/vancouver) are siblings — both numeric citation-sequence systems descended from a tradition of compact technical printing. [APA](/guides/apa) is the outsider, an author–date system from the social sciences. Rendering the same journal-article fixture in all three styles makes the differences concrete.
+IEEE and [Vancouver](/guides/vancouver/) are siblings — both numeric citation-sequence systems descended from a tradition of compact technical printing. [APA](/guides/apa/) is the outsider, an author–date system from the social sciences. Rendering the same journal-article fixture in all three styles makes the differences concrete.
 
 In IEEE:
 

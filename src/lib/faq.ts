@@ -1,7 +1,7 @@
 import { marked } from 'marked';
 
 // Guide FAQ answers (in each guide's frontmatter) are authored with inline
-// markdown — **bold**, `code`, *italic*, and [links](/guides/...). They are
+// markdown — **bold**, `code`, *italic*, and [links](/guides/.../). They are
 // shown via GuideFaq and also fed into FAQPage structured data.
 
 /**

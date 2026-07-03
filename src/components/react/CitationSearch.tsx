@@ -6,22 +6,29 @@ import Dropdown from "./Dropdown";
 import citationStyles from '../citationStyles';
 import styles from "../../styles/citation-search.module.css";
 
+interface SearchPanelProps {
+    label: string;
+    placeholder: string;
+    name: string;
+    active: boolean;
+}
+
 // Component for each search input field
-const SearchPanel = ({ label, placeholder, name }) => {
+const SearchPanel = ({ label, placeholder, name, active }: SearchPanelProps) => {
     const inputId = `${name}-input`;
     return (
         <div className={styles.labelContent}>
             <label htmlFor={inputId} id={name} className={styles.inputLabel}>{label}</label>
             <div className={styles.inputWrapper}>
                 <div className={styles.inputFade} aria-hidden="true"></div>
-                <input id={inputId} type="text" placeholder={placeholder} name={name} autoComplete="off" />
+                <input id={inputId} type="text" placeholder={placeholder} name={name} autoComplete="off" disabled={!active} />
             </div>
         </div>
     );
 }
 
 // Main CitationSearch component
-const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeManualCite: Boolean }, ref: Ref<HTMLInputElement>) => {
+const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeManualCite: Boolean, defaultStyle?: string }, ref: Ref<HTMLInputElement>) => {
     // State for managing active tab index
     const [tabIndex, setTabIndex] = useState(0);
 
@@ -35,7 +42,7 @@ const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeMan
     const tabPanels = [
         { label: "Website", placeholder: "Paste the website URL", name: "website" },
         { label: "Book", placeholder: "Enter an ISBN", name: "book" },
-        // { label: "Journal", placeholder: "Enter an ISBN", name: "journal" }
+        { label: "Journal", placeholder: "Enter a DOI", name: "journal" }
     ];
 
     return (
@@ -51,18 +58,19 @@ const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeMan
             {/* Form containing search inputs and citation options */}
             <form className={`${styles.searchBox} ${clsx(
                 props.includeDropdown && styles.withDropdown
-            )}`} action="/my-references">
+            )}`} action="/my-references/">
 
                 {/* Dropdown for selecting citation style */}
                 {props.includeDropdown ? <Dropdown
                     options={citationStyles}
                     className={clsx(styles.label, styles.dropdown)}
+                    defaultStyle={props.defaultStyle}
                 /> : <input type="hidden" name="citationStyle" ref={ref} />}
 
                 {/* Render tab panels dynamically */}
                 {tabPanels.map((panel, index) => (
                     <TabPanel key={index} className={`${styles.label} ${getClassNames('searchPanel', index)}`} role="tabpanel" aria-labelledby={panel.name} hidden={tabIndex !== index}>
-                        <SearchPanel {...panel} />
+                        <SearchPanel {...panel} active={tabIndex === index} />
                     </TabPanel>
                 ))}
 
@@ -72,7 +80,7 @@ const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeMan
                 </button>
             </form>
             {props.includeManualCite && (
-                <a href="/my-references" className={styles.smallButton}>
+                <a href="/my-references/" className={styles.smallButton}>
                     <span>Cite Manually</span>
                     <ChevronRightIcon className={styles.icon} aria-hidden="true" />
                 </a>

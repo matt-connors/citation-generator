@@ -16,12 +16,23 @@ interface DropdownProps {
     options: Option[];
     className: string;
     value?: Option;
+    defaultStyle?: string;
     onChange?: (value: Option) => void;
 }
 
-export default function Dropdown({ options, className, value, onChange }: DropdownProps) {
+export default function Dropdown({ options, className, value, defaultStyle, onChange }: DropdownProps) {
 
-    const defaultOption = value || options.find(option => option.default) || options[0];
+    // Resolve an optional preset style key (e.g. "apa" or "apa-7") to one of the
+    // available options. Match on value case-insensitively: exact first, then a
+    // prefix/substring match so a short key like "apa" maps to "apa-7".
+    const presetKey = defaultStyle?.trim().toLowerCase();
+    const presetOption = presetKey
+        ? options.find(option => option.value.toLowerCase() === presetKey)
+            || options.find(option => option.value.toLowerCase().startsWith(presetKey))
+            || options.find(option => option.value.toLowerCase().includes(presetKey))
+        : undefined;
+
+    const defaultOption = value || presetOption || options.find(option => option.default) || options[0];
 
     const [open, setOpen] = useState(false);
     const [searchText, setSearchText] = useState('');

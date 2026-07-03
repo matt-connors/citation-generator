@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { loadSources, saveSources, STORAGE_KEY, type StoredSource } from './storage';
-import type { CSLItem, SupportedStyle } from '../citations/csl-types';
+import { decodeInlineCslParam, INLINE_CSL_PARAM } from './inline-csl';
+import type { CSLItem, ExtractQuality, FieldProvenance, SupportedStyle } from '../citations/csl-types';
 
 export interface UseReferencesReturn {
   sources: StoredSource[];
@@ -25,6 +26,8 @@ interface ApiEnvelope {
   uuid: string;
   type: CSLItem['type'];
   csl: CSLItem;
+  _quality?: ExtractQuality;
+  _provenance?: Partial<Record<keyof CSLItem, FieldProvenance>>;
 }
 
 export function useReferences(): UseReferencesReturn {
@@ -73,7 +76,25 @@ export function useReferences(): UseReferencesReturn {
     const styleParam = params.get('citationStyle');
     if (isSupportedStyle(styleParam)) setCitationFormatState(styleParam);
 
-    setSourcesState(loadSources());
+    const existing = loadSources();
+    const inlineSource = decodeInlineCslParam(params.get(INLINE_CSL_PARAM));
+    if (inlineSource) {
+      const next = existing.some((source) => source.uuid === inlineSource.uuid || source.csl.id === inlineSource.csl.id)
+        ? existing
+        : [...existing, inlineSource];
+      setSourcesState(next);
+      if (next !== existing) saveSources(next);
+      params.delete(INLINE_CSL_PARAM);
+      try {
+        const search = params.toString();
+        window.history.replaceState({}, '', `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`);
+      } catch {
+        // URL cleanup is best-effort; the import itself has already succeeded.
+      }
+      return;
+    }
+
+    setSourcesState(existing);
 
     const website = params.get('website');
     const book = params.get('book');
@@ -91,8 +112,12 @@ export function useReferences(): UseReferencesReturn {
     const timeout = setTimeout(() => controller.abort(), 15_000);
     fetch(requestUrl, { signal: controller.signal })
       .then(async (res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json() as Promise<ApiEnvelope>;
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          if (website) return errorEnvelopeFromWebsite(website, body);
+          throw new Error(`HTTP ${res.status}`);
+        }
+        return body as ApiEnvelope;
       })
       .then((env) => {
         if (cancelled || !env?.csl) return;
@@ -100,7 +125,12 @@ export function useReferences(): UseReferencesReturn {
         // the user added between mount and fetch resolution aren't clobbered.
         setSources((prev) => prev.some((s) => s.uuid === env.uuid)
           ? prev
-          : [...prev, { uuid: env.uuid, csl: env.csl }]);
+          : [...prev, {
+            uuid: env.uuid,
+            csl: env.csl,
+            quality: env._quality,
+            provenance: env._provenance,
+          }]);
       })
       .catch((err) => { if (!cancelled) console.error('Citation fetch failed', err); })
       .finally(() => clearTimeout(timeout));
@@ -146,5 +176,39 @@ export function useReferences(): UseReferencesReturn {
     selectAll,
     setCitationFormat,
     handleDelete,
+  };
+}
+
+function errorEnvelopeFromWebsite(website: string, body: any): ApiEnvelope {
+  const code = typeof body?.code === 'string' ? body.code : 'fetch_failed';
+  const blocked = code === 'blocked' || /blocked|captcha|access/i.test(String(body?.error || ''));
+  const message = blocked
+    ? 'This site blocked automated access. Use the browser extension, paste page text, or enter the citation details manually.'
+    : 'We could not fetch this source automatically. Use the browser extension, paste page text, or enter the citation details manually.';
+  return {
+    uuid: website,
+    type: 'webpage',
+    csl: {
+      id: website,
+      type: 'webpage',
+      URL: website,
+    },
+    _quality: {
+      score: 40,
+      warnings: [{
+        code: blocked ? 'fetch_blocked' : 'fetch_failed',
+        severity: blocked ? 'warning' : 'review',
+        message,
+        action: blocked ? 'use-extension' : 'enter-manually',
+      }],
+      acquisition: {
+        fetch: {
+          source: 'fetch',
+          status: blocked ? 'blocked' : 'error',
+          reason: String(body?.error || code),
+          url: website,
+        },
+      },
+    },
   };
 }

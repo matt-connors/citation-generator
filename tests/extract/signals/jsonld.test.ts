@@ -65,6 +65,15 @@ describe('jsonldSignal', () => {
     ]);
   });
 
+  it('handles organization authors with array-typed @type', () => {
+    const $ = load(`<html><head><script type="application/ld+json">${JSON.stringify({
+      '@type': 'Article',
+      headline: 'h',
+      author: { '@type': ['Organization', 'NewsMediaOrganization'], name: 'Example News' },
+    })}</script></head></html>`);
+    expect(jsonldSignal($).fields.author).toEqual([{ literal: 'Example News' }]);
+  });
+
   it('silently ignores malformed JSON', () => {
     const $ = load(`<html><head><script type="application/ld+json">{not json}</script></head></html>`);
     const r = jsonldSignal($);
@@ -101,5 +110,56 @@ describe('jsonldSignal', () => {
     const $ = cheerio.load(html);
     const r = jsonldSignal($);
     expect(r.fields.URL).toBe('https://mysite.com/2026/article/');
+  });
+
+  it('handles creator, isPartOf, mainEntityOfPage, and non-ISO dates', () => {
+    const html = `<html><head><script type="application/ld+json">${JSON.stringify({
+      '@type': ['WebPage', 'NewsArticle'],
+      headline: 'The Article',
+      creator: 'Jane Doe',
+      datePublished: 'May 26, 2026',
+      isPartOf: { '@type': 'WebSite', name: 'Example News' },
+      mainEntityOfPage: { '@id': 'https://example.com/article' },
+    })}</script></head></html>`;
+    const r = jsonldSignal(load(html));
+    expect(r.fields.author).toEqual([{ family: 'Doe', given: 'Jane' }]);
+    expect(r.fields.issued).toEqual({ 'date-parts': [[2026, 5, 26]] });
+    expect(r.fields['container-title']).toBe('Example News');
+    expect(r.fields.URL).toBe('https://example.com/article');
+  });
+
+  it('does not take titles from array-typed non-article containers', () => {
+    const html = `<html><head><script type="application/ld+json">${JSON.stringify({
+      '@type': ['Organization', 'WebSite'],
+      name: 'Site Root',
+    })}</script></head></html>`;
+    expect(jsonldSignal(load(html)).fields.title).toBeUndefined();
+  });
+
+  it('extracts scholarly DOI, volume, issue, pages, and abstract from JSON-LD', () => {
+    const html = `<html><head><script type="application/ld+json">${JSON.stringify({
+      '@type': 'ScholarlyArticle',
+      headline: 'A Scholarly Article',
+      identifier: [
+        { '@type': 'PropertyValue', propertyID: 'DOI', value: 'https://doi.org/10.5555/example.2026.001.' },
+      ],
+      isPartOf: {
+        '@type': 'PublicationIssue',
+        issueNumber: '4',
+        isPartOf: {
+          '@type': 'PublicationVolume',
+          volumeNumber: '22',
+        },
+      },
+      pageStart: '101',
+      pageEnd: '118',
+      abstract: 'A concise article abstract.',
+    })}</script></head></html>`;
+    const r = jsonldSignal(load(html));
+    expect(r.fields.DOI).toBe('10.5555/example.2026.001');
+    expect(r.fields.volume).toBe('22');
+    expect(r.fields.issue).toBe('4');
+    expect(r.fields.page).toBe('101-118');
+    expect(r.fields.abstract).toBe('A concise article abstract.');
   });
 });

@@ -3,17 +3,17 @@
 // wired into `npm run build`, so the Cloudflare deploy never depends on the
 // image renderer. Re-run it when guide titles/categories change:
 //
-//   npm install -D @resvg/resvg-js   # if not already installed
 //   node scripts/gen-og-images.mjs
+//   node scripts/gen-og-images.mjs how-to-cite-a-website-with-no-author
 //
 // Design: 1200x630, white card, brand-green category pill, large wrapped
 // title, "MLA Generator" wordmark, and the domain. Text is rendered with the
-// system font (Arial) via resvg.
+// system font (Arial) via SVG text and sharp's SVG renderer.
 
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { Resvg } from '@resvg/resvg-js';
+import sharp from 'sharp';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const guidesDir = join(root, 'src/content/guides');
@@ -104,9 +104,14 @@ function buildSvg(title, categoryLabel) {
 </svg>`;
 }
 
-function main() {
+async function main() {
     if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
-    const files = readdirSync(guidesDir).filter((f) => f.endsWith('.mdx'));
+    const requested = new Set(process.argv.slice(2).map((slug) => slug.replace(/\.mdx$/, '')));
+    const files = readdirSync(guidesDir).filter((f) => {
+        if (!f.endsWith('.mdx')) return false;
+        if (requested.size === 0) return true;
+        return requested.has(f.replace(/\.mdx$/, ''));
+    });
     let count = 0;
     for (const file of files) {
         const slug = file.replace(/\.mdx$/, '');
@@ -117,11 +122,7 @@ function main() {
         }
         const label = CATEGORY_LABEL[category] ?? 'Guide';
         const svg = buildSvg(title, label);
-        const resvg = new Resvg(svg, {
-            font: { loadSystemFonts: true, defaultFontFamily: 'Arial' },
-            fitTo: { mode: 'width', value: W },
-        });
-        const png = resvg.render().asPng();
+        const png = await sharp(Buffer.from(svg)).png().toBuffer();
         writeFileSync(join(outDir, `${slug}.png`), png);
         count++;
         console.log(`  wrote og/${slug}.png (${png.length} B) — "${title.slice(0, 50)}"`);

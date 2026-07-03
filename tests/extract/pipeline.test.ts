@@ -40,6 +40,59 @@ describe('runExtractionPipeline', () => {
     expect(result.csl.URL).toBe('https://example.com/p');
   });
 
+  it('resolves relative canonical URLs against the input URL', () => {
+    const result = runExtractionPipeline(
+      `<html><head><link rel="canonical" href="/canonical/article" /></head></html>`,
+      'https://example.com/path/article?utm_source=x',
+    );
+    expect(result.csl.URL).toBe('https://example.com/canonical/article');
+    expect(result.signals.URL).toBe('heuristic');
+  });
+
+  it('deduplicates matching publisher and container-title fields', () => {
+    const html = `<!DOCTYPE html><html><head>
+      <meta property="og:site_name" content="AP News" />
+      <script type="application/ld+json">${JSON.stringify({
+        '@type': 'NewsArticle',
+        headline: 'T',
+        publisher: { '@type': 'Organization', name: 'AP News' },
+      })}</script>
+    </head></html>`;
+    const result = runExtractionPipeline(html, 'https://example.com/p');
+    expect(result.csl['container-title']).toBe('AP News');
+    expect(result.csl.publisher).toBeUndefined();
+  });
+
+  it('promotes journal landing pages when volume, issue, or page metadata is present', () => {
+    const html = `<!DOCTYPE html><html><head>
+      <meta name="citation_title" content="Scholarly Article" />
+      <meta name="citation_journal_title" content="Journal of Testing" />
+      <meta name="citation_volume" content="12" />
+    </head></html>`;
+    const result = runExtractionPipeline(html, 'https://example.com/article');
+    expect(result.csl.type).toBe('article-journal');
+  });
+
+  it('promotes DOI-only journal landing pages when a journal title is present', () => {
+    const html = `<!DOCTYPE html><html><head>
+      <meta name="citation_title" content="Early View Reliability Study" />
+      <meta name="citation_journal_title" content="Journal of Citation Testing" />
+      <meta name="citation_doi" content="https://doi.org/10.5555/jct.2026.early" />
+    </head></html>`;
+    const result = runExtractionPipeline(html, 'https://example.com/article');
+    expect(result.csl.type).toBe('article-journal');
+    expect(result.csl.DOI).toBe('10.5555/jct.2026.early');
+  });
+
+  it('keeps ordinary site containers as webpages', () => {
+    const html = `<!DOCTYPE html><html><head>
+      <meta property="og:title" content="News Article" />
+      <meta property="og:site_name" content="Example News" />
+    </head></html>`;
+    const result = runExtractionPipeline(html, 'https://example.com/news');
+    expect(result.csl.type).toBe('webpage');
+  });
+
   describe('wikipedia title override', () => {
     // Wikipedia's JSON-LD `headline` is the article description, not the title.
     // The override prefers the heuristic <title> tag for *.wikipedia.org hosts.

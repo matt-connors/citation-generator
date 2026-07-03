@@ -48,6 +48,8 @@
 .citationSourceWrapper {
     margin-left: 48px;
     max-width: 800px;
+    padding-right: 26px;
+    position: relative;
 }
 
 .citationSource {
@@ -64,6 +66,87 @@
     -webkit-text-size-adjust: 100%;
     font-feature-settings: normal;
     font-variation-settings: normal;
+}
+
+.qualityIndicator {
+    align-items: center;
+    border-radius: 999px;
+    color: #a16207;
+    display: inline-flex;
+    height: 18px;
+    justify-content: center;
+    opacity: 0.78;
+    position: absolute;
+    right: 0;
+    top: 7px;
+    width: 18px;
+}
+
+.qualityIndicator[data-severity="error"] {
+    color: #8a1f11;
+    opacity: 0.86;
+}
+
+.qualityIndicator[data-severity="warning"] {
+    color: #a16207;
+    opacity: 0.82;
+}
+
+.qualityIcon {
+    height: 15px;
+    width: 15px;
+}
+
+.fieldWarningText {
+    color: #a16207;
+}
+
+.fieldWarningText[data-severity="error"] {
+    color: #8a1f11;
+}
+
+.fieldWarningText[data-severity="info"] {
+    color: hsl(var(--muted-foreground));
+}
+
+.fieldWarningText[data-severity="review"],
+.fieldWarningText[data-severity="warning"] {
+    color: #a16207;
+}
+
+.fieldWarningMessage {
+    min-width: 0;
+}
+
+.fieldWarningDismiss {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: 999px;
+    color: hsl(var(--muted-foreground));
+    display: inline-flex;
+    flex: 0 0 auto;
+    height: 16px;
+    justify-content: center;
+    margin-left: 2px;
+    opacity: 0.72;
+    padding: 0;
+    width: 16px;
+}
+
+.fieldWarningDismiss:hover {
+    background: rgba(161, 98, 7, 0.12);
+    opacity: 1;
+}
+
+.fieldWarningDismiss:focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 2px;
+}
+
+.fieldWarningDismissIcon {
+    height: 12px;
+    width: 12px;
 }
 
 .citation span::selection,

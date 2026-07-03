@@ -1,14 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import { onRequest } from '../functions/_middleware';
 
-// onRequest = [errorHandling, adminAuth, cors]; compose them the way Cloudflare
-// Pages does: errorHandling wraps adminAuth wraps cors wraps the route handler.
+// Compose the middleware array the way Cloudflare Pages does: each middleware
+// receives a `next` that calls the next middleware, ending at the route handler.
 function run(request: Request, route: () => Promise<Response>, env: Record<string, unknown> = {}) {
-  const [errorHandling, adminAuth, cors] = onRequest as any[];
-  const corsCtx = { request, env, next: route };
-  const authCtx = { request, env, next: () => cors(corsCtx) };
-  const errCtx = { request, env, next: () => adminAuth(authCtx) };
-  return errorHandling(errCtx) as Promise<Response>;
+  const middleware = onRequest as any[];
+  const next = middleware.reduceRight(
+    (inner, fn) => () => fn({ request, env, next: inner }),
+    route,
+  );
+  return next() as Promise<Response>;
 }
 
 describe('_middleware', () => {
@@ -32,6 +33,30 @@ describe('_middleware', () => {
     expect(res.status).toBe(200);
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe('*');
     expect(await res.text()).toBe('ok');
+  });
+
+  it('redirects worker-routed no-slash pages before the route handler', async () => {
+    let routeHit = false;
+    const res = await run(
+      new Request('https://m.com/my-references?citationStyle=mla-9'),
+      async () => { routeHit = true; return new Response('references'); },
+    );
+
+    expect(res.status).toBe(301);
+    expect(res.headers.get('location')).toBe('https://m.com/my-references/?citationStyle=mla-9');
+    expect(routeHit).toBe(false);
+  });
+
+  it('redirects HEAD checks for worker-routed no-slash pages', async () => {
+    let routeHit = false;
+    const res = await run(
+      new Request('https://m.com/my-references', { method: 'HEAD' }),
+      async () => { routeHit = true; return new Response('references'); },
+    );
+
+    expect(res.status).toBe(301);
+    expect(res.headers.get('location')).toBe('https://m.com/my-references/');
+    expect(routeHit).toBe(false);
   });
 
   it('returns a generic 500 without leaking the error message or stack', async () => {

@@ -8,7 +8,7 @@ import type { CSLName } from '../csl-types';
 // alternations (Foundation, Press, University, Institute, Society, Group,
 // Company, Department, Office, Agency, Bureau, Commission) don't include an
 // optional `.` of their own.
-const ORG_SUFFIXES = /\b(Inc\.?|LLC|Ltd\.?|Corp\.?|Corporation|Foundation|Press|University|Institute|Society|Group|Company|Co\.?|Department|Office|Agency|Bureau|Commission)[.\s]*$/i;
+const ORG_SUFFIXES = /\b(Inc\.?|LLC|Ltd\.?|Corp\.?|Corporation|Foundation|Press|University|Institute|Society|Group|Company|Co\.?|Department|Office|Agency|Bureau|Commission|Administration|Authority|Association|Council|Center|Centre|Laboratory|Lab|Labs|Ministry|Service|Services|News|Editorial Board|Editorial Team|Staff)[.\s]*$/i;
 const PARTICLES = new Set([
   'von', 'de', 'del', 'della', 'van', 'la', 'le', 'der', 'den', 'di', 'da', 'du', 'dos', 'des',
 ]);
@@ -19,6 +19,7 @@ export function parseAuthorName(input: string | CSLName | null | undefined): CSL
   if (typeof input === 'object') return input;
   const trimmed = input.trim();
   if (!trimmed) return null;
+  if (/^[A-Z][A-Z0-9&.-]{1,14}$/.test(trimmed)) return { literal: trimmed };
   if (ORG_SUFFIXES.test(trimmed)) return { literal: trimmed };
 
   if (trimmed.includes(',')) {
@@ -36,15 +37,80 @@ export function parseAuthorName(input: string | CSLName | null | undefined): CSL
   }
   const family = parts.pop();
   if (!family) return null;
-  let particle: string | undefined;
-  if (parts.length >= 1 && PARTICLES.has(parts[parts.length - 1].toLowerCase())) {
-    particle = parts.pop();
+  const particleParts: string[] = [];
+  while (parts.length >= 1 && PARTICLES.has(parts[parts.length - 1].toLowerCase())) {
+    particleParts.unshift(parts.pop() as string);
   }
   const given = parts.join(' ');
 
   const out: CSLName = { family };
   if (given) (out as any).given = given;
-  if (particle) (out as any)['non-dropping-particle'] = particle;
+  if (particleParts.length) (out as any)['non-dropping-particle'] = particleParts.join(' ');
   if (suffix) (out as any).suffix = suffix;
   return out;
+}
+
+export function parseAuthorList(input: string | null | undefined): CSLName[] {
+  if (!input) return [];
+  const cleaned = input
+    .replace(/\s+/g, ' ')
+    .replace(/^(by|written by|posted by|author:)\s+/i, '')
+    .replace(/\s+et\s+al\.?$/i, '')
+    .trim();
+  if (!cleaned) return [];
+
+  const segments = splitAuthorSegments(cleaned);
+  return segments
+    .map((segment) => parseAuthorName(segment))
+    .filter(Boolean) as CSLName[];
+}
+
+function splitAuthorSegments(input: string): string[] {
+  const semicolonParts = input.split(/\s*;\s*/).filter(Boolean);
+  if (semicolonParts.length > 1) {
+    return semicolonParts.flatMap(splitAuthorSegments);
+  }
+
+  const conjunctionParts = input.split(/\s+(?:and|&)\s+/i).filter(Boolean);
+  if (conjunctionParts.length > 1 && conjunctionParts.every(looksLikeAuthorUnit)) {
+    return conjunctionParts.flatMap(splitAuthorSegments);
+  }
+
+  return splitCommaSegments(input);
+}
+
+function splitCommaSegments(input: string): string[] {
+  const parts = input.split(/\s*,\s*/).filter(Boolean);
+  if (parts.length <= 1) return [input];
+
+  if (parts.length === 2) {
+    return looksLikeInvertedSingleName(parts[0], parts[1]) ? [input] : parts;
+  }
+
+  if (parts.length % 2 === 0) {
+    const pairs: string[] = [];
+    for (let i = 0; i < parts.length; i += 2) {
+      if (!looksLikeInvertedSingleName(parts[i], parts[i + 1])) return parts;
+      pairs.push(`${parts[i]}, ${parts[i + 1]}`);
+    }
+    return pairs;
+  }
+
+  return parts;
+}
+
+function looksLikeInvertedSingleName(left: string, right: string): boolean {
+  const leftWords = left.trim().split(/\s+/).filter(Boolean);
+  const rightWords = right.trim().split(/\s+/).filter(Boolean);
+  if (!leftWords.length || !rightWords.length) return false;
+  if (ORG_SUFFIXES.test(left) || ORG_SUFFIXES.test(right)) return false;
+  if (leftWords.length === 1 || rightWords.length === 1) return true;
+  return leftWords.slice(0, -1).every((word) => PARTICLES.has(word.toLowerCase()));
+}
+
+function looksLikeAuthorUnit(segment: string): boolean {
+  const parsed = parseAuthorName(segment);
+  if (!parsed) return false;
+  if ('literal' in parsed) return true;
+  return Boolean(parsed.given);
 }

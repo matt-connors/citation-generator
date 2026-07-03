@@ -11,6 +11,12 @@
     "preview": "npm run build && wrangler pages dev ./dist --compatibility-flags=\"nodejs_compat\"",
     "watch": "nodemon --ext tsx,astro,html,css --exec npm run build-tailwind",
     "build-tailwind": "tailwindcss -i ./src/styles/tailwind.css -o ./src/styles/tailwind-output.css",
+    "content:schedule": "node scripts/check-scheduled-guides.mjs --json",
+    "content:publish-due": "node scripts/check-scheduled-guides.mjs --live-sitemap=https://mlagenerator.com/sitemap-0.xml --write-trigger=public/content-publish-trigger.json",
+    "indexnow:dry-run": "node scripts/submit-indexnow.mjs --dry-run",
+    "indexnow:submit": "node scripts/submit-indexnow.mjs",
+    "eval:citation-acquisition": "node scripts/eval-citation-acquisition.mjs",
+    "deploy:browser-renderer": "wrangler deploy --config workers/browser-renderer/wrangler.toml",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -48,6 +54,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240222.0",
+    "@resvg/resvg-js": "^2.6.2",
     "@testing-library/react": "^14.3.1",
     "jsdom": "^29.1.1",
     "tailwindcss": "^3.4.12",

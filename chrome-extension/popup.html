@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MLA Generator</title>
+    <link rel="icon" type="image/png" href="icons/icon32.png">
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <img src="icons/icon32.png" width="32" height="32" alt="" aria-hidden="true">
+          <div>
+            <h1>MLA Generator</h1>
+            <p class="brand-caption">Citation Generator</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <label class="style-picker">
+            <select id="style-select" name="style" aria-label="Citation style"></select>
+          </label>
+          <button id="history-button" class="history-toggle" type="button" aria-expanded="false" aria-controls="history-panel">
+            <span>History</span>
+          </button>
+        </div>
+      </header>
+
+      <section id="history-panel" class="history-panel" aria-label="Citation history" hidden>
+        <div class="history-head">
+          <span>Recent citations</span>
+          <button id="history-clear" type="button">Clear</button>
+        </div>
+        <ul id="history-list" class="history-list"></ul>
+      </section>
+
+      <section class="source" aria-label="Current page">
+        <div class="source-kicker">
+          <span id="tab-host" class="host">Loading tab</span>
+        </div>
+        <p id="tab-title" class="title">Current page</p>
+        <p id="tab-url" class="url"></p>
+      </section>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+
+      <button id="cite-button" class="primary" type="button" disabled>
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M4 19.5V5.75A2.75 2.75 0 0 1 6.75 3H20v15H6.75A2.75 2.75 0 0 0 4 20.75"></path>
+          <path d="M8 7h8"></path>
+          <path d="M8 10.5h6"></path>
+        </svg>
+        <span class="button-text">Cite page</span>
+      </button>
+
+      <section id="result" class="result" hidden>
+        <div class="result-head">
+          <span class="result-label">Works Cited entry</span>
+          <span id="detail-count" class="result-label"></span>
+        </div>
+        <div id="citation-output" class="citation" tabindex="0"></div>
+        <dl id="details-list" class="details-list"></dl>
+        <div class="actions">
+          <button id="copy-button" class="secondary" type="button" disabled>
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy</span>
+          </button>
+          <button id="edit-button" class="secondary" type="button" disabled>
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M14 3h7v7"></path>
+              <path d="M10 14 21 3"></path>
+              <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"></path>
+            </svg>
+            <span>Edit</span>
+          </button>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
