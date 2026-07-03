@@ -14,7 +14,6 @@ interface Env extends AiGatewayEnv {
   AI_CITATION_MODEL?: string;
   AI_GATEWAY_MODEL?: string;
   CITATION_INTERNAL_DEBUG_TOKEN?: string;
-  CITATION_AI_ASSIST_ENABLED?: string;
   BROWSER_RENDERER_TOKEN?: string;
 }
 
@@ -36,7 +35,12 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     aiModel: context.env.AI_CITATION_MODEL || context.env.AI_GATEWAY_MODEL,
     acquisitionMode: internalDebug ? acquisitionMode(url.searchParams.get('acquisition')) : 'auto',
     bypassCache: internalDebug && url.searchParams.get('nocache') === '1',
-    aiAssistEnabled: context.env.CITATION_AI_ASSIST_ENABLED === '1',
+    // AI field-assist is enabled whenever an AI binding is present (the binding
+    // is the enablement signal — no separate flag). It still only runs on pages
+    // still missing core fields after fetch+render (shouldRunAiAssist), every
+    // proposal must be verbatim-verified against the page (see citation-assist),
+    // and AI-filled fields are surfaced as "AI-suggested — verify" in the UI.
+    aiAssistEnabled: !!ai,
     // Browser Run is enabled whenever a browser binding is present — the binding
     // IS the enablement signal (no separate flag). Rendering still only fires for
     // thin/blocked/JS-heavy pages (see shouldRender) and degrades gracefully to
