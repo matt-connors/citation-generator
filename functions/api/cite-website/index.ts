@@ -14,7 +14,6 @@ interface Env extends AiGatewayEnv {
   AI_CITATION_MODEL?: string;
   AI_GATEWAY_MODEL?: string;
   CITATION_INTERNAL_DEBUG_TOKEN?: string;
-  CITATION_RENDERING_ENABLED?: string;
   CITATION_AI_ASSIST_ENABLED?: string;
   BROWSER_RENDERER_TOKEN?: string;
 }
@@ -38,7 +37,12 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     acquisitionMode: internalDebug ? acquisitionMode(url.searchParams.get('acquisition')) : 'auto',
     bypassCache: internalDebug && url.searchParams.get('nocache') === '1',
     aiAssistEnabled: context.env.CITATION_AI_ASSIST_ENABLED === '1',
-    renderingEnabled: context.env.CITATION_RENDERING_ENABLED === '1',
+    // Browser Run is enabled whenever a browser binding is present — the binding
+    // IS the enablement signal (no separate flag). Rendering still only fires for
+    // thin/blocked/JS-heavy pages (see shouldRender) and degrades gracefully to
+    // the fetch result on failure, so a bound-but-broken renderer never breaks a
+    // request.
+    renderingEnabled: !!browser,
   });
 };
 
