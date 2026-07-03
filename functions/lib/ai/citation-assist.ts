@@ -54,8 +54,14 @@ const FIELD_SCHEMA = {
 };
 
 export async function runAiFieldAssist(input: AiAssistInput): Promise<FieldEvidence[]> {
-  const sourceText = combinedSourceText(input);
-  if (sourceText.length < 50) return [];
+  // Keep each source document separate. A snippet must live verbatim inside ONE
+  // document — never spanning a fetched/rendered boundary — or a value could be
+  // synthesized across the join of two unrelated texts.
+  const normalizedSources = [input.fetchedText, input.renderedText]
+    .filter((text): text is string => typeof text === 'string' && text.trim().length > 0)
+    .map(normalizeText);
+  const totalLength = normalizedSources.reduce((sum, text) => sum + text.length, 0);
+  if (totalLength < 50) return [];
 
   const response = await input.ai.run(input.model || DEFAULT_MODEL, {
     messages: [
@@ -64,7 +70,10 @@ export async function runAiFieldAssist(input: AiAssistInput): Promise<FieldEvide
         content: [
           'You extract citation fields only from provided source text.',
           'Do not invent missing fields.',
-          'Return only fields with a direct evidenceSnippet copied from the provided text.',
+          'For every proposal, evidenceSnippet MUST be copied verbatim from the provided text, and value MUST appear verbatim inside that evidenceSnippet.',
+          'Return every value as a string, copied exactly as written in the text — do not reformat, translate, abbreviate, or normalize it (e.g. keep a date as "January 15, 2026" exactly as printed; do not convert it to another format).',
+          'A snippet must be copied from a single source field; never stitch text across fetchedText and renderedText.',
+          'If a field is not stated verbatim in the text, omit it rather than guessing.',
           'Do not format citations.',
         ].join(' '),
       },
@@ -85,9 +94,19 @@ export async function runAiFieldAssist(input: AiAssistInput): Promise<FieldEvide
     },
   });
 
-  return parseAiProposals(response)
-    .map((proposal) => evidenceFromProposal(proposal, input, sourceText))
+  const accepted = parseAiProposals(response)
+    .map((proposal) => evidenceFromProposal(proposal, input, normalizedSources))
     .filter((item): item is FieldEvidence => !!item);
+
+  // Deterministic one-evidence-per-field: if the model proposes a field twice,
+  // keep the highest-confidence acceptance (first wins on a tie) so a later
+  // proposal can't silently overwrite an earlier one downstream.
+  const byField = new Map<keyof CSLItem, FieldEvidence>();
+  for (const item of accepted) {
+    const prev = byField.get(item.field);
+    if (!prev || item.confidence > prev.confidence) byField.set(item.field, item);
+  }
+  return [...byField.values()];
 }
 
 function parseAiProposals(response: unknown): AiProposal[] {
@@ -147,13 +166,28 @@ function parseJson(value: string): any {
 function evidenceFromProposal(
   proposal: AiProposal,
   input: AiAssistInput,
-  sourceText: string,
+  normalizedSources: string[],
 ): FieldEvidence | null {
   if (!Number.isFinite(proposal.confidence) || proposal.confidence < MIN_CONFIDENCE || proposal.confidence > 1) return null;
   const snippet = normalizeText(proposal.evidenceSnippet);
-  if (!snippet || !normalizeText(sourceText).includes(snippet)) return null;
+  // The cited snippet must appear verbatim within a SINGLE source document (not
+  // across the fetched/rendered join — that would let a value be stitched from
+  // two unrelated texts).
+  if (!snippet || !normalizedSources.some((source) => source.includes(snippet))) return null;
+  // ...and the proposed value must itself appear verbatim inside that snippet.
+  // Snippet-in-page alone is NOT sufficient: without this gate a model can quote
+  // any real page sentence as evidence and pair it with a fabricated value
+  // (hallucinated author/date/DOI). Requiring value ⊆ snippet ⊆ page is the core
+  // guardrail invariant — the AI may only surface a value already present on the
+  // page, never one it invented.
+  if (!valueSupportedBySnippet(proposal.value, snippet)) return null;
   const normalizedValue = normalizeFieldValue(proposal.field, proposal.value);
   if (normalizedValue === undefined) return null;
+  // Cheap field-shape sanity: reject values whose surface form can't be that
+  // field (e.g. body prose misattributed to DOI). This does not — and cannot by
+  // substring alone — catch semantic misattribution of plausibly-shaped text
+  // (a person named in the body proposed as author); ai-extract stays low-trust.
+  if (!fieldShapeValid(proposal.field, normalizedValue)) return null;
   if ((input.csl as any)[proposal.field] !== undefined) return null;
   return {
     field: proposal.field,
@@ -165,6 +199,50 @@ function evidenceFromProposal(
     confidence: Math.min(0.82, proposal.confidence),
     acquiredAt: input.acquiredAt,
   };
+}
+
+// A proposed value is only trustworthy if it literally appears inside the cited
+// evidence snippet (which itself must be verbatim page text — see caller). This
+// enforces the guardrail invariant that the AI may only surface a value already
+// present on the page, never one it invented. Values we cannot reduce to plain
+// strings for this check — structured objects, notably `{ 'date-parts': ... }` —
+// are treated as unverifiable and rejected, so a model must quote dates/values as
+// text (per the system prompt) to have them accepted.
+function valueSupportedBySnippet(value: unknown, normalizedSnippet: string): boolean {
+  const parts = supportStrings(value);
+  if (!parts.length) return false;
+  return parts.every((part) => {
+    const norm = normalizeText(part);
+    return norm.length > 0 && normalizedSnippet.includes(norm);
+  });
+}
+
+function supportStrings(value: unknown): string[] {
+  // Only strings (or arrays of strings) are verifiable against the text. Numbers
+  // are rejected so a bare digit-run on the page (e.g. a year "2026") can't be
+  // coerced into volume/issue/page, nor a number slipped into an author list.
+  if (typeof value === 'string') return value.trim() ? [value] : [];
+  if (Array.isArray(value)) {
+    if (value.length === 0) return [];
+    const out: string[] = [];
+    for (const item of value) {
+      if (typeof item === 'string' && item.trim()) out.push(item);
+      else return []; // an unverifiable/empty element invalidates the whole list
+    }
+    return out;
+  }
+  return []; // numbers, objects (incl. { 'date-parts': ... }), booleans, null
+}
+
+// Cheap, surface-form-only validation that a normalized value could plausibly be
+// the given field. Intentionally minimal — it guards the egregious cases (random
+// text into DOI) without pretending to verify semantic correctness.
+function fieldShapeValid(field: keyof CSLItem, normalizedValue: unknown): boolean {
+  if (field === 'DOI') {
+    const doi = String(normalizedValue).replace(/^doi:\s*/i, '').replace(/^https?:\/\/(dx\.)?doi\.org\//i, '');
+    return /^10\.\d{4,9}\/\S+$/.test(doi);
+  }
+  return true;
 }
 
 function normalizeFieldValue(field: keyof CSLItem, value: unknown): unknown {
@@ -206,10 +284,18 @@ function missingFields(csl: CSLItem): string[] {
   return out;
 }
 
-function combinedSourceText(input: AiAssistInput): string {
-  return `${input.fetchedText || ''}\n${input.renderedText || ''}`.trim();
-}
-
+// Canonicalize text for verbatim comparison. Folds only *cosmetic* differences
+// (unicode form, curly quotes/apostrophes, en/em dashes) that would otherwise
+// drop legitimate values whose surface form differs trivially from the page.
+// Applied symmetrically to both value and page text, so it never admits a
+// semantically different value — same principle as the conflict-normalization.
 function normalizeText(value: string): string {
-  return value.replace(/\s+/g, ' ').trim().toLowerCase();
+  return value
+    .normalize('NFC')
+    .replace(/[‘’ʼ]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/[–—]/g, '-')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
 }
