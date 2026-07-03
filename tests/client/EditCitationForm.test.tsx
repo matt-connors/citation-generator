@@ -102,6 +102,31 @@ describe('EditCitationForm quality warnings', () => {
     expect(queryByText(/page appeared to load only partially/)).toBeNull();
   });
 
+  it('renders an AI-suggested field note that the user can dismiss', () => {
+    const source: StoredSource = {
+      uuid: 'u2',
+      csl: { id: 'u2', type: 'webpage', title: 'AI-suggested Title', URL: 'https://x.com/p' },
+      quality: {
+        score: 80,
+        warnings: [
+          {
+            code: 'title_ai_suggested',
+            field: 'title',
+            severity: 'review',
+            message: 'This value was suggested by AI. Verify it against the source before relying on this citation.',
+            action: 'review-field',
+          },
+        ],
+      },
+    };
+
+    const { getByText, container } = render(<EditCitationForm source={source} setSources={() => {}} />);
+
+    expect(getByText('AI-suggested — verify this value against the source.')).toBeTruthy();
+    // The note is dismissible ("I verified this").
+    expect(container.querySelectorAll('button[aria-label^="Dismiss warning:"]')).toHaveLength(1);
+  });
+
   it('dismisses optional warnings for only the current citation', () => {
     const setSources = vi.fn();
     const source: StoredSource = {

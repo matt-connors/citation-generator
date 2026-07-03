@@ -184,6 +184,7 @@ function conciseWarningMessage(warning: CitationQualityWarning): string {
         case 'title_conflict':
             return 'Multiple titles were found; confirm this title.';
         default:
+            if (warning.code.endsWith('_ai_suggested')) return 'AI-suggested — verify this value against the source.';
             if (warning.code.endsWith('_conflict')) return 'Conflicting source data was found; confirm this value.';
             return warning.message;
     }

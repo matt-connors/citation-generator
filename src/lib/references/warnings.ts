@@ -18,6 +18,7 @@ export function isDismissibleCitationWarning(warning: CitationQualityWarning): b
   if (warning.severity === 'error') return false;
   if (NON_DISMISSIBLE_CODES.has(warning.code)) return false;
   if (warning.code.endsWith('_conflict')) return true;
+  if (warning.code.endsWith('_ai_suggested')) return true; // "I verified this"
   return false;
 }
 
