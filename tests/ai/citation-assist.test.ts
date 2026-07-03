@@ -15,7 +15,7 @@ function aiWith(proposals: unknown[]) {
 
 async function assist(
   proposals: unknown[],
-  opts: { csl?: Partial<CSLItem>; text?: string } = {},
+  opts: { csl?: Partial<CSLItem>; text?: string; rendered?: string } = {},
 ) {
   const ai = aiWith(proposals);
   const evidence = await runAiFieldAssist({
@@ -23,6 +23,7 @@ async function assist(
     csl: { type: 'webpage', ...(opts.csl ?? {}) } as CSLItem,
     url: 'https://example.com/article',
     fetchedText: opts.text ?? PAGE,
+    renderedText: opts.rendered,
     acquiredAt: '2026-07-03T00:00:00.000Z',
   });
   return { ai, evidence, fields: evidence.map((e) => e.field) };
@@ -180,5 +181,82 @@ describe('runAiFieldAssist — evidence guardrail', () => {
     );
     expect(evidence).toEqual([]);
     expect(ai.run).not.toHaveBeenCalled();
+  });
+
+  // ---- Hardening from adversarial review. ----
+
+  it('drops a value synthesized across the fetched/rendered boundary', async () => {
+    // "Jane Fakeman" appears on NEITHER document; only across the join.
+    const { fields } = await assist(
+      [P({
+        field: 'author',
+        value: 'Jane Fakeman',
+        evidenceSnippet: 'writing to Jane Fakeman covers technology',
+        confidence: 0.9,
+      })],
+      {
+        text: 'Reach the newsroom by writing to Jane',
+        rendered: 'Fakeman covers technology for the outlet and edits weekend features here.',
+      },
+    );
+    expect(fields).not.toContain('author');
+  });
+
+  it('accepts a snippet that lives entirely within the rendered source', async () => {
+    const { evidence } = await assist(
+      [P({ field: 'author', value: 'Jane Doe', evidenceSnippet: 'By Jane Doe and John Smith, staff writers' })],
+      { text: 'A short stub with almost no metadata at all in it whatsoever.', rendered: PAGE },
+    );
+    expect(evidence).toHaveLength(1);
+    expect(evidence[0].field).toBe('author');
+  });
+
+  it('rejects a numeric value coerced into a non-date field (page year → volume)', async () => {
+    const { fields } = await assist([
+      P({ field: 'volume', value: 2026, evidenceSnippet: 'Published January 15, 2026' }),
+    ]);
+    expect(fields).not.toContain('volume');
+  });
+
+  it('rejects an author list containing a bare number', async () => {
+    const { fields } = await assist([
+      P({ field: 'author', value: ['Jane Doe', 2026], evidenceSnippet: 'By Jane Doe and John Smith, staff writers' }),
+    ]);
+    expect(fields).not.toContain('author');
+  });
+
+  it('rejects body prose misattributed to DOI (shape check)', async () => {
+    const { fields } = await assist([
+      P({ field: 'DOI', value: 'the article body text', evidenceSnippet: 'This is the article body text used for testing' }),
+    ]);
+    expect(fields).not.toContain('DOI');
+  });
+
+  it('accepts a real DOI present on the page', async () => {
+    const { evidence } = await assist(
+      [P({ field: 'DOI', value: '10.1038/s41586-020-2649-2', evidenceSnippet: 'doi:10.1038/s41586-020-2649-2 for reference' })],
+      { text: 'Full text below. Cite as doi:10.1038/s41586-020-2649-2 for reference in your bibliography.' },
+    );
+    expect(evidence).toHaveLength(1);
+    expect(evidence[0].field).toBe('DOI');
+    expect(evidence[0].normalizedValue).toBe('10.1038/s41586-020-2649-2');
+  });
+
+  it('emits at most one evidence per field when the model proposes it twice', async () => {
+    const { evidence, fields } = await assist([
+      P({ field: 'author', value: 'Jane Doe', evidenceSnippet: 'By Jane Doe and John Smith, staff writers', confidence: 0.8 }),
+      P({ field: 'author', value: 'John Smith', evidenceSnippet: 'By Jane Doe and John Smith, staff writers', confidence: 0.9 }),
+    ]);
+    expect(fields.filter((f) => f === 'author')).toHaveLength(1);
+    expect(evidence).toHaveLength(1);
+  });
+
+  it('matches across a curly/straight apostrophe difference (recall)', async () => {
+    const { evidence } = await assist(
+      [P({ field: 'title', value: "Cat's Cradle Study", evidenceSnippet: 'The Cat’s Cradle Study appears' })],
+      { text: 'Reviewed here: The Cat’s Cradle Study appears widely across schools and libraries this year.' },
+    );
+    expect(evidence).toHaveLength(1);
+    expect(evidence[0].field).toBe('title');
   });
 });
