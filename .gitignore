@@ -33,5 +33,7 @@ pnpm-debug.log*
 # functions/api/
 
 wrangler.toml
+# ...except the browser-renderer worker config: no secrets, needed for a reproducible `wrangler deploy`
+!workers/browser-renderer/wrangler.toml
 # Claude Code local state
 .claude/
