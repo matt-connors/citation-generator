@@ -68,7 +68,12 @@ const CASES: SmokeCase[] = [
     containerTitle: 'Nature',
     DOI: '10.1038/s41586-024-08025-4',
     issuedYear: 2024,
-    expectedWarningCodes: ['title_conflict', 'author_conflict', 'issued_conflict', 'publisher_conflict'],
+    // No issued_conflict: the only differing date candidate is the meta
+    // citation_publication_date "2024/10" (month precision), which agrees with the
+    // JSON-LD "2024-10-23" winner on every shared part. author_conflict remains —
+    // the heuristic byline reads the on-page author list (with ORCID text), which
+    // is a genuinely different value, not just a reshaped copy of the 24 authors.
+    expectedWarningCodes: ['title_conflict', 'author_conflict', 'publisher_conflict'],
     absentWarningCodes: ['author_not_found', 'date_not_found', 'journal_title_missing', 'journal_locator_missing'],
     styleTokens: {
       'mla-9': ['Dathathri, Sumanth, et al.', '<i>Nature</i>', 'https://doi.org/10.1038/s41586-024-08025-4'],
@@ -89,7 +94,10 @@ const CASES: SmokeCase[] = [
     authorCount: 2,
     containerTitle: 'AP News',
     issuedYear: 2026,
-    expectedWarningCodes: ['title_conflict', 'author_conflict'],
+    // No author_conflict: the only differing author candidate is the heuristic
+    // byline "By CLAIRE RUSH and REBECCA BOONE", which matches the JSON-LD authors
+    // once name comparison is case-insensitive.
+    expectedWarningCodes: ['title_conflict'],
     absentWarningCodes: ['author_not_found', 'date_not_found', 'url_missing'],
     styleTokens: {
       'mla-9': ['Rush, Claire, and Rebecca Boone.', '<i>AP News</i>', '26 May 2026'],
