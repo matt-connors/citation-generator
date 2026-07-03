@@ -64,7 +64,9 @@ export async function runAiFieldAssist(input: AiAssistInput): Promise<FieldEvide
         content: [
           'You extract citation fields only from provided source text.',
           'Do not invent missing fields.',
-          'Return only fields with a direct evidenceSnippet copied from the provided text.',
+          'For every proposal, evidenceSnippet MUST be copied verbatim from the provided text, and value MUST appear verbatim inside that evidenceSnippet.',
+          'Copy each value exactly as written in the text — do not reformat, translate, abbreviate, or normalize it (e.g. keep a date as "January 15, 2026" exactly as printed; do not convert it to another format).',
+          'If a field is not stated verbatim in the text, omit it rather than guessing.',
           'Do not format citations.',
         ].join(' '),
       },
@@ -151,7 +153,15 @@ function evidenceFromProposal(
 ): FieldEvidence | null {
   if (!Number.isFinite(proposal.confidence) || proposal.confidence < MIN_CONFIDENCE || proposal.confidence > 1) return null;
   const snippet = normalizeText(proposal.evidenceSnippet);
+  // The cited snippet must appear verbatim in the page text.
   if (!snippet || !normalizeText(sourceText).includes(snippet)) return null;
+  // ...and the proposed value must itself appear verbatim inside that snippet.
+  // Snippet-in-page alone is NOT sufficient: without this gate a model can quote
+  // any real page sentence as evidence and pair it with a fabricated value
+  // (hallucinated author/date/DOI). Requiring value ⊆ snippet ⊆ page is the core
+  // guardrail invariant — the AI may only surface a value already present on the
+  // page, never one it invented.
+  if (!valueSupportedBySnippet(proposal.value, snippet)) return null;
   const normalizedValue = normalizeFieldValue(proposal.field, proposal.value);
   if (normalizedValue === undefined) return null;
   if ((input.csl as any)[proposal.field] !== undefined) return null;
@@ -165,6 +175,37 @@ function evidenceFromProposal(
     confidence: Math.min(0.82, proposal.confidence),
     acquiredAt: input.acquiredAt,
   };
+}
+
+// A proposed value is only trustworthy if it literally appears inside the cited
+// evidence snippet (which itself must be verbatim page text — see caller). This
+// enforces the guardrail invariant that the AI may only surface a value already
+// present on the page, never one it invented. Values we cannot reduce to plain
+// strings for this check — structured objects, notably `{ 'date-parts': ... }` —
+// are treated as unverifiable and rejected, so a model must quote dates/values as
+// text (per the system prompt) to have them accepted.
+function valueSupportedBySnippet(value: unknown, normalizedSnippet: string): boolean {
+  const parts = supportStrings(value);
+  if (!parts.length) return false;
+  return parts.every((part) => {
+    const norm = normalizeText(part);
+    return norm.length > 0 && normalizedSnippet.includes(norm);
+  });
+}
+
+function supportStrings(value: unknown): string[] {
+  if (typeof value === 'string') return [value];
+  if (typeof value === 'number' && Number.isFinite(value)) return [String(value)];
+  if (Array.isArray(value)) {
+    const out: string[] = [];
+    for (const item of value) {
+      if (typeof item === 'string') out.push(item);
+      else if (typeof item === 'number' && Number.isFinite(item)) out.push(String(item));
+      else return []; // an unverifiable element invalidates the whole list
+    }
+    return out;
+  }
+  return []; // objects (including { 'date-parts': ... }) are unverifiable here
 }
 
 function normalizeFieldValue(field: keyof CSLItem, value: unknown): unknown {
