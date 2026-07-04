@@ -4,6 +4,7 @@ import citationStyles from '../citationStyles';
 import Dropdown from './Dropdown';
 import CitationSearch from './CitationSearch';
 import ReferenceItem from './ReferenceItem';
+import ReferenceSkeleton from './ReferenceSkeleton';
 import { useReferences } from '../../lib/references/useReferences';
 import type { StoredSource } from '../../lib/references/storage';
 import type { SupportedStyle, RichText } from '../../lib/citations/csl-types';
@@ -22,6 +23,7 @@ function emptySource(): StoredSource {
 export default function References() {
     const {
         sources,
+        pending,
         sourceCount,
         selected,
         selectedCount,
@@ -148,7 +150,7 @@ export default function References() {
                         <span>Add Manually</span>
                     </Button>
                 </div>
-                {sources.length > 0 && (
+                {(sources.length > 0 || pending.length > 0) && (
                     <ul className={styles.citationSourceContainer} role="list">
                         {sources.map((source) => (
                             <ReferenceItem
@@ -160,6 +162,9 @@ export default function References() {
                                 citationFormat={citationFormat}
                                 autoOpenEdit={source.uuid === lastAddedId}
                             />
+                        ))}
+                        {pending.map((p) => (
+                            <ReferenceSkeleton key={p.id} url={p.url} />
                         ))}
                     </ul>
                 )}

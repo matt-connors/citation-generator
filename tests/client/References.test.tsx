@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { render, fireEvent, waitFor, act } from '@testing-library/react';
 import React from 'react';
 import References from '../../src/components/react/References';
 import { _resetCacheForTests } from '../../src/lib/citations/useFormattedCitation';
@@ -53,5 +53,44 @@ describe('References selection label', () => {
       expect(container.textContent).toContain('2 sources');
       expect(container.textContent).not.toContain('selected');
     });
+  });
+});
+
+describe('References loading skeleton', () => {
+  function makeDeferred() {
+    let resolve!: (v: any) => void;
+    const promise = new Promise((res) => { resolve = res; });
+    return { promise, resolve };
+  }
+
+  it('shows a skeleton row while a submitted URL is fetching, then replaces it in place', async () => {
+    localStorage.clear();
+    Object.defineProperty(window, 'location', {
+      writable: true, value: new URL('http://localhost/my-references?website=https://x.com/p'),
+    });
+    const cite = makeDeferred();
+    globalThis.fetch = vi.fn((url: any) => {
+      if (String(url).includes('/api/cite-website')) return cite.promise;
+      // /api/format for any resolved rows.
+      return Promise.resolve(new Response(JSON.stringify({ formatted: [{ text: 'Formatted' }] }), { status: 200 }));
+    }) as any;
+
+    const { container, queryByRole } = render(<References />);
+
+    // Skeleton appears immediately — the list renders even with 0 real sources.
+    await waitFor(() => expect(queryByRole('status')).not.toBeNull());
+    expect(queryByRole('status')?.getAttribute('aria-busy')).toBe('true');
+    expect(container.querySelectorAll('input[aria-label^="Select reference"]').length).toBe(0);
+
+    // Resolve the citation → skeleton is replaced by a real, selectable row.
+    await act(async () => {
+      cite.resolve(new Response(JSON.stringify({
+        uuid: 'https://x.com/p', type: 'webpage',
+        csl: { id: 'u', type: 'webpage', title: 'Resolved Title', URL: 'https://x.com/p' },
+      }), { status: 200 }));
+    });
+
+    await waitFor(() => expect(queryByRole('status')).toBeNull());
+    expect(container.querySelectorAll('input[aria-label^="Select reference"]').length).toBe(1);
   });
 });
