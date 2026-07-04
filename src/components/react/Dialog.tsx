@@ -5,7 +5,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
 import { cn } from "./utils"
-import styles from "./Dialog.module.css"
+import "./dialog-transitions.css"
 
 const Dialog = DialogPrimitive.Root
 
@@ -22,11 +22,10 @@ const DialogOverlay = React.forwardRef<
     <DialogPrimitive.Overlay
         ref={ref}
         className={cn(
-            // Elegant fading black backdrop with a faint blur for depth. The fade
-            // itself is driven by styles.overlay (keyframes on Radix data-state),
-            // since this project doesn't ship tailwindcss-animate.
-            "fixed inset-0 z-50 bg-black/70 backdrop-blur-sm",
-            styles.overlay,
+            // Fading black backdrop + faint blur. Background and fade both live in
+            // dialog-transitions.css (.mla-dialog-overlay): this project ships
+            // neither tailwindcss-animate nor a working bg-black/70 opacity utility.
+            "fixed inset-0 z-50 mla-dialog-overlay",
             className
         )}
         {...props}
@@ -45,14 +44,14 @@ const DialogContent = React.forwardRef<
             from 48% just to stay centered); centering via flex frees the content
             for a clean centered zoom. The wrapper is pointer-events-none so clicks
             in the padding fall through to the overlay and still close the dialog. */}
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+        <div className="mla-dialog-wrapper fixed inset-0 z-50 flex items-center justify-center p-4">
             <DialogPrimitive.Content
                 ref={ref}
                 className={cn(
-                    "pointer-events-auto relative grid w-full max-w-[850px] max-h-[92vh] overflow-hidden border bg-background shadow-2xl sm:rounded-2xl",
-                    // Popup enters on its own curve (scale-up + slight rise + fade,
-                    // ease-out-expo) via styles.content — distinct from the backdrop.
-                    styles.content,
+                    // .mla-dialog-content carries the entrance/exit animation
+                    // (scale-up + slight rise + fade, ease-out-expo) — a curve
+                    // distinct from the backdrop's plain fade.
+                    "mla-dialog-content relative grid w-full max-w-[850px] max-h-[92vh] overflow-hidden border bg-background shadow-2xl sm:rounded-2xl",
                     className
                 )}
                 {...props}
