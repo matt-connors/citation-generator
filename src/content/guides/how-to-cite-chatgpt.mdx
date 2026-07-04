@@ -1,0 +1,158 @@
+---
+title: 'How to Cite ChatGPT and AI in MLA, APA, and Five More Styles'
+pubDate: 2026-07-04
+description: 'Cite ChatGPT and generative AI in MLA 9 and APA 7 with the official 2025 templates: prompt-as-title Works Cited entries, in-text citations, and examples.'
+category: 'how-to'
+keywords: ['how to cite chatgpt', 'how to cite chatgpt in mla', 'how to cite chatgpt apa', 'how to cite ai in mla', 'chatgpt citation mla', 'mla citation for chatgpt', 'cite chatgpt apa 7', 'how to cite ai generated content', 'how to cite chatgpt in text', 'how to reference chatgpt', 'how to cite an ai chatbot', 'apa citation chatgpt example']
+tags: ['ChatGPT', 'generative AI', 'online sources', 'citations', 'MLA', 'APA', 'Chicago', 'Harvard', 'Vancouver', 'IEEE', 'AMA']
+relatedGuides: ['mla', 'apa', 'chicago', 'how-to-cite-a-website', 'in-text-citations', 'avoiding-plagiarism']
+faq:
+  - question: 'Can you cite ChatGPT as a source?'
+    answer: 'Yes. MLA and APA both publish official formats for generative AI, and both updated them in 2025. MLA builds the entry around your prompt because it does not treat the AI as an author; APA credits the company (OpenAI, Anthropic, Google) and now prefers citing the specific chat by its share link. Whether you are allowed to use ChatGPT in an assignment is a separate question, so check your instructor''s or publisher''s policy first.'
+  - question: 'Who is the author when citing ChatGPT?'
+    answer: 'In MLA, nobody: the MLA Style Center says "We do not recommend treating the AI tool as an author," so the entry starts with your prompt in quotation marks instead. In APA the company is the author — OpenAI for ChatGPT, Anthropic for Claude, Google for Gemini. Chicago flips it, crediting ChatGPT as the "author" in a note with OpenAI as the publisher.'
+  - question: 'How do I cite ChatGPT in-text?'
+    answer: 'In MLA, use a shortened version of the prompt title in quotation marks, for example ("Describe the theme"). In APA, use the company and year: (OpenAI, 2025), or OpenAI (2025) in a narrative sentence. Chicago author–date uses the tool and the full date: (ChatGPT, September 23, 2024). Numbered styles like Vancouver and IEEE simply use the entry''s number.'
+  - question: 'Is it plagiarism to use ChatGPT if you cite it?'
+    answer: 'Citing quoted or paraphrased AI output protects you from plagiarism in the attribution sense, but it does not make AI use allowed. Many instructors and publishers restrict or ban generative AI regardless of citation, and submitting AI-written work as your own analysis is academic misconduct even with a reference attached. Check the policy for your course or venue before you rely on a citation to cover you.'
+  - question: 'Do you put the prompt in the citation?'
+    answer: 'In MLA, yes: the prompt, in quotation marks and followed by the word "prompt," fills the Title of Source slot, and MLA lets you substitute a short description of what was generated if the prompt is too long. APA does the opposite. The APA reference lists the chat''s title, and the prompt itself belongs in your text, your Method section, or an appendix.'
+  - question: 'How do you cite ChatGPT when there is no shareable link?'
+    answer: 'MLA says to fall back to the general URL of the tool (chatgpt.com) when no stable share link exists. APA goes further: without a link you cite the tool itself — OpenAI. (2025). ChatGPT (GPT-5) [Large language model]. https://chatgpt.com/ — and reproduce the prompt and relevant output in your text or an appendix. Either way, save your own copy of the conversation, because a reader cannot verify an unlinked chat.'
+cite:
+  tab: 'website'
+  placeholder: 'Paste a ChatGPT share link'
+  style: 'mla-9'
+  heading: 'Cite your ChatGPT conversation now'
+  blurb: 'Paste a share link from ChatGPT, Claude, or Gemini and get a formatted entry in MLA 9, APA 7, or five more styles.'
+  inline: true
+---
+
+import CitationExampleTable from "../../components/astro/CitationExampleTable.astro";
+import TryGenerator from "../../components/astro/TryGenerator.astro";
+
+A ChatGPT conversation breaks every assumption a citation template makes. There is no human author — MLA explicitly says not to treat the AI as one. There is no fixed title, no publication, and no guarantee the same prompt will ever produce the same words again. On top of that, both official style bodies rewrote their guidance recently: MLA revised its generative AI page in August 2025, and APA replaced its widely copied 2023 format with a new chat-level format in September 2025. Most library guides still show the old APA entry with "(Mar 14 version)" and a chat.openai.com URL. This page uses the current templates.
+
+> The shortest answer: in MLA, the prompt is the title. Put your prompt in quotation marks followed by the word "prompt," then *ChatGPT* in italics, the model, OpenAI, the date you generated the text, and the share link: "Describe the theme of nature in Jane Austen's *Mansfield Park*" prompt. *ChatGPT*, model GPT-4o, OpenAI, 23 Sept. 2024, chatgpt.com/share/66f1b0a0-d704-8000-be9a-85f53c850607. In-text, use a shortened title: ("Describe the theme").
+
+## What counts as "citing ChatGPT"
+
+This page covers text you generated with a conversational AI tool — ChatGPT, Claude, Gemini, Copilot — and quoted, paraphrased, or otherwise used as a source in your writing. The same templates work for all of these tools; only the tool name, model, and company change.
+
+Several things that look like citing an AI are actually citing something else:
+
+- **The chatbot pointed you to sources.** MLA is blunt about this: "you should click through to the cited sources and use those directly." Cite the [web page](/guides/how-to-cite-a-website/) or [journal article](/guides/how-to-cite-a-journal-article/) the AI surfaced, not the AI's summary of it. APA says the same about Google's AI Overviews — click through and cite the underlying source.
+- **You used AI as a tool, not a source.** If ChatGPT fixed your grammar, translated a passage, or tightened your prose, MLA says to acknowledge that in a note or in the text rather than build a citation. Nothing goes in the Works Cited.
+- **You are citing an AI response someone else published.** A screenshot of a chatbot answer in a news article cites as the news article.
+- **You generated an image.** MLA handles AI images with a figure caption rather than a Works Cited entry — see the MLA section below, and the [image guide](/guides/how-to-cite-an-image/) for images generally.
+
+If you genuinely used the model's own output as material in your paper, read on.
+
+## Information to collect before you cite
+
+Before the conversation scrolls away, capture these fields:
+
+- **The tool** — ChatGPT, Claude, Gemini. This is the container in MLA and part of the source line in APA.
+- **The model, as specifically as possible** — GPT-4o, GPT-5, Claude Sonnet 4. MLA asks for "the specific AI model or model version as specifically as possible."
+- **The company** — OpenAI, Anthropic, Google, Microsoft. Publisher in MLA; the author in APA.
+- **Your prompt, verbatim** — MLA builds the title from it; APA wants it in your text or an appendix when you quote output.
+- **The date you generated the text** — not the date you later pasted it into your draft. Both styles date the generation.
+- **A stable share link** — chatgpt.com/share/… or claude.ai/share/…. Both styles now prefer it over the tool's homepage. Note the domain: current ChatGPT links live at chatgpt.com, not the old chat.openai.com.
+- **The chat's title** — the label in the sidebar (ChatGPT auto-generates one). APA's 2025 format uses it as the reference title.
+
+The [generator at /](/) accepts a pasted share link and extracts most of these fields automatically; double-check the model name, which share pages do not always expose.
+
+## The same chat, formatted in all seven styles
+
+> **The source:** the MLA Style Center's own published example — a ChatGPT (model GPT-4o) response to the prompt "Describe the theme of nature in Jane Austen's *Mansfield Park*," generated by OpenAI's tool on September 23, 2024, and saved at the share link chatgpt.com/share/66f1b0a0-d704-8000-be9a-85f53c850607. The chat's sidebar title is "Nature Theme in Mansfield Park." Accessed July 4, 2026.
+
+<CitationExampleTable
+  source={{ id: 'chatgpt-mansfield', type: 'webpage', title: '“Describe the theme of nature in Jane Austen’s <i>Mansfield Park</i>” prompt', 'container-title': 'ChatGPT', publisher: 'OpenAI', issued: { 'date-parts': [[2024, 9, 23]] }, accessed: { 'date-parts': [[2026, 7, 4]] }, URL: 'https://chatgpt.com/share/66f1b0a0-d704-8000-be9a-85f53c850607' }}
+  overrides={{
+    'mla-9': '“Describe the theme of nature in Jane Austen’s <em>Mansfield Park</em>” prompt. <em>ChatGPT</em>, model GPT-4o, OpenAI, 23 Sept. 2024, chatgpt.com/share/66f1b0a0-d704-8000-be9a-85f53c850607.',
+    'apa-7': 'OpenAI. (2024, September 23). <em>Nature theme in Mansfield Park</em> [Generative AI chat]. ChatGPT. https://chatgpt.com/share/66f1b0a0-d704-8000-be9a-85f53c850607',
+    'chicago-18': 'ChatGPT. 2024. Response to “Describe the theme of nature in Jane Austen’s <em>Mansfield Park</em>.” OpenAI, September 23, 2024. https://chatgpt.com/share/66f1b0a0-d704-8000-be9a-85f53c850607.',
+    'ama-11': 'ChatGPT. Version GPT-4o. OpenAI; 2024. Accessed July 4, 2026. https://chatgpt.com/',
+  }}
+/>
+
+One decision splits the styles more than any other: **who takes the author slot**. MLA leaves it empty and leads with the prompt, because "We do not recommend treating the AI tool as an author." APA credits the company, OpenAI, exactly as it would a corporate author. Chicago credits the tool itself, ChatGPT, with OpenAI as publisher. AMA agrees with MLA that the AI is no author but reaches the opposite conclusion about the entry: its manual cites the tool like software — name, version, company, year — and keeps the prompt out of the reference entirely. Harvard, Vancouver, and IEEE have no dedicated AI rule yet, so for those the entry treats the share page as a web page whose title is the prompt — the prompt-as-title pattern above.
+
+The second decision is **where the prompt lives**. MLA puts it in the citation itself, as the Title of Source. APA keeps it out of the reference (the chat title goes there instead) and asks you to reproduce the prompt in your text, your Method section, or an appendix.
+
+The in-text citation for the same chat:
+
+- **MLA:** ("Describe the theme") — a shortened version of the prompt title in quotation marks
+- **APA:** (OpenAI, 2024), or narratively: OpenAI (2024)
+- **Chicago author–date:** (ChatGPT, September 23, 2024) — Chicago keeps the full date, as it does for personal communications
+- **Harvard:** the shortened title and year, since the entry has no author
+- **Vancouver, AMA:** (1) or superscript ¹; **IEEE:** [1] — numeric styles cite by entry number
+
+See the [in-text citations guide](/guides/in-text-citations/) for how these forms behave inside sentences.
+
+<TryGenerator heading="Cite your ChatGPT conversation now" blurb="Paste a share link from ChatGPT, Claude, or Gemini and get a formatted entry in MLA 9, APA 7, or five more styles." tab="website" placeholder="Paste a ChatGPT share link" style="mla-9" from="how-to-cite-chatgpt" />
+
+## How to cite ChatGPT in MLA
+
+[MLA 9](/guides/mla/) runs generative AI through its ordinary core-elements template. The mapping, straight from the MLA Style Center's updated guidance:
+
+> "Your prompt" prompt. *Tool Name*, model Model Name, Company, Day Month Year, share URL.
+
+- **Title of Source** — the prompt in quotation marks, followed by the lowercase word "prompt." If the prompt is too long, substitute a short description of what was generated.
+- **Title of Container** — the tool, italicized: *ChatGPT*, *Claude*, *Gemini*.
+- **Version** — the model, "as specifically as possible": model GPT-4o, model Claude Sonnet 4.
+- **Publisher** — the company: OpenAI, Anthropic, Google.
+- **Publication date** — the date the content was generated.
+- **Location** — "a stable, shareable URL for accessing the generated content." Only if the tool cannot produce one do you fall back to the general URL (chatgpt.com).
+
+The official example:
+
+> "Describe the theme of nature in Jane Austen's *Mansfield Park*" prompt. *ChatGPT*, model GPT-4o, OpenAI, 23 Sept. 2024, chatgpt.com/share/66f1b0a0-d704-8000-be9a-85f53c850607.
+
+In-text, shorten the title the way you would any long title: ("Describe the theme"). Paraphrased AI output takes exactly the same citation as quoted output.
+
+Three variants matter in practice:
+
+**The AI produced a titled work.** If you asked for a poem or story and the output has a title, lead with that title and describe the genre: "The Oak Tree" free verse poem. *ChatGPT*, model GPT-4o, OpenAI, 23 Sept. 2024, followed by the URL.
+
+**You generated an image.** MLA cites AI images in a figure caption, not the Works Cited list: Fig. 1. "Create an expressionist-style image of two people standing on a beach looking at the ocean" prompt, *DALL-E*, version 3, OpenAI, 23 Sept. 2024, then the share URL.
+
+**A different chatbot, same template.** For Claude: "Your prompt" prompt. *Claude*, model Claude Sonnet 4, Anthropic, date, claude.ai/share/…. Swap tool, model, and company; nothing else changes.
+
+## How to cite ChatGPT in APA
+
+[APA 7](/guides/apa/) changed its recommendation on September 9, 2025, and the new guidance supersedes the 2023 "How to cite ChatGPT" post that most library guides still reproduce. The current rule: when you have a shareable link, cite the specific chat.
+
+> AI Company Name. (Year, Month Day). *Title of chat* [Generative AI chat]. Tool Name/Model. URL of the chat
+
+The two official examples:
+
+> OpenAI. (2025, August 21). *High school grammar concepts* [Generative AI chat]. ChatGPT. https://chatgpt.com/share/68a77b60-0ee4-800c-9acc-cd3fd573c311
+>
+> Anthropic. (2025, May 20). *Essential grammar topics for high school graduates* [Generative AI chat]. Claude Sonnet 4. https://claude.ai/share/329173b2-ec93-4663-ac68-4f65ea4f166d
+
+The company is the author, the chat's title (the sidebar label) is the reference title in italics and sentence case, and the tool name or the model as displayed fills the source slot. In-text: (OpenAI, 2025), or OpenAI (2025) in a narrative sentence.
+
+**No shareable link?** Cite the tool generally and move the specifics into your paper:
+
+> OpenAI. (2025). *ChatGPT (GPT-5)* [Large language model]. https://chatgpt.com/
+
+Then reproduce the prompt and the quoted output in your text, your Method section, or an appendix (an appendix is the place for long transcripts). APA also asks you to describe how you used the tool, whichever reference format you pick.
+
+**One warning.** The 2023 format — OpenAI. (2023). ChatGPT (Mar 14 version) [Large language model]. https://chat.openai.com/chat — is outdated on both counts: the format is superseded and the old chat.openai.com address now just redirects to chatgpt.com. If a guide shows "(Mar 14 version)," it predates the September 2025 change.
+
+## Edge cases
+
+**The references ChatGPT gave you might be fake.** Language models fabricate plausible-looking citations: real journals, real-sounding authors, articles that do not exist. Never move a citation from a chatbot into your [Works Cited](/guides/works-cited-page/) without opening the actual source and confirming it says what the AI claims. A fabricated reference in a submitted paper is worse than a formatting error; it reads as fraud.
+
+**The chat is gone.** Share links can be revoked and conversations deleted, and regenerating the same prompt will not reproduce the same words. The citation still carries the original generation date; do not re-date it. Protect yourself the way you would with any unstable web source: export or screenshot the conversation before you cite it, so you can produce the transcript if a reader or instructor asks.
+
+**Your tool cannot make a share link.** Enterprise Copilot, school-locked accounts, and some modes of consumer tools disable sharing. MLA's fallback is the tool's general URL; APA's fallback is the tool-level reference plus the prompt and output reproduced in your text or an appendix. Both are covered above — the practical point is that the burden of evidence shifts to you, so keep the transcript.
+
+**Chicago and the remaining styles.** Chicago's official position (CMOS 18 and its FAQ) is to credit the AI in a note, treated like a personal communication: "Text generated by ChatGPT, OpenAI, March 7, 2023, https://chat.openai.com/chat." ChatGPT stands as the "author," OpenAI as publisher, and the entry only joins a bibliography when a publicly available link exists — which is why the table above can include one. Chicago also asks you to note it if you edited the AI's text. AMA does have a rule, and it points the other way: the AMA Manual of Style says not to credit the AI as an author and cites the tool like software — ChatGPT. Version Mar 14. OpenAI; 2023. Accessed March 28, 2023. https://openai.com/ — with the prompt and how you used the tool described in the text or Methods, which is what the AMA row of the table follows. IEEE likewise has no reference format for AI but requires AI-generated content to be disclosed in the acknowledgments, and points authors to its software reference format. Harvard and Vancouver have published no dedicated generative AI format as of mid-2026; for them, treating the share page as a web page with the prompt as its title, as the table does, is the defensible reading of their existing web-source rules.
+
+**You used AI but produced the words yourself.** Brainstorming, outlining, critique of your draft: no citation exists for influence. MLA's advice for functional uses applies — acknowledge the tool in your text or a note where the use was substantive. Silence about substantive AI help is the risk, not the missing citation.
+
+**Citing does not equal permission.** A perfect citation documents AI use; it does not authorize it. Course policies, journal policies, and institutional rules on generative AI vary enormously, and passing off AI-generated analysis as your own thinking is misconduct with or without a reference. When in doubt, ask first — and see [avoiding plagiarism](/guides/avoiding-plagiarism/) for where the lines sit.
+
+> A final principle: a reader must be able to see what the machine actually said. Name the tool and the model, date the generation, and link the exact conversation whenever the tool allows it. When it does not, the transcript in your appendix or your files does the job the link would have done. The citation formats differ; the obligation does not.

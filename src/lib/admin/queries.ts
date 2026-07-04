@@ -274,5 +274,29 @@ export function buildQueries(dataset: string): QueryDef[] {
         ${J}
       `,
     },
+    {
+      key: 'citations_by_guide',
+      title: 'Citations by guide (last 28d)',
+      description:
+        'Which /guides/* pages convert readers into citations, via the trailing `from` attribution dimension (blob6 on cite_website, blob3 on cite_book/cite_journal). This is the number that decides whether to write more long-tail guides.',
+      render: 'table',
+      columns: [
+        { key: 'guide', label: 'Guide' },
+        { key: 'citations', label: 'Citations', align: 'right', bar: true },
+      ],
+      sql: `
+        SELECT
+          if(index1 = 'cite_website', blob6, blob3) AS guide,
+          count() AS citations
+        FROM ${dataset}
+        WHERE index1 IN ('cite_website', 'cite_book', 'cite_journal')
+          AND if(index1 = 'cite_website', blob6, blob3) <> ''
+          AND timestamp >= NOW() - INTERVAL '28' DAY
+        GROUP BY guide
+        ORDER BY citations DESC
+        LIMIT 40
+        ${J}
+      `,
+    },
   ];
 }
