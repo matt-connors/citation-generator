@@ -73,3 +73,46 @@ describe('parseDate', () => {
     expect(parseDate('04/05/2026')).toBeNull();
   });
 });
+
+describe('parseDate — timestamp guard + compact/named forms (regression suite)', () => {
+  it('rejects Unix epoch timestamps instead of emitting a bogus year', () => {
+    // Reported bug: an og:updated_time carrying an epoch produced issued year 1704.
+    expect(parseDate('1704149963')).toBeNull();    // 2024-01-01, seconds
+    expect(parseDate('1704067200')).toBeNull();
+    expect(parseDate('1703980800')).toBeNull();
+    expect(parseDate('1703980800000')).toBeNull(); // milliseconds
+    expect(parseDate('2000000000')).toBeNull();
+    expect(parseDate('9999999999')).toBeNull();
+    expect(parseDate('12345')).toBeNull();
+  });
+
+  it('rejects a 4-digit year immediately followed by more digits (truncated number)', () => {
+    expect(parseDate('10000-01-01')).toBeNull(); // 5-digit leading year
+    expect(parseDate('12345-06-07')).toBeNull();
+  });
+
+  it('parses compact YYYYMMDD / YYYYMM (previously year-only)', () => {
+    expect(parseDate('20231231')).toEqual([2023, 12, 31]);
+    expect(parseDate('20231231T100000Z')).toEqual([2023, 12, 31]);
+    expect(parseDate('202312')).toEqual([2023, 12]);
+  });
+
+  it('parses year-first spelled months, e.g. 2023/Dec/31 (previously year-only)', () => {
+    expect(parseDate('2023/Dec/31')).toEqual([2023, 12, 31]);
+    expect(parseDate('2023/December/31')).toEqual([2023, 12, 31]);
+    expect(parseDate('2023/Dec')).toEqual([2023, 12]);
+  });
+
+  it('trims surrounding whitespace', () => {
+    expect(parseDate(' 2023-12-31 ')).toEqual([2023, 12, 31]);
+  });
+
+  it('leaves valid ISO / datetime / freeform forms unchanged (no regression)', () => {
+    expect(parseDate('2021/04/21')).toEqual([2021, 4, 21]);
+    expect(parseDate('2024-03')).toEqual([2024, 3]);
+    expect(parseDate('2024')).toEqual([2024]);
+    expect(parseDate('2024-03-15T10:30:00+05:00')).toEqual([2024, 3, 15]);
+    expect(parseDate('December 31, 2023')).toEqual([2023, 12, 31]);
+    expect(parseDate('31 December 2023')).toEqual([2023, 12, 31]);
+  });
+});

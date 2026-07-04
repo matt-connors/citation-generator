@@ -17,12 +17,55 @@ const MONTHS: Record<string, number> = {
 
 export function parseIsoDate(s: string | null | undefined): CSLDateParts | null {
   if (!s) return null;
-  // Accept both `-` and `/` as separators — arxiv (and others) emit dates like
-  // `2021/04/21` in citation_date meta tags.
+  s = s.trim();
+  if (!s) return null;
+
+  // Compact all-numeric date `YYYYMMDD` (optionally trailed by a time, e.g.
+  // `20231231T120000`). The lookahead requires EXACTLY 8 date digits, so a
+  // 10-digit (seconds) or 13-digit (millis) Unix epoch can never match here.
+  const compact = s.match(/^(\d{4})(\d{2})(\d{2})(?!\d)/);
+  if (compact) {
+    const y = parseInt(compact[1], 10);
+    const month = parseInt(compact[2], 10);
+    const day = parseInt(compact[3], 10);
+    return isValidYmd(y, month, day) ? [y, month, day] : null;
+  }
+
+  // Compact `YYYYMM` (exactly 6 date digits; the lookahead again excludes a
+  // longer epoch). Preserves the month a bare-year fallback would otherwise drop.
+  const compactYm = s.match(/^(\d{4})(\d{2})(?!\d)/);
+  if (compactYm) {
+    const y = parseInt(compactYm[1], 10);
+    const month = parseInt(compactYm[2], 10);
+    return isValidYear(y) && month >= 1 && month <= 12 ? [y, month] : null;
+  }
+
+  // Year-first date with a spelled-out month, e.g. `2023/Dec/31`,
+  // `2023-December-31`, or `2023/Dec` (some CMSs and URL-shaped dates emit this).
+  const named = s.match(/^(\d{4})[-\/]([A-Za-z]+)\.?(?:[-\/](\d{1,2}))?/);
+  if (named) {
+    const y = parseInt(named[1], 10);
+    const month = MONTHS[named[2].toLowerCase()];
+    if (isValidYear(y) && month) {
+      if (named[3]) {
+        const day = parseInt(named[3], 10);
+        return isValidYmd(y, month, day) ? [y, month, day] : null;
+      }
+      return [y, month];
+    }
+  }
+
+  // Numeric ISO date with `-` or `/` separators (arxiv emits `2021/04/21`),
+  // optionally trailed by a time component.
   const m = s.match(/^(\d{4})(?:[-\/](\d{1,2})(?:[-\/](\d{1,2}))?)?/);
   if (!m) return null;
+  // Timestamp guard: a matched date immediately followed by another digit means
+  // the `^`-only anchor truncated a longer number — a Unix epoch like
+  // `1704149963` (which yielded a bogus year 1704), or a malformed value. Reject
+  // rather than emit a wrong year.
+  if (/^\d/.test(s.slice(m[0].length))) return null;
   const y = parseInt(m[1], 10);
-  if (!Number.isFinite(y) || y < 1000 || y > 9999) return null;
+  if (!isValidYear(y)) return null;
   if (m[3]) {
     const month = parseInt(m[2], 10);
     const day = parseInt(m[3], 10);

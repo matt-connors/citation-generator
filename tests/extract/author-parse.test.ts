@@ -101,3 +101,45 @@ describe('parseAuthorList', () => {
     expect(parseAuthorList('Jane Doe et al.')).toEqual([{ family: 'Doe', given: 'Jane' }]);
   });
 });
+
+describe('parseAuthorList — byline role words (regression suite)', () => {
+  it('returns [] for a lone role word instead of a bogus surname', () => {
+    // Reported bug: a <span>by</span> byline label produced author {family:"by"}.
+    for (const w of ['by', 'By', 'BY', 'Posted by', 'written by', 'Author:', 'By:']) {
+      expect(parseAuthorList(w)).toEqual([]);
+    }
+  });
+
+  it('strips a leading byline prefix and keeps the real name', () => {
+    expect(parseAuthorList('By Joel Spolsky')).toEqual([{ family: 'Spolsky', given: 'Joel' }]);
+    expect(parseAuthorList('  By Joel Spolsky  ')).toEqual([{ family: 'Spolsky', given: 'Joel' }]);
+    expect(parseAuthorList('Posted by Jane Doe')).toEqual([{ family: 'Doe', given: 'Jane' }]);
+    expect(parseAuthorList('Authored by Jane Smith')).toEqual([{ family: 'Smith', given: 'Jane' }]);
+    expect(parseAuthorList('Author: Maria Garcia')).toEqual([{ family: 'Garcia', given: 'Maria' }]);
+  });
+
+  it('never drops a real name that merely starts with a role substring', () => {
+    expect(parseAuthorList('Bythewood')).toEqual([{ family: 'Bythewood' }]);
+    expect(parseAuthorList('By Bythewood')).toEqual([{ family: 'Bythewood' }]);
+    expect(parseAuthorList('Byrne')).toEqual([{ family: 'Byrne' }]);
+    expect(parseAuthorList('Ashby Newton')).toEqual([{ family: 'Newton', given: 'Ashby' }]);
+  });
+});
+
+describe('parseAuthorName — stopword / letterless guard', () => {
+  it('rejects a standalone role word (any case) as a non-name', () => {
+    for (const w of ['by', 'By', 'BY', 'the', 'and', 'posted']) {
+      expect(parseAuthorName(w)).toBeNull();
+    }
+  });
+
+  it('does not reject a multi-word name containing those words', () => {
+    expect(parseAuthorName('The Weeknd')).toEqual({ family: 'Weeknd', given: 'The' });
+    expect(parseAuthorName('Bythewood')).toEqual({ family: 'Bythewood' });
+  });
+
+  it('rejects letterless junk', () => {
+    expect(parseAuthorName('123')).toBeNull();
+    expect(parseAuthorName('---')).toBeNull();
+  });
+});
