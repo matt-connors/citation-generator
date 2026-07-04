@@ -13,12 +13,21 @@ const PARTICLES = new Set([
   'von', 'de', 'del', 'della', 'van', 'la', 'le', 'der', 'den', 'di', 'da', 'du', 'dos', 'des',
 ]);
 const SUFFIX = /^(Jr\.?|Sr\.?|II|III|IV|V|PhD|Ph\.D\.?|MD|M\.D\.?|MA|MSc|BSc|Esq\.?)$/i;
+// Lone role words that a byline can leave behind (e.g. a `<span>by</span>` label
+// selected on its own). As an exact whole-token match they never bite a real
+// multi-word name — "The Onion" or "By Bythewood" are unaffected.
+const STOPWORDS = new Set(['by', 'written', 'posted', 'author', 'and', 'the']);
 
 export function parseAuthorName(input: string | CSLName | null | undefined): CSLName | null {
   if (input == null) return null;
   if (typeof input === 'object') return input;
   const trimmed = input.trim();
   if (!trimmed) return null;
+  // A lone role word ("by"/"By"/"BY"…) or letterless junk is never a name. This
+  // sits before the all-caps acronym branch so "BY" can't slip through as a
+  // literal, and guards every caller (byline heuristic, jsonld, meta, microdata).
+  if (STOPWORDS.has(trimmed.toLowerCase())) return null;
+  if (!/\p{L}/u.test(trimmed)) return null;
   if (/^[A-Z][A-Z0-9&.-]{1,14}$/.test(trimmed)) return { literal: trimmed };
   if (ORG_SUFFIXES.test(trimmed)) return { literal: trimmed };
 
@@ -54,7 +63,12 @@ export function parseAuthorList(input: string | null | undefined): CSLName[] {
   if (!input) return [];
   const cleaned = input
     .replace(/\s+/g, ' ')
-    .replace(/^(by|written by|posted by|author:)\s+/i, '')
+    .trim() // trim FIRST so a leading "By" is at ^ for the strip (e.g. "  By Jane ")
+    // Strip a leading byline role word, anchored on \b so it only matches a whole
+    // token — "by"/"By"/"written by"/"posted/authored by"/"Author:" go, but
+    // "Bythewood" is preserved. The name after it is no longer required, so a
+    // bare "by" collapses to "" (→ []) instead of {family:"by"}.
+    .replace(/^(?:written\s+by|posted\s+by|authored\s+by|by|author)\b\s*:?\s*/i, '')
     .replace(/\s+et\s+al\.?$/i, '')
     .trim();
   if (!cleaned) return [];

@@ -37,6 +37,23 @@ describe('heuristicSignal', () => {
     expect(heuristicSignal($).fields.author).toEqual([{ family: 'Doe', given: 'Jane' }]);
   });
 
+  it('skips a lone role-word byline label and reads the sibling author element', () => {
+    // Reported bug (joelonsoftware.com): "by" sits in its own .byline span and the
+    // name in a sibling .author span; .first() grabbed "by" → author {family:"by"}.
+    // Iterating the candidates skips the empty-parsing "by" and lands on the name.
+    const $ = cheerio.load(
+      `<span class="byline"> by </span>` +
+      `<span class="author vcard"><a class="url fn n" href="/author/x">Joel Spolsky</a></span>`,
+    );
+    expect(heuristicSignal($).fields.author).toEqual([{ family: 'Spolsky', given: 'Joel' }]);
+  });
+
+  it('keeps a "Posted by <name>" single-element byline instead of deleting it', () => {
+    // cleanBylineText must not treat a LEADING "Posted" as a trailing date clause.
+    const $ = cheerio.load(`<div class="byline">Posted by Joel Spolsky</div>`);
+    expect(heuristicSignal($).fields.author).toEqual([{ family: 'Spolsky', given: 'Joel' }]);
+  });
+
   it('reads <time datetime>', () => {
     const $ = cheerio.load(`<time datetime="2026-05-26">May 26</time>`);
     expect(heuristicSignal($).fields.issued).toEqual({ 'date-parts': [[2026, 5, 26]] });
