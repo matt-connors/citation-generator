@@ -7,6 +7,10 @@ import { parseDate } from '../extract/date-parse';
 // AI_CITATION_MODEL / AI_GATEWAY_MODEL.
 const DEFAULT_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const MIN_CONFIDENCE = 0.7;
+// Bound the model call: the 70B model can take 15s+, and AI only runs on already
+// slow (thin) pages. On timeout we return no proposals and the extraction result
+// stands — AI is strictly additive, so a skipped call never degrades the result.
+const AI_TIMEOUT_MS = 10_000;
 
 export interface AiBinding {
   run(model: string, input: Record<string, unknown>): Promise<unknown>;
@@ -66,7 +70,7 @@ export async function runAiFieldAssist(input: AiAssistInput): Promise<FieldEvide
   const totalLength = normalizedSources.reduce((sum, text) => sum + text.length, 0);
   if (totalLength < 50) return [];
 
-  const response = await input.ai.run(input.model || DEFAULT_MODEL, {
+  const response = await runModelWithTimeout(input.ai.run(input.model || DEFAULT_MODEL, {
     messages: [
       {
         role: 'system',
@@ -95,8 +99,9 @@ export async function runAiFieldAssist(input: AiAssistInput): Promise<FieldEvide
       type: 'json_schema',
       json_schema: FIELD_SCHEMA,
     },
-  });
+  }), AI_TIMEOUT_MS);
 
+  // response is null on timeout/model failure → parseAiProposals yields [].
   const accepted = parseAiProposals(response)
     .map((proposal) => evidenceFromProposal(proposal, input, normalizedSources))
     .filter((item): item is FieldEvidence => !!item);
@@ -110,6 +115,24 @@ export async function runAiFieldAssist(input: AiAssistInput): Promise<FieldEvide
     if (!prev || item.confidence > prev.confidence) byField.set(item.field, item);
   }
   return [...byField.values()];
+}
+
+// Resolve the model call, or null if it exceeds the timeout or fails. A null
+// result flows through parseAiProposals as "no proposals", so the caller adds no
+// AI fields and the deterministic extraction result is used unchanged.
+async function runModelWithTimeout(call: Promise<unknown>, ms: number): Promise<unknown | null> {
+  call.catch(() => {}); // avoid an unhandled rejection if the timeout wins the race
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      call,
+      new Promise<null>((resolve) => { timer = setTimeout(() => resolve(null), ms); }),
+    ]);
+  } catch {
+    return null; // model error → treated as no proposals
+  } finally {
+    clearTimeout(timer); // don't leave a dangling timer when the model wins the race
+  }
 }
 
 function parseAiProposals(response: unknown): AiProposal[] {
