@@ -2,7 +2,10 @@ import type { CSLDate, CSLItem, FieldEvidence } from '../csl-types';
 import { parseAuthorList } from '../extract/author-parse';
 import { parseDate } from '../extract/date-parse';
 
-const DEFAULT_MODEL = '@cf/meta/llama-3.1-8b-instruct-fast';
+// Stronger default model: the 8B was too weak to produce verbatim-verifiable
+// proposals in practice (added nothing in prod smoke tests). Overridable via
+// AI_CITATION_MODEL / AI_GATEWAY_MODEL.
+const DEFAULT_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const MIN_CONFIDENCE = 0.7;
 
 export interface AiBinding {
