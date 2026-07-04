@@ -39,30 +39,25 @@ const DialogContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
     <DialogPortal>
         <DialogOverlay />
-        {/* Flex-centered wrapper so the popup can scale/fade IN PLACE. The shadcn
-            translate-centering fights the animation transform (its default slides
-            from 48% just to stay centered); centering via flex frees the content
-            for a clean centered zoom. The wrapper is pointer-events-none so clicks
-            in the padding fall through to the overlay and still close the dialog. */}
-        <div className="mla-dialog-wrapper fixed inset-0 z-50 flex items-center justify-center p-4">
-            <DialogPrimitive.Content
-                ref={ref}
-                className={cn(
-                    // .mla-dialog-content carries the entrance/exit animation
-                    // (scale-up + slight rise + fade, ease-out-expo) — a curve
-                    // distinct from the backdrop's plain fade.
-                    "mla-dialog-content relative grid w-full max-w-[850px] max-h-[92vh] overflow-hidden border bg-background shadow-2xl sm:rounded-2xl",
-                    className
-                )}
-                {...props}
-            >
-                {children}
-                <DialogPrimitive.Close className="absolute right-5 top-5 z-10 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                    <X className="h-4 w-4" />
-                    <span className="sr-only">Close</span>
-                </DialogPrimitive.Close>
-            </DialogPrimitive.Content>
-        </div>
+        {/* Content is a direct portal child (standard Radix placement) so Radix
+            Presence reliably plays the exit animation before unmount. Centering
+            (fixed + translate), rounded corners, and the entrance/exit animation
+            all live in dialog-transitions.css (.mla-dialog-content); the scale is
+            composed with the centering translate so the popup scales in place. */}
+        <DialogPrimitive.Content
+            ref={ref}
+            className={cn(
+                "mla-dialog-content z-50 grid w-full max-w-[850px] max-h-[92vh] overflow-hidden border bg-background shadow-2xl",
+                className
+            )}
+            {...props}
+        >
+            {children}
+            <DialogPrimitive.Close className="absolute right-5 top-5 z-10 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+            </DialogPrimitive.Close>
+        </DialogPrimitive.Content>
     </DialogPortal>
 ))
 DialogContent.displayName = DialogPrimitive.Content.displayName

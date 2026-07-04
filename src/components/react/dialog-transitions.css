@@ -2,15 +2,15 @@
  * Edit-citation dialog transitions.
  *
  * Plain (non-module) CSS with STABLE class names, imported for its side effect.
- * Two earlier approaches failed here: the shadcn `animate-in` utilities need the
- * `tailwindcss-animate` plugin (not installed), and a CSS Module's hashed class
- * names weren't applied at runtime. Stable class names + an explicit rgba scrim
- * (Tailwind's `bg-black/70` opacity-modifier produced no rule in this build)
- * guarantee the backdrop and the animations actually render.
+ * Earlier approaches failed here: the shadcn `animate-in` utilities need the
+ * `tailwindcss-animate` plugin (not installed); a CSS Module's hashed names
+ * weren't applied at runtime; and `bg-black/70` / `sm:rounded-2xl` produced no
+ * rule in this build. Stable classes + explicit values guarantee they render.
  *
- * Animations key off Radix's `data-state`; Radix Presence waits for the exit
- * animation before unmounting. The popup is flex-centered by its wrapper, so the
- * transform (scale + translateY) animates it cleanly in place.
+ * The content is centered with a fixed translate(-50%,-50%) — the standard Radix
+ * placement, so Radix Presence reliably plays the EXIT animation before
+ * unmounting (a wrapping element broke that). The scale is composed WITH the
+ * centering translate inside the keyframes, so the popup scales in place.
  */
 
 .mla-dialog-overlay {
@@ -25,15 +25,12 @@
     background-color: rgba(0, 0, 0, 0.7);
 }
 
-/* The flex-centering wrapper is transparent to clicks so a click in the padding
-   falls through to the overlay and closes the dialog; the content re-enables
-   pointer events for itself. Defined here rather than via Tailwind's
-   pointer-events utilities, which we can't rely on generating in this build. */
-.mla-dialog-wrapper {
-    pointer-events: none;
-}
 .mla-dialog-content {
-    pointer-events: auto;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 1rem; /* sm:rounded-2xl didn't compile in this build */
 }
 
 .mla-dialog-overlay[data-state="open"] {
@@ -43,13 +40,13 @@
     animation: mla-dialog-overlay-out 200ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 
-/* The popup enters on a distinct, springier ease-out-expo curve than the
-   backdrop's plain fade: scale up + a slight rise + fade, settling into place. */
+/* Popup enters on a distinct, springier ease-out-expo curve than the backdrop's
+   plain fade: scale up + a slight rise + fade, settling in place. */
 .mla-dialog-content[data-state="open"] {
     animation: mla-dialog-content-in 340ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .mla-dialog-content[data-state="closed"] {
-    animation: mla-dialog-content-out 190ms cubic-bezier(0.4, 0, 1, 1);
+    animation: mla-dialog-content-out 200ms cubic-bezier(0.4, 0, 1, 1);
 }
 
 @keyframes mla-dialog-overlay-in {
@@ -61,12 +58,12 @@
     to { opacity: 0; }
 }
 @keyframes mla-dialog-content-in {
-    from { opacity: 0; transform: scale(0.96) translateY(12px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
+    from { opacity: 0; transform: translate(-50%, calc(-50% + 10px)) scale(0.96); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 @keyframes mla-dialog-content-out {
-    from { opacity: 1; transform: scale(1) translateY(0); }
-    to { opacity: 0; transform: scale(0.97) translateY(6px); }
+    from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    to { opacity: 0; transform: translate(-50%, calc(-50% + 6px)) scale(0.97); }
 }
 
 @media (prefers-reduced-motion: reduce) {
