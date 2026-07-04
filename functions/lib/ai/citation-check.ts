@@ -1,7 +1,7 @@
 import type { CitationQualityWarning, CSLItem, SupportedStyle } from '../csl-types';
 import type { AiBinding } from './citation-assist';
 
-const DEFAULT_MODEL = '@cf/meta/llama-3.1-8b-instruct-fast';
+const DEFAULT_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 
 export interface AiCitationCheckInput {
   ai: AiBinding;
