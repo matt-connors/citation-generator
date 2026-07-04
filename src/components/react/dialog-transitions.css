@@ -1,0 +1,74 @@
+/*
+ * Edit-citation dialog transitions.
+ *
+ * Plain (non-module) CSS with STABLE class names, imported for its side effect.
+ * Earlier approaches failed here: the shadcn `animate-in` utilities need the
+ * `tailwindcss-animate` plugin (not installed); a CSS Module's hashed names
+ * weren't applied at runtime; and `bg-black/70` / `sm:rounded-2xl` produced no
+ * rule in this build. Stable classes + explicit values guarantee they render.
+ *
+ * The content is centered with a fixed translate(-50%,-50%) — the standard Radix
+ * placement, so Radix Presence reliably plays the EXIT animation before
+ * unmounting (a wrapping element broke that). The scale is composed WITH the
+ * centering translate inside the keyframes, so the popup scales in place.
+ */
+
+.mla-dialog-overlay {
+    background-color: rgba(0, 0, 0, 0.7);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+}
+
+/* Mobile drawer scrim. Same explicit black (bg-black/70 produced no rule here);
+   vaul animates this overlay's opacity itself, so no keyframes are needed. */
+.mla-drawer-overlay {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.mla-dialog-content {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 1rem; /* sm:rounded-2xl didn't compile in this build */
+}
+
+.mla-dialog-overlay[data-state="open"] {
+    animation: mla-dialog-overlay-in 300ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+.mla-dialog-overlay[data-state="closed"] {
+    animation: mla-dialog-overlay-out 200ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* Popup enters on a distinct, springier ease-out-expo curve than the backdrop's
+   plain fade: scale up + a slight rise + fade, settling in place. */
+.mla-dialog-content[data-state="open"] {
+    animation: mla-dialog-content-in 340ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mla-dialog-content[data-state="closed"] {
+    animation: mla-dialog-content-out 200ms cubic-bezier(0.4, 0, 1, 1);
+}
+
+@keyframes mla-dialog-overlay-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes mla-dialog-overlay-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+@keyframes mla-dialog-content-in {
+    from { opacity: 0; transform: translate(-50%, calc(-50% + 10px)) scale(0.96); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes mla-dialog-content-out {
+    from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    to { opacity: 0; transform: translate(-50%, calc(-50% + 6px)) scale(0.97); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mla-dialog-overlay[data-state],
+    .mla-dialog-content[data-state] {
+        animation: none;
+    }
+}
