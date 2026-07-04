@@ -1,8 +1,12 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
+import { describe, it, expect, afterEach } from 'vitest';
+import { render, cleanup } from '@testing-library/react';
 import React from 'react';
 import ReferenceSkeleton from '../../src/components/react/ReferenceSkeleton';
+
+// This project runs vitest without globals, so @testing-library's automatic
+// afterEach cleanup isn't registered — unmount renders between tests ourselves.
+afterEach(cleanup);
 
 describe('ReferenceSkeleton', () => {
   it('renders an accessible loading placeholder with two shimmer bars', () => {
