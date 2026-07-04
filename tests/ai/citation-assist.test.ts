@@ -259,4 +259,23 @@ describe('runAiFieldAssist — evidence guardrail', () => {
     expect(evidence).toHaveLength(1);
     expect(evidence[0].field).toBe('title');
   });
+
+  it('returns no fields when the model call exceeds the timeout', async () => {
+    vi.useFakeTimers();
+    try {
+      const ai = { run: vi.fn(() => new Promise(() => {})) }; // never resolves
+      const promise = runAiFieldAssist({
+        ai: ai as never,
+        csl: { type: 'webpage' } as CSLItem,
+        url: 'https://example.com/a',
+        fetchedText: PAGE,
+        acquiredAt: '2026-07-04T00:00:00.000Z',
+      });
+      await vi.advanceTimersByTimeAsync(10_000);
+      await expect(promise).resolves.toEqual([]);
+      expect(ai.run).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
