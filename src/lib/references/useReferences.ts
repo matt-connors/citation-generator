@@ -3,8 +3,17 @@ import { loadSources, saveSources, STORAGE_KEY, type StoredSource } from './stor
 import { decodeInlineCslParam, INLINE_CSL_PARAM } from './inline-csl';
 import type { CSLItem, ExtractQuality, FieldProvenance, SupportedStyle } from '../citations/csl-types';
 
+// A citation request that is in flight. Kept in component-only state and NEVER
+// persisted, so a loading placeholder can never leak into localStorage.
+export interface PendingSource {
+  id: string;
+  kind: 'website' | 'book' | 'journal';
+  url?: string;
+}
+
 export interface UseReferencesReturn {
   sources: StoredSource[];
+  pending: PendingSource[];
   sourceCount: number;
   selected: ReadonlySet<string>;
   selectedCount: number;
@@ -32,6 +41,7 @@ interface ApiEnvelope {
 
 export function useReferences(): UseReferencesReturn {
   const [sources, setSourcesState] = useState<StoredSource[]>([]);
+  const [pending, setPending] = useState<PendingSource[]>([]);
   const [selected, setSelected] = useState<ReadonlySet<string>>(() => new Set());
   const [citationFormat, setCitationFormatState] = useState<SupportedStyle>('mla-9');
 
@@ -109,6 +119,27 @@ export function useReferences(): UseReferencesReturn {
     else if (journal) requestUrl = `/api/cite-journal?doi=${encodeURIComponent(journal)}`;
     if (!requestUrl) return;
 
+    // Show a loading skeleton for this request immediately (component-only
+    // state, never persisted) so the user sees what they're waiting for.
+    const kind: PendingSource['kind'] = website ? 'website' : book ? 'book' : 'journal';
+    const pendingValue = website || book || journal || '';
+    const pendingId = `pending:${kind}:${pendingValue}`;
+    setPending((p) => (p.some((x) => x.id === pendingId) ? p : [...p, { id: pendingId, kind, url: pendingValue }]));
+    const clearPending = () => setPending((p) => p.filter((x) => x.id !== pendingId));
+
+    // Functional updater (not a closed-over `existing`) so manual citations the
+    // user added between mount and fetch resolution aren't clobbered.
+    const addEnvelope = (env: ApiEnvelope) => {
+      setSources((prev) => prev.some((s) => s.uuid === env.uuid)
+        ? prev
+        : [...prev, {
+          uuid: env.uuid,
+          csl: env.csl,
+          quality: env._quality,
+          provenance: env._provenance,
+        }]);
+    };
+
     let cancelled = false;
     // Bound the request so a slow/hung backend can't leave the page spinning
     // forever; abort on unmount so a late response can't update stale state.
@@ -125,20 +156,17 @@ export function useReferences(): UseReferencesReturn {
       })
       .then((env) => {
         if (cancelled || !env?.csl) return;
-        // Functional updater (not a closed-over `existing`) so manual citations
-        // the user added between mount and fetch resolution aren't clobbered.
-        setSources((prev) => prev.some((s) => s.uuid === env.uuid)
-          ? prev
-          : [...prev, {
-            uuid: env.uuid,
-            csl: env.csl,
-            quality: env._quality,
-            provenance: env._provenance,
-          }]);
+        addEnvelope(env);
       })
-      .catch((err) => { if (!cancelled) console.error('Citation fetch failed', err); })
-      .finally(() => clearTimeout(timeout));
-    return () => { cancelled = true; controller.abort(); clearTimeout(timeout); };
+      .catch((err) => {
+        if (cancelled) return;
+        console.error('Citation fetch failed', err);
+        // A timeout / network abort still resolves the skeleton to an actionable
+        // card for websites, instead of letting the placeholder vanish silently.
+        if (website) addEnvelope(errorEnvelopeFromWebsite(website, {}));
+      })
+      .finally(() => { clearTimeout(timeout); clearPending(); });
+    return () => { cancelled = true; controller.abort(); clearTimeout(timeout); clearPending(); };
   }, [setSources]);
 
   // Reload when another tab writes our localStorage key so two open tabs don't
@@ -171,6 +199,7 @@ export function useReferences(): UseReferencesReturn {
   // would only pay the shallow-compare cost without benefit.
   return {
     sources,
+    pending,
     sourceCount: sources.length,
     selected,
     selectedCount: selected.size,

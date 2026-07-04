@@ -224,4 +224,94 @@ describe('useReferences', () => {
       expect(result.current.selectedCount).toBe(1);
     });
   });
+
+  describe('optimistic loading (pending skeleton)', () => {
+    function makeDeferred() {
+      let resolve!: (v: any) => void;
+      let reject!: (e: any) => void;
+      const promise = new Promise((res, rej) => { resolve = res; reject = rej; });
+      return { promise, resolve, reject };
+    }
+    const atUrl = (search: string) => Object.defineProperty(window, 'location', {
+      writable: true, value: new URL(`http://localhost/my-references?${search}`),
+    });
+
+    it('shows a non-persisted placeholder while a website request is in flight', async () => {
+      atUrl('website=https://x.com/p');
+      const d = makeDeferred();
+      globalThis.fetch = vi.fn(() => d.promise) as any;
+
+      const { result } = renderHook(() => useReferences());
+      await waitFor(() => expect(result.current.pending.length).toBe(1));
+
+      expect(result.current.pending[0].kind).toBe('website');
+      expect(result.current.pending[0].url).toBe('https://x.com/p');
+      expect(result.current.sourceCount).toBe(0);
+      // The placeholder must never reach localStorage.
+      expect(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')).toEqual([]);
+    });
+
+    it('replaces the placeholder with the real citation on success, persisting only the real item', async () => {
+      atUrl('website=https://x.com/p');
+      const d = makeDeferred();
+      globalThis.fetch = vi.fn(() => d.promise) as any;
+
+      const { result } = renderHook(() => useReferences());
+      await waitFor(() => expect(result.current.pending.length).toBe(1));
+
+      await act(async () => {
+        d.resolve(new Response(JSON.stringify({
+          uuid: 'https://x.com/p', type: 'webpage', csl: { id: 'u', type: 'webpage', title: 'T' },
+        }), { status: 200 }));
+      });
+
+      await waitFor(() => expect(result.current.pending.length).toBe(0));
+      expect(result.current.sourceCount).toBe(1);
+      expect(result.current.sources[0].uuid).toBe('https://x.com/p');
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      expect(saved.map((s: any) => s.uuid)).toEqual(['https://x.com/p']);
+    });
+
+    it('clears the placeholder and shows a reviewable card when a website request rejects', async () => {
+      atUrl('website=https://slow.example/p');
+      const d = makeDeferred();
+      globalThis.fetch = vi.fn(() => d.promise) as any;
+
+      const { result } = renderHook(() => useReferences());
+      await waitFor(() => expect(result.current.pending.length).toBe(1));
+
+      await act(async () => { d.reject(new Error('network')); });
+
+      await waitFor(() => expect(result.current.sourceCount).toBe(1));
+      expect(result.current.pending.length).toBe(0);
+      expect(result.current.sources[0].quality?.warnings[0].code).toBe('fetch_failed');
+    });
+
+    it('clears the placeholder without a card when a book request rejects', async () => {
+      atUrl('book=9780000000000');
+      const d = makeDeferred();
+      globalThis.fetch = vi.fn(() => d.promise) as any;
+
+      const { result } = renderHook(() => useReferences());
+      await waitFor(() => expect(result.current.pending.length).toBe(1));
+      expect(result.current.pending[0].kind).toBe('book');
+
+      await act(async () => { d.reject(new Error('network')); });
+
+      await waitFor(() => expect(result.current.pending.length).toBe(0));
+      expect(result.current.sourceCount).toBe(0);
+    });
+
+    it('drops the placeholder on unmount and persists nothing', async () => {
+      atUrl('website=https://x.com/p');
+      const d = makeDeferred();
+      globalThis.fetch = vi.fn(() => d.promise) as any;
+
+      const { result, unmount } = renderHook(() => useReferences());
+      await waitFor(() => expect(result.current.pending.length).toBe(1));
+
+      unmount();
+      expect(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')).toEqual([]);
+    });
+  });
 });
