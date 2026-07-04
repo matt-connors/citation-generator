@@ -59,10 +59,37 @@ describe('analytics integration', () => {
       const shape = shapeOf(writeDataPoint.mock.calls[0][0]);
       expect(shape.event).toBe('cite_book');
       expect(shape.index).toBe('cite_book');
-      expect(shape.dimensions).toEqual(['openlibrary']);
+      // [source, from] — from is '' for searches not started on a guide page
+      expect(shape.dimensions).toEqual(['openlibrary', '']);
       // metrics: [latency_ms, cache_hit]. Latency is wall-clock so just bounds-check.
       expect(shape.metrics[0]).toBeGreaterThanOrEqual(0);
       expect(shape.metrics[1]).toBe(0);
+    });
+
+    it('records the guide slug in the trailing from dimension', async () => {
+      const body = loadFixtureFile(OL_FIX, '9780553418811.json');
+      mockOnce(new Response(body, { status: 200, headers: { 'content-type': 'application/json' } }));
+      const { binding, writeDataPoint } = makeAnalytics();
+
+      await handleCiteBook(
+        new URL('https://m.com/api/cite-book?isbn=9780553418811&from=how-to-cite-a-book'),
+        null, undefined, binding,
+      );
+      const shape = shapeOf(writeDataPoint.mock.calls[0][0]);
+      expect(shape.dimensions).toEqual(['openlibrary', 'how-to-cite-a-book']);
+    });
+
+    it('drops a non-slug-shaped from value', async () => {
+      const body = loadFixtureFile(OL_FIX, '9780553418811.json');
+      mockOnce(new Response(body, { status: 200, headers: { 'content-type': 'application/json' } }));
+      const { binding, writeDataPoint } = makeAnalytics();
+
+      await handleCiteBook(
+        new URL('https://m.com/api/cite-book?isbn=9780553418811&from=' + encodeURIComponent('https://evil.example/x')),
+        null, undefined, binding,
+      );
+      const shape = shapeOf(writeDataPoint.mock.calls[0][0]);
+      expect(shape.dimensions).toEqual(['openlibrary', '']);
     });
 
     it('emits cite_book with source=googlebooks when OL is empty', async () => {

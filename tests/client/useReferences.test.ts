@@ -49,6 +49,34 @@ describe('useReferences', () => {
     expect((globalThis.fetch as any).mock.calls[0][0]).toContain('/api/cite-website');
   });
 
+  it('forwards a slug-shaped ?from= to the cite API and drops a malformed one', async () => {
+    const envelope = () => new Response(JSON.stringify({
+      uuid: 'https://x.com/p',
+      type: 'webpage',
+      csl: { id: 'u', type: 'webpage', title: 'T' },
+    }), { status: 200 });
+
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: new URL('http://localhost/my-references?website=https://x.com/p&from=how-to-cite-a-tiktok'),
+    });
+    globalThis.fetch = vi.fn(async () => envelope()) as any;
+    const first = renderHook(() => useReferences());
+    await waitFor(() => expect(first.result.current.sourceCount).toBe(1));
+    expect((globalThis.fetch as any).mock.calls[0][0]).toContain('&from=how-to-cite-a-tiktok');
+    first.unmount();
+    localStorage.clear();
+
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: new URL('http://localhost/my-references?website=https://x.com/p&from=Not%20A%20Slug!'),
+    });
+    globalThis.fetch = vi.fn(async () => envelope()) as any;
+    const second = renderHook(() => useReferences());
+    await waitFor(() => expect(second.result.current.sourceCount).toBe(1));
+    expect((globalThis.fetch as any).mock.calls[0][0]).not.toContain('from=');
+  });
+
   it('stores citation quality metadata returned by cite endpoints', async () => {
     Object.defineProperty(window, 'location', {
       writable: true,

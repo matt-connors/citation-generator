@@ -28,6 +28,19 @@ export interface AnalyticsBinding {
  * reordering them is silently breaking. See docs/analytics.md for the
  * column→meaning mapping that downstream queries depend on.
  */
+/**
+ * Extract the guide-attribution slug from a cite request URL. The embedded
+ * generator on /guides/* pages appends `from=<guide-slug>` to the search it
+ * submits, and /my-references forwards it to the cite API. Returns '' when
+ * absent or not slug-shaped, so callers can unconditionally append it as a
+ * trailing analytics dimension (positional storage: appending a dimension at
+ * the END of an event's dimension list is the only safe schema change).
+ */
+export function fromAttribution(requestUrl: URL): string {
+  const raw = requestUrl.searchParams.get('from') ?? '';
+  return /^[a-z0-9-]{1,64}$/.test(raw) ? raw : '';
+}
+
 export function writeEvent(
   analytics: AnalyticsBinding | undefined,
   event: string,

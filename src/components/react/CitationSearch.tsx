@@ -20,23 +20,44 @@ const SearchPanel = ({ label, placeholder, name }) => {
     );
 }
 
+export type CitationSearchTab = 'website' | 'book' | 'journal';
+
+interface CitationSearchProps {
+    includeDropdown?: Boolean;
+    includeManualCite?: Boolean;
+    defaultStyle?: string;
+    /** Which tab opens first — lets a guide about DOIs start on the Journal tab. */
+    defaultTab?: CitationSearchTab;
+    /** Placeholder override for the default tab (e.g. "Paste the TikTok URL"). */
+    placeholder?: string;
+    /** Attribution slug carried through to /my-references and the cite APIs. */
+    from?: string;
+}
+
 // Main CitationSearch component
-const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeManualCite: Boolean, defaultStyle?: string }, ref: Ref<HTMLInputElement>) => {
-    // State for managing active tab index
-    const [tabIndex, setTabIndex] = useState(0);
-
-    // Function to generate class names for styling active tabs
-    const getClassNames = (className: string, index: number) => clsx(
-        styles[className],
-        tabIndex === index && styles.active
-    );
-
+const CitationSearch = forwardRef((props: CitationSearchProps, ref: Ref<HTMLInputElement>) => {
     // Array of search panels with their respective labels, placeholders, and names
     const tabPanels = [
         { label: "Website", placeholder: "Paste the website URL", name: "website" },
         { label: "Book", placeholder: "Enter an ISBN", name: "book" },
         { label: "Journal", placeholder: "Enter a DOI", name: "journal" },
     ];
+
+    const defaultTabIndex = Math.max(0, tabPanels.findIndex((panel) => panel.name === props.defaultTab));
+
+    // State for managing active tab index
+    const [tabIndex, setTabIndex] = useState(defaultTabIndex);
+
+    // A guide-supplied placeholder applies only to the tab it was written for.
+    if (props.placeholder) {
+        tabPanels[defaultTabIndex].placeholder = props.placeholder;
+    }
+
+    // Function to generate class names for styling active tabs
+    const getClassNames = (className: string, index: number) => clsx(
+        styles[className],
+        tabIndex === index && styles.active
+    );
 
     return (
         <Tabs selectedIndex={tabIndex} onSelect={setTabIndex} className={styles.citationSearch}>
@@ -59,6 +80,9 @@ const CitationSearch = forwardRef((props: { includeDropdown: Boolean, includeMan
                     className={clsx(styles.label, styles.dropdown)}
                     defaultStyle={props.defaultStyle}
                 /> : <input type="hidden" name="citationStyle" ref={ref} />}
+
+                {/* Attribution: which guide page this search started from */}
+                {props.from && <input type="hidden" name="from" value={props.from} />}
 
                 {/* Render tab panels dynamically */}
                 {tabPanels.map((panel, index) => (

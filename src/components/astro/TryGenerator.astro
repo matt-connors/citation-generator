@@ -1,31 +1,58 @@
 ---
 // src/components/astro/TryGenerator.astro
-// Contextual call-to-action that links to the citation tool.
-// Pass a custom heading/blurb per guide so it reads as part of the
-// page's flow rather than a generic promo.
+// Embedded citation generator, shown on every guide page. Instead of linking
+// out to the homepage, the actual search box is embedded so a reader can cite
+// the source they just read about without leaving the page. Pass a custom
+// heading/blurb/tab/placeholder per guide so it reads as part of the page's
+// flow rather than a generic promo.
+import CitationSearch from "../react/CitationSearch";
+
 interface Props {
     heading?: string;
     blurb?: string;
-    cta?: string;
+    /** Which input tab opens first: website (URL), book (ISBN), or journal (DOI). */
+    tab?: "website" | "book" | "journal";
+    /** Placeholder override for the default tab, e.g. "Paste the TikTok URL". */
+    placeholder?: string;
+    /** Citation style preselected in the dropdown, e.g. "mla-9". */
+    style?: string;
+    /** Guide slug, recorded as the `from` attribution dimension on cite events. */
+    from?: string;
 }
 
 const {
-    heading = 'Try the citation generator',
-    blurb = 'Paste a URL, DOI, or ISBN — we format the reference instantly in your chosen style.',
-    cta = 'Open the generator',
+    heading = "Cite your source now",
+    blurb = "Paste a URL, DOI, or ISBN — the generator formats the reference instantly in your chosen style.",
+    tab = "website",
+    placeholder,
+    style,
+    from,
 } = Astro.props;
 ---
 
 <aside class="try-generator" aria-labelledby="try-generator-heading">
     <h2 id="try-generator-heading">{heading}</h2>
-    <p>{blurb}</p>
-    <a href="/" class="try-generator-cta">{cta}</a>
+    <p class="try-generator-blurb">{blurb}</p>
+    <div class="try-generator-tool">
+        <CitationSearch
+            includeDropdown
+            defaultStyle={style}
+            defaultTab={tab}
+            placeholder={placeholder}
+            from={from}
+            client:visible
+        />
+    </div>
+    <p class="try-generator-alt">
+        Prefer the full page? <a href="/">Open the citation generator</a> or
+        <a href="/my-references/">enter the details manually</a>.
+    </p>
 </aside>
 
 <style>
     .try-generator {
         margin: 2.5rem 0;
-        padding: 1.5rem 1.75rem;
+        padding: 1.5rem 1.75rem 1.25rem;
         background-color: var(--color-background-2);
         border-radius: 12px;
         border: 1px solid var(--color-border);
@@ -35,29 +62,44 @@ const {
         margin: 0 0 0.5rem;
         color: var(--color-text-dark);
     }
-    .try-generator p {
-        margin: 0 0 1rem;
+    .try-generator-blurb {
+        margin: 0 0 1.25rem;
         color: var(--color-text-medium);
         line-height: 1.5;
     }
-    .try-generator-cta {
-        display: inline-block;
-        font-weight: 510;
-        color: var(--color-text-dark);
-        /* Single underline only — no border-bottom (which, combined with the
-           inherited #guide-content underline, rendered as a double line). */
-        text-decoration: underline;
-        padding: 0.5rem 0;
+    .try-generator-alt {
+        margin: 1rem 0 0;
+        font-size: 14px;
+        color: var(--color-text-light);
     }
-    .try-generator-cta:hover,
-    .try-generator-cta:focus-visible {
-        color: var(--color-text-dark);
-        opacity: 0.8;
-        outline: none;
+    /* The search box was designed for the homepage hero: viewport-sized grid
+       columns (min(50vw, 600px)) on a white page background. Inside a guide's
+       content column both assumptions break, so re-ground it here: fluid
+       columns bounded by the container, and an explicit white surface so the
+       borderless inputs and the input fade gradient sit on the background they
+       were designed against. Selector carries more specificity than the
+       module's .searchBox.withDropdown (0-2-0) without needing !important. */
+    .try-generator .try-generator-tool :global(form) {
+        /* Dropdown | input | Cite button. The module's own mobile rule
+           (<=750px) stacks these with !important, so no override needed there. */
+        grid-template-columns: minmax(auto, 200px) minmax(0, 1fr) auto;
+        background-color: var(--color-background-1);
+        width: 100%;
+        box-sizing: border-box;
     }
-    .try-generator-cta:focus-visible {
-        outline: 2px solid var(--color-text-dark);
-        outline-offset: 4px;
-        border-radius: 4px;
+    .try-generator .try-generator-tool :global([role="tablist"]) {
+        justify-content: flex-start;
+        list-style: none;
+        padding-left: 0;
+    }
+    /* Longest style label is "Chicago 18th edition" — 170px (the homepage cap)
+       truncates it here, so give the dropdown column the room it needs. */
+    .try-generator .try-generator-tool :global(form > div:first-child) {
+        max-width: 200px;
+    }
+    /* The active-tab pill is background-2 on the homepage — invisible against
+       this aside's background-2 surface, so use the white surface here. */
+    .try-generator .try-generator-tool :global([role="tab"][aria-selected="true"]) {
+        background: var(--color-background-1);
     }
 </style>

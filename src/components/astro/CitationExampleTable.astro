@@ -1,0 +1,100 @@
+---
+// src/components/astro/CitationExampleTable.astro
+// The "same source in all seven styles" table used by how-to guides, rendered
+// at BUILD TIME by the same citeproc engine that powers the generator
+// (functions/lib/format). Guides that use this component are guaranteed to
+// show exactly what the tool produces — the examples can never drift from
+// engine behavior, and authoring a new guide no longer means hand-formatting
+// seven styles.
+//
+// Where a style's official guidance includes elements the engine does not yet
+// emit for a source type (e.g. APA's "[Video]" type designator, MLA's
+// "uploaded by" phrasing for social platforms), pass an override for that
+// style. Overrides are trusted author-written HTML (<em> etc.) and are
+// rendered instead of the engine output — use them sparingly and only where
+// official guidance genuinely differs.
+import { formatCitation, registerStyle, registerLocale } from "../../../functions/lib/format/citeproc";
+import { decode as decodeStyle, NAMES as STYLE_NAMES } from "../../../functions/lib/format/styles";
+import { decode as decodeLocale } from "../../../functions/lib/format/locales";
+import type { CSLItem, RichText, SupportedStyle } from "../../../functions/lib/csl-types";
+
+// Same registration the /api/format endpoint performs, done once per build
+// process (module scope survives across pages in a single astro build).
+registerLocale("en-US", decodeLocale("locales-en-US"));
+registerLocale("en-GB", decodeLocale("locales-en-GB"));
+for (const name of STYLE_NAMES) {
+    registerStyle(name as SupportedStyle, decodeStyle(name));
+}
+
+// MLA leads: this is mlagenerator.com, and the style-specific long-tail
+// queries these guides target are dominated by MLA phrasing.
+const STYLE_ROWS: { style: SupportedStyle; label: string; href: string }[] = [
+    { style: "mla-9", label: "MLA 9", href: "/guides/mla/" },
+    { style: "apa-7", label: "APA 7", href: "/guides/apa/" },
+    { style: "chicago-18", label: "Chicago 18 (author–date)", href: "/guides/chicago/" },
+    { style: "harvard", label: "Harvard (Cite Them Right)", href: "/guides/harvard/" },
+    { style: "vancouver", label: "Vancouver", href: "/guides/vancouver/" },
+    { style: "ieee", label: "IEEE", href: "/guides/ieee/" },
+    { style: "ama-11", label: "AMA 11", href: "/guides/ama/" },
+];
+
+interface Props {
+    /** The real source being cited, as CSL-JSON (same shape the tool builds). */
+    source: CSLItem;
+    /** Author-written replacement entry per style, HTML allowed (<em>). */
+    overrides?: Partial<Record<SupportedStyle, string>>;
+    /** Restrict/reorder the rows; defaults to all seven styles, MLA first. */
+    styles?: SupportedStyle[];
+}
+
+const { source, overrides = {}, styles } = Astro.props;
+
+// Numeric styles (Vancouver, IEEE, AMA) prefix the entry with its list number
+// ("1." / "[1]"). In a running paper that number comes from the entry's
+// position in the reference list, so a standalone example shouldn't carry it.
+function stripListNumber(segments: RichText[]): RichText[] {
+    const [first, ...rest] = segments;
+    if (!first || first.italic) return segments;
+    const stripped = first.text.replace(/^\s*(\[\d+\]|\d+\.)\s*/, "");
+    if (stripped === first.text) return segments;
+    return stripped ? [{ ...first, text: stripped }, ...rest] : rest;
+}
+
+const rows = (styles ? STYLE_ROWS.filter((r) => styles.includes(r.style)) : STYLE_ROWS).map((row) => {
+    const override = overrides[row.style];
+    return {
+        ...row,
+        override,
+        segments: override ? null : stripListNumber(formatCitation(source, row.style)),
+    };
+});
+---
+
+<table>
+    <thead>
+        <tr>
+            <th>Style</th>
+            <th>Reference list entry</th>
+        </tr>
+    </thead>
+    <tbody>
+        {
+            rows.map((row) => (
+                <tr>
+                    <td>
+                        <a href={row.href}>{row.label}</a>
+                    </td>
+                    {row.override ? (
+                        <td set:html={row.override} />
+                    ) : (
+                        <td>
+                            {(row.segments as RichText[]).map((seg) =>
+                                seg.italic ? <em>{seg.text}</em> : seg.text,
+                            )}
+                        </td>
+                    )}
+                </tr>
+            ))
+        }
+    </tbody>
+</table>

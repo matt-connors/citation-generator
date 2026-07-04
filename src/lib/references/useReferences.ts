@@ -113,10 +113,15 @@ export function useReferences(): UseReferencesReturn {
     const website = params.get('website');
     const book = params.get('book');
     const journal = params.get('journal') || params.get('doi');
+    // Attribution: which guide page the search started from (set by the
+    // embedded generator on /guides/* pages). Forwarded to the cite API,
+    // which records it as an analytics dimension. Slug-shaped values only.
+    const from = params.get('from');
+    const fromParam = from && /^[a-z0-9-]{1,64}$/.test(from) ? `&from=${from}` : '';
     let requestUrl: string | null = null;
-    if (website) requestUrl = `/api/cite-website?url=${encodeURIComponent(website)}`;
-    else if (book) requestUrl = `/api/cite-book?isbn=${encodeURIComponent(book)}`;
-    else if (journal) requestUrl = `/api/cite-journal?doi=${encodeURIComponent(journal)}`;
+    if (website) requestUrl = `/api/cite-website?url=${encodeURIComponent(website)}${fromParam}`;
+    else if (book) requestUrl = `/api/cite-book?isbn=${encodeURIComponent(book)}${fromParam}`;
+    else if (journal) requestUrl = `/api/cite-journal?doi=${encodeURIComponent(journal)}${fromParam}`;
     if (!requestUrl) return;
 
     // Show a loading skeleton for this request immediately (component-only

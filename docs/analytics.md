@@ -80,6 +80,15 @@ The `fetch_ms` column on `cite_website` was added 2026-05-27 — older rows have
 
 `cite_website` also carries **`blob5` = `url`** (the full normalized cited URL), added 2026-05-31 — older rows have null/empty. This is the exact page the user cited (tracking params already stripped by `url-normalize`), enabling per-URL analysis beyond the host-level `blob4`.
 
+All three cite events carry a trailing **`from`** dimension (guide attribution), added 2026-07-04 — `blob6` on `cite_website`, `blob3` on `cite_book` and `cite_journal`; older rows have null/empty. It holds the guide slug (e.g. `how-to-cite-a-tiktok`) when the citation started from the generator embedded on a `/guides/*` page, and `''` for searches from the homepage or style landing pages. Values are validated slug-shaped strings (`^[a-z0-9-]{1,64}$`) by `fromAttribution` in `functions/lib/analytics.ts`. This is the column that answers "which guide pages actually produce citations" — the metric that gates writing more long-tail guides:
+
+```sql
+SELECT blob6 AS guide, COUNT() AS citations
+FROM citation_generator_events
+WHERE index1 = 'cite_website' AND blob6 <> '' AND timestamp > NOW() - INTERVAL '28' DAY
+GROUP BY guide ORDER BY citations DESC
+```
+
 On a cache hit, `source` for cite_book / cite_journal is `''` (empty string) because we didn't talk to either upstream; the `cache_hit` metric is the source of truth for "this was a cache hit". **Per-source SQL slices should filter on the metric, not on `blob2`** — e.g. to count fresh OpenLibrary hits, write `WHERE index1 = 'cite_book' AND double2 = 0 AND blob2 = 'openlibrary'`, not `WHERE blob2 = 'openlibrary'` alone (that's already correct, but the omission of `double2 = 0` would silently exclude cache hits even though they came from "openlibrary" originally — usually the desired behavior, but be explicit). cite_website on a cache hit carries the cached signal-winner dimensions but `html_size_kb` and `extraction_ms` are both 0.
 
 ## Sample queries

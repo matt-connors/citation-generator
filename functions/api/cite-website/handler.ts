@@ -3,7 +3,7 @@ import { fetchHtml, FetchError } from '../../lib/extract/fetch';
 import { normalizeUrl } from '../../lib/extract/url-normalize';
 import { TTL } from '../../lib/cache';
 import type { AcquisitionAttempt, AcquisitionSource, CSLDate, ExtractEnvelope } from '../../lib/csl-types';
-import { writeEvent, type AnalyticsBinding } from '../../lib/analytics';
+import { writeEvent, fromAttribution, type AnalyticsBinding } from '../../lib/analytics';
 import { analyzeHtmlReadiness, extractReadableText, shouldTryRenderedAcquisition, type PageReadiness } from '../../lib/acquisition/page-readiness';
 import { renderHtmlWithBrowserRun, RenderError, type BrowserRunBinding } from '../../lib/acquisition/browser-run';
 import { mergePipelineResults, addEvidenceToResult, type MergedCitationEvidence } from '../../lib/provenance/merge';
@@ -52,6 +52,7 @@ export async function handleCiteWebsite(
   }
 
   const host = hostOf(target);
+  const from = fromAttribution(requestUrl);
   const mode = deps.acquisitionMode ?? 'auto';
   const aiEnabled = deps.aiAssistEnabled !== false;
 
@@ -73,6 +74,7 @@ export async function handleCiteWebsite(
           signal_winner_url: body._signals?.URL ?? '',
           host,
           url: target,
+          from,
         },
         { html_size_kb: 0, extraction_ms: 0, cache_hit: 1, fetch_ms: 0 },
       );
@@ -242,6 +244,7 @@ export async function handleCiteWebsite(
       signal_winner_url: merged.signals.URL ?? '',
       host,
       url: target,
+      from,
     },
     {
       html_size_kb: Math.round((fetchedHtml || renderedHtml).length / 1024),
