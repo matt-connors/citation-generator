@@ -34,7 +34,7 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
         label: 'How to cite',
         blurb: 'Format common source types across every style.',
         description:
-            'Step-by-step guides for citing websites, books, journal articles, PDFs, interviews, videos, podcasts, images, reports, quotes, and other sources.',
+            'Step-by-step guides for citing websites, books, journal articles, PDFs, videos, podcasts, social media, AI tools, lectures, and other sources.',
     },
     {
         key: 'concept',

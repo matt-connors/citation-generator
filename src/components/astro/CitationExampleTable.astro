@@ -38,9 +38,14 @@ const STYLE_ROWS: { style: SupportedStyle; label: string; href: string }[] = [
     { style: "ama-11", label: "AMA 11", href: "/guides/ama/" },
 ];
 
+// Guides may format source types the API pipeline doesn't ingest yet (song,
+// broadcast, speech, …) — citeproc handles any CSL type, so the example table
+// accepts a wider `type` than the pipeline's CSLType union.
+type ExampleSource = Omit<CSLItem, "type"> & { type: string };
+
 interface Props {
     /** The real source being cited, as CSL-JSON (same shape the tool builds). */
-    source: CSLItem;
+    source: ExampleSource;
     /** Author-written replacement entry per style, HTML allowed (<em>). */
     overrides?: Partial<Record<SupportedStyle, string>>;
     /** Restrict/reorder the rows; defaults to all seven styles, MLA first. */
@@ -48,6 +53,14 @@ interface Props {
 }
 
 const { source, overrides = {}, styles } = Astro.props;
+
+// citeproc expects string values for ordinal fields; a bare `volume: 1` in a
+// guide's CSL-JSON crashes deep inside sort-key padding (num.match is not a
+// function). Coerce here so authors can write either.
+const normalizedSource = { ...source } as Record<string, unknown>;
+for (const key of ["number", "volume", "issue", "page", "edition"]) {
+    if (typeof normalizedSource[key] === "number") normalizedSource[key] = String(normalizedSource[key]);
+}
 
 // Numeric styles (Vancouver, IEEE, AMA) prefix the entry with its list number
 // ("1." / "[1]"). In a running paper that number comes from the entry's
@@ -65,7 +78,7 @@ const rows = (styles ? STYLE_ROWS.filter((r) => styles.includes(r.style)) : STYL
     return {
         ...row,
         override,
-        segments: override ? null : stripListNumber(formatCitation(source, row.style)),
+        segments: override ? null : stripListNumber(formatCitation(normalizedSource as CSLItem, row.style)),
     };
 });
 ---
