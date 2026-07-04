@@ -19,6 +19,12 @@
     backdrop-filter: blur(3px);
 }
 
+/* Mobile drawer scrim. Same explicit black (bg-black/70 produced no rule here);
+   vaul animates this overlay's opacity itself, so no keyframes are needed. */
+.mla-drawer-overlay {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
 /* The flex-centering wrapper is transparent to clicks so a click in the padding
    falls through to the overlay and closes the dialog; the content re-enables
    pointer events for itself. Defined here rather than via Tailwind's
