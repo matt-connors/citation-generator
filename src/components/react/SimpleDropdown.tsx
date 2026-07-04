@@ -48,7 +48,7 @@ export default function SimpleDropdown({
                     className
                 )}
             >
-                <span className="truncate leading-none">{value?.label || placeholder}</span>
+                <span className={cn("truncate leading-none", !value?.label && "text-muted-foreground")}>{value?.label || placeholder}</span>
                 <ChevronDownIcon className="h-4 w-4 opacity-50" />
             </button>
             {isOpen && (
