@@ -5,6 +5,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
 import { cn } from "./utils"
+import styles from "./Dialog.module.css"
 
 const Dialog = DialogPrimitive.Root
 
@@ -21,11 +22,11 @@ const DialogOverlay = React.forwardRef<
     <DialogPrimitive.Overlay
         ref={ref}
         className={cn(
-            // Elegant fading black backdrop: the scrim eases in over 300ms with a
-            // faint blur for depth; the popup (below) enters on a different curve.
-            "fixed inset-0 z-50 bg-black/70 backdrop-blur-sm ease-out",
-            "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:duration-300",
-            "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:duration-200",
+            // Elegant fading black backdrop with a faint blur for depth. The fade
+            // itself is driven by styles.overlay (keyframes on Radix data-state),
+            // since this project doesn't ship tailwindcss-animate.
+            "fixed inset-0 z-50 bg-black/70 backdrop-blur-sm",
+            styles.overlay,
             className
         )}
         {...props}
@@ -49,11 +50,9 @@ const DialogContent = React.forwardRef<
                 ref={ref}
                 className={cn(
                     "pointer-events-auto relative grid w-full max-w-[850px] max-h-[92vh] overflow-hidden border bg-background shadow-2xl sm:rounded-2xl",
-                    // Popup enters on a different curve than the backdrop: a soft
-                    // scale-up + fade + slight rise, easing out (expo) over 300ms.
-                    "ease-[cubic-bezier(0.16,1,0.3,1)]",
-                    "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-bottom-3 data-[state=open]:duration-300",
-                    "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:slide-out-to-bottom-2 data-[state=closed]:duration-200",
+                    // Popup enters on its own curve (scale-up + slight rise + fade,
+                    // ease-out-expo) via styles.content — distinct from the backdrop.
+                    styles.content,
                     className
                 )}
                 {...props}
