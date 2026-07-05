@@ -148,7 +148,7 @@ const CitationSearch = forwardRef((props: CitationSearchProps, ref: Ref<HTMLInpu
                     <Tab key={index} className={getClassNames('searchPanelTab', index)} role="tab" aria-selected={tabIndex === index ? "true" : "false"}>{panel.label}</Tab>
                 ))}
                 <Tab
-                    className={clsx(getClassNames('searchPanelTab', MORE_TAB_INDEX), styles.moreTab)}
+                    className={clsx(getClassNames('searchPanelTab', MORE_TAB_INDEX), styles.moreTab, menuOpen && styles.moreTabOpen)}
                     role="tab"
                     aria-selected={tabIndex === MORE_TAB_INDEX ? "true" : "false"}
                     aria-haspopup="menu"
