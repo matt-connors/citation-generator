@@ -1,1 +1,1 @@
-Cormen, Thomas H., Charles E. Leiserson, Ronald L. Rivest, and Clifford Stein. <i>Introduction to Algorithms</i>. 3rd ed. MIT Press, 2009.
+Cormen, Thomas H., Charles E. Leiserson, Ronald L. Rivest, and Clifford Stein. 2009. <i>Introduction to Algorithms</i>. 3rd ed. MIT Press.

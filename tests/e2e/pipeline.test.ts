@@ -102,7 +102,7 @@ const CASES: SmokeCase[] = [
     styleTokens: {
       'mla-9': ['Rush, Claire, and Rebecca Boone.', '<i>AP News</i>', '26 May 2026'],
       'apa-7': ['Rush, C., & Boone, R. (2026, May 26).', 'AP News.'],
-      'chicago-18': ['AP News, May 26, 2026.'],
+      'chicago-18': ['Rush, Claire, and Rebecca Boone. 2026.', 'AP News, May 26.'],
       ieee: ['[1] C. Rush and R. Boone', '[Online]. Available:'],
       vancouver: ['Rush C, Boone R.', 'Available from:'],
     },
@@ -139,7 +139,7 @@ const CASES: SmokeCase[] = [
     styleTokens: {
       'mla-9': ['Nomitch, Mike.', '<i>The Cloudflare Blog</i>'],
       'apa-7': ['Nomitch, M. (2026, May 19).'],
-      'chicago-18': ['The Cloudflare Blog, May 19, 2026.'],
+      'chicago-18': ['Nomitch, Mike. 2026.', 'The Cloudflare Blog, May 19.'],
       ieee: ['[1] M. Nomitch'],
       vancouver: ['Nomitch M. The Cloudflare Blog [Internet].'],
     },
@@ -202,7 +202,7 @@ const CASES: SmokeCase[] = [
     styleTokens: {
       'mla-9': ['Patel, Mira.', '<i>Journal of Citation Reliability</i>', 'June 2026', 'https://doi.org/10.5555/jcr.2026.015'],
       'apa-7': ['Patel, M. (2026).', 'https://doi.org/10.5555/jcr.2026.015'],
-      'chicago-18': ['ahead of print, June 15, 2026'],
+      'chicago-18': ['Patel, Mira. 2026.', 'ahead of print, June 15'],
       'ama-11': ['Patel M.', 'Published online June 15, 2026.', 'doi:10.5555/jcr.2026.015'],
       ieee: ['[1] M. Patel', 'Jun. 2026', 'doi: 10.5555/jcr.2026.015'],
       vancouver: ['Patel M.', '2026 Jun 15.', 'doi:10.5555/jcr.2026.015'],
@@ -235,7 +235,7 @@ const CASES: SmokeCase[] = [
     styleTokens: {
       'mla-9': ['Lee, Jordan.', '<i>Example Daily</i>', '4 Feb. 2026'],
       'apa-7': ['Lee, J. (2026, February 4).'],
-      'chicago-18': ['Example Daily, February 4, 2026.'],
+      'chicago-18': ['Lee, Jordan. 2026.', 'Example Daily, February 4.'],
       ieee: ['[1] J. Lee'],
       vancouver: ['Lee J. Example Daily [Internet]. 2026.'],
     },

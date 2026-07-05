@@ -73,12 +73,21 @@ function stripListNumber(segments: RichText[]): RichText[] {
     return stripped ? [{ ...first, text: stripped }, ...rest] : rest;
 }
 
-const rows = (styles ? STYLE_ROWS.filter((r) => styles.includes(r.style)) : STYLE_ROWS).map((row) => {
+// `styles` both restricts AND reorders (rows follow the caller's array order).
+const selectedRows = styles
+    ? styles
+          .map((s) => STYLE_ROWS.find((r) => r.style === s))
+          .filter((r): r is (typeof STYLE_ROWS)[number] => r !== undefined)
+    : STYLE_ROWS;
+
+const rows = selectedRows.map((row) => {
     const override = overrides[row.style];
     return {
         ...row,
         override,
-        segments: override ? null : stripListNumber(formatCitation(normalizedSource as CSLItem, row.style)),
+        segments: override
+            ? null
+            : stripListNumber(formatCitation(normalizedSource as CSLItem, row.style)),
     };
 });
 ---

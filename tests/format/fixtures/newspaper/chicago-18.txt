@@ -1,1 +1,1 @@
-Reporter, Rita. “City Council Approves Budget.” <i>The New York Times</i>, April 18, 2025. https://example.com/budget.
+Reporter, Rita. 2025. “City Council Approves Budget.” <i>The New York Times</i>, April 18. https://example.com/budget.

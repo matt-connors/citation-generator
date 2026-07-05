@@ -157,12 +157,13 @@ const category = categoryByKey(frontmatter.category);
     #guide-content * + h3 {
         margin-top: 1.1rem;
     }
-    /* Prose lists only — the embedded generator's tab list is also a <ul>
-       (react-tabs renders role="tablist"), and must not inherit bullets. */
-    #guide-content ul:not([role="tablist"]) li + li {
+    /* Prose lists only — the embedded generator renders two non-prose <ul>s
+       (react-tabs' role="tablist" and the style dropdown's role="listbox")
+       that must not inherit bullets, indentation, or item spacing. */
+    #guide-content ul:not([role="tablist"]):not([role="listbox"]) li + li {
         margin-top: 0.5rem;
     }
-    #guide-content ul:not([role="tablist"]) {
+    #guide-content ul:not([role="tablist"]):not([role="listbox"]) {
         padding-left: 1.5rem;
         list-style: circle;
     }

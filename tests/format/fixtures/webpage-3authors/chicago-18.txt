@@ -1,1 +1,1 @@
-Doe, Jane, John Smith, and Anna Lee. “AI Breakthrough Discovery.” Tech Crunch, January 20, 2025. https://example.com/ai.
+Doe, Jane, John Smith, and Anna Lee. 2025. “AI Breakthrough Discovery.” Tech Crunch, January 20. https://example.com/ai.
