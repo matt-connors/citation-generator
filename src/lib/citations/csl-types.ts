@@ -28,6 +28,17 @@ export type CSLType =
   | 'article-magazine'
   | 'article-newspaper';
 
+// Platform metadata for social/video posts, mirrored from
+// functions/lib/csl-types.ts. The format layer uses it to apply per-style
+// handle and descriptor conventions; the client just needs to carry it
+// through edits and storage untouched.
+export interface SocialMeta {
+  platform: 'tiktok' | 'youtube' | 'instagram' | 'x';
+  handle?: string;
+  displayName?: string;
+  kind: 'video' | 'post' | 'photo';
+}
+
 export interface CSLItem {
   id: string;
   type: CSLType;
@@ -47,6 +58,7 @@ export interface CSLItem {
   page?: string;
   edition?: string;
   abstract?: string;
+  custom?: { social?: SocialMeta };
 }
 
 export type AcquisitionSource =
