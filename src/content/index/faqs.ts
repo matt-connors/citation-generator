@@ -13,7 +13,7 @@ const faqs = [
     },
     {
         question: "What types of sources can your generator handle?",
-        answer: "<p>Automatically, from a URL, ISBN, or DOI: websites, books, and journal articles. For other source types — videos, images, and more — our <a href='/guides/'>citation guides</a> show you exactly how to format each one in every style.</p>",
+        answer: "<p>Most of what students actually cite comes in through the URL box: news articles, YouTube and TikTok videos, social media posts, Wikipedia entries, podcasts, blog posts, and government pages. Books come in by ISBN and journal articles by DOI. For sources without a good URL — a print interview, a painting seen in a museum, a live lecture — our <a href='/guides/'>citation guides</a> show the exact format in every style.</p>",
     },
     {
         question: "Is MLA Generator accurate?",

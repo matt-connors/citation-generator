@@ -23,6 +23,7 @@ const guides = defineCollection({
         cite: z
             .object({
                 tab: z.enum(['website', 'book', 'journal']).default('website'),
+                sourceType: z.string().optional(),
                 placeholder: z.string().optional(),
                 style: z.string().optional(),
                 heading: z.string().optional(),

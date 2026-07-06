@@ -12,6 +12,8 @@ interface Props {
     blurb?: string;
     /** Which input tab opens first: website (URL), book (ISBN), or journal (DOI). */
     tab?: "website" | "book" | "journal";
+    /** Open on a More-menu source type by key (e.g. 'youtube', 'tiktok'). */
+    sourceType?: string;
     /** Placeholder override for the default tab, e.g. "Paste the TikTok URL". */
     placeholder?: string;
     /** Citation style preselected in the dropdown, e.g. "mla-9". */
@@ -24,6 +26,7 @@ const {
     heading = "Cite your source now",
     blurb = "Paste a URL, DOI, or ISBN — the generator formats the reference instantly in your chosen style.",
     tab = "website",
+    sourceType,
     placeholder,
     style,
     from,
@@ -38,6 +41,7 @@ const {
             includeDropdown
             defaultStyle={style}
             defaultTab={tab}
+            defaultSourceType={sourceType}
             placeholder={placeholder}
             from={from}
             client:visible

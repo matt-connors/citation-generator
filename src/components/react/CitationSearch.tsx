@@ -29,21 +29,23 @@ const SearchPanel = ({ label, placeholder, name, idKey, active }: {
 
 export type CitationSearchTab = 'website' | 'book' | 'journal';
 
-// Extra source types behind the "More" menu. All are website-URL lookups —
-// the entry point just names the source and tailors the placeholder, and the
-// matching guide is offered under the box. `key` doubles as the attribution
-// value (menu-<key>) so the dashboard can see which entry points get used.
+// Source types behind the "More" menu. Most are website-URL lookups — the
+// entry point just names the source and tailors the placeholder — while
+// Journal keeps its own DOI submit path via `name`. The matching guide is
+// offered under the box, and `key` doubles as the attribution value
+// (menu-<key>) so the dashboard can see which entry points get used.
 export const MORE_SOURCE_TYPES = [
-    { key: 'youtube', label: 'YouTube', placeholder: 'Paste the video URL', guide: 'how-to-cite-a-youtube-video' },
-    { key: 'tiktok', label: 'TikTok', placeholder: 'Paste the TikTok URL', guide: 'how-to-cite-a-tiktok' },
-    { key: 'x-post', label: 'X / Tweet', placeholder: "Paste the post's URL", guide: 'how-to-cite-a-tweet' },
-    { key: 'instagram', label: 'Instagram', placeholder: 'Paste the post or Reel URL', guide: 'how-to-cite-an-instagram-post' },
-    { key: 'wikipedia', label: 'Wikipedia', placeholder: 'Paste the article URL', guide: 'how-to-cite-wikipedia' },
-    { key: 'news', label: 'News article', placeholder: 'Paste the article URL', guide: 'how-to-cite-a-newspaper-article' },
-    { key: 'blog', label: 'Blog post', placeholder: 'Paste the blog post URL', guide: 'how-to-cite-a-blog-post' },
-    { key: 'podcast', label: 'Podcast', placeholder: "Paste the episode's URL", guide: 'how-to-cite-a-podcast' },
-    { key: 'ted', label: 'TED Talk', placeholder: "Paste the talk's URL", guide: 'how-to-cite-a-ted-talk' },
-    { key: 'gov', label: 'Government page', placeholder: 'Paste the .gov page URL', guide: 'how-to-cite-a-government-website' },
+    { key: 'journal', label: 'Journal', placeholder: 'Enter a DOI', name: 'journal', guide: 'how-to-cite-a-journal-article' },
+    { key: 'youtube', label: 'YouTube', placeholder: 'Paste the video URL', name: 'website', guide: 'how-to-cite-a-youtube-video' },
+    { key: 'tiktok', label: 'TikTok', placeholder: 'Paste the TikTok URL', name: 'website', guide: 'how-to-cite-a-tiktok' },
+    { key: 'x-post', label: 'X / Tweet', placeholder: "Paste the post's URL", name: 'website', guide: 'how-to-cite-a-tweet' },
+    { key: 'instagram', label: 'Instagram', placeholder: 'Paste the post or Reel URL', name: 'website', guide: 'how-to-cite-an-instagram-post' },
+    { key: 'wikipedia', label: 'Wikipedia', placeholder: 'Paste the article URL', name: 'website', guide: 'how-to-cite-wikipedia' },
+    { key: 'news', label: 'News article', placeholder: 'Paste the article URL', name: 'website', guide: 'how-to-cite-a-newspaper-article' },
+    { key: 'blog', label: 'Blog post', placeholder: 'Paste the blog post URL', name: 'website', guide: 'how-to-cite-a-blog-post' },
+    { key: 'podcast', label: 'Podcast', placeholder: "Paste the episode's URL", name: 'website', guide: 'how-to-cite-a-podcast' },
+    { key: 'ted', label: 'TED Talk', placeholder: "Paste the talk's URL", name: 'website', guide: 'how-to-cite-a-ted-talk' },
+    { key: 'gov', label: 'Government page', placeholder: 'Paste the .gov page URL', name: 'website', guide: 'how-to-cite-a-government-website' },
 ] as const;
 
 type MoreSourceType = (typeof MORE_SOURCE_TYPES)[number];
@@ -52,15 +54,19 @@ interface CitationSearchProps {
     includeDropdown?: Boolean;
     includeManualCite?: Boolean;
     defaultStyle?: string;
-    /** Which tab opens first — lets a guide about DOIs start on the Journal tab. */
+    /** Which base tab opens first. 'journal' maps to the Journal source type
+        in the More menu (it is no longer a base tab). */
     defaultTab?: CitationSearchTab;
-    /** Placeholder override for the default tab (e.g. "Paste the TikTok URL"). */
+    /** Open on a More-menu source type (by key, e.g. 'youtube') — used by
+        guide embeds so the TikTok guide's widget starts on TikTok. */
+    defaultSourceType?: string;
+    /** Placeholder override for whichever panel opens first. */
     placeholder?: string;
     /** Attribution slug carried through to /my-references and the cite APIs. */
     from?: string;
 }
 
-const MORE_TAB_INDEX = 3;
+const MORE_TAB_INDEX = 2;
 
 // Main CitationSearch component
 const CitationSearch = forwardRef((props: CitationSearchProps, ref: Ref<HTMLInputElement>) => {
@@ -68,22 +74,34 @@ const CitationSearch = forwardRef((props: CitationSearchProps, ref: Ref<HTMLInpu
     const tabPanels = [
         { label: "Website", placeholder: "Paste the website URL", name: "website" },
         { label: "Book", placeholder: "Enter an ISBN", name: "book" },
-        { label: "Journal", placeholder: "Enter a DOI", name: "journal" },
     ];
 
-    const defaultTabIndex = Math.max(0, tabPanels.findIndex((panel) => panel.name === props.defaultTab));
+    // The widget can open on a More-menu source type: explicitly via
+    // defaultSourceType, or via the legacy defaultTab='journal' (Journal
+    // lives in the menu now).
+    const initialSourceType =
+        MORE_SOURCE_TYPES.find((type) => type.key === props.defaultSourceType) ??
+        (props.defaultTab === 'journal' ? MORE_SOURCE_TYPES.find((type) => type.key === 'journal')! : null);
+
+    const defaultTabIndex = initialSourceType
+        ? MORE_TAB_INDEX
+        : Math.max(0, tabPanels.findIndex((panel) => panel.name === props.defaultTab));
 
     // State for managing active tab index
     const [tabIndex, setTabIndex] = useState(defaultTabIndex);
     // The source type chosen from the More menu (TikTok, YouTube, ...)
-    const [sourceType, setSourceType] = useState<MoreSourceType | null>(null);
+    const [sourceType, setSourceType] = useState<MoreSourceType | null>(initialSourceType);
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    // A guide-supplied placeholder applies only to the tab it was written for.
-    if (props.placeholder) {
+    // A guide-supplied placeholder applies only to the panel it was written for.
+    if (props.placeholder && !initialSourceType) {
         tabPanels[defaultTabIndex].placeholder = props.placeholder;
     }
+    const morePlaceholder =
+        sourceType && initialSourceType && sourceType.key === initialSourceType.key && props.placeholder
+            ? props.placeholder
+            : sourceType?.placeholder ?? 'Paste the website URL';
 
     // Close the More menu on outside press or Escape. pointerdown, not click:
     // the opening click is still bubbling to the document when this listener
@@ -203,12 +221,13 @@ const CitationSearch = forwardRef((props: CitationSearchProps, ref: Ref<HTMLInpu
                     </TabPanel>
                 ))}
 
-                {/* The More panel: a website-URL lookup labeled with the chosen source type */}
+                {/* The More panel: labeled with the chosen source type. Most
+                    types submit as website URLs; Journal keeps its DOI path. */}
                 <TabPanel className={`${styles.label} ${getClassNames('searchPanel', MORE_TAB_INDEX)}`} role="tabpanel" aria-labelledby="more-source" hidden={tabIndex !== MORE_TAB_INDEX}>
                     <SearchPanel
                         label={sourceType?.label ?? 'Website'}
-                        placeholder={sourceType?.placeholder ?? 'Paste the website URL'}
-                        name="website"
+                        placeholder={morePlaceholder}
+                        name={sourceType?.name ?? 'website'}
                         idKey="more-source"
                         active={tabIndex === MORE_TAB_INDEX}
                     />
@@ -220,7 +239,8 @@ const CitationSearch = forwardRef((props: CitationSearchProps, ref: Ref<HTMLInpu
                 </button>
             </form>
             <div className={styles.smallButtonRow}>
-                {tabIndex === MORE_TAB_INDEX && sourceType && (
+                {/* Skip the guide link when embedded on that very guide. */}
+                {tabIndex === MORE_TAB_INDEX && sourceType && sourceType.guide !== props.from && (
                     <a href={`/guides/${sourceType.guide}/`} className={styles.smallButton}>
                         <span>How to cite: {sourceType.label}</span>
                         <ChevronRightIcon className={styles.icon} aria-hidden="true" />
