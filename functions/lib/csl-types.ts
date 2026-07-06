@@ -28,6 +28,21 @@ export type CSLType =
   | 'article-magazine'
   | 'article-newspaper';
 
+// Platform metadata for social/video posts (TikTok, YouTube, Instagram, X).
+// The styles disagree about how to present handles and descriptors — MLA wants
+// "Cook, Phil [@chemteacherphil]" while APA wants "Cook, P. [@chemteacherphil]"
+// plus a bracketed [Video] — so extraction records the raw facts here and the
+// format layer shapes them per style at render time.
+export interface SocialMeta {
+  platform: 'tiktok' | 'youtube' | 'instagram' | 'x';
+  /** Account handle without the @ sign, e.g. "chemteacherphil". */
+  handle?: string;
+  /** Display name as shown on the account, e.g. "Phillip Cook". */
+  displayName?: string;
+  /** What the post is, for styles that add a bracketed descriptor. */
+  kind: 'video' | 'post' | 'photo';
+}
+
 export interface CSLItem {
   id: string;
   type: CSLType;
@@ -47,6 +62,9 @@ export interface CSLItem {
   page?: string;
   edition?: string;
   abstract?: string;
+  // CSL-JSON reserves `custom` for processor-ignored extension data; citeproc
+  // passes it through untouched and it round-trips localStorage → /api/format.
+  custom?: { social?: SocialMeta };
 }
 
 export type AcquisitionSource =
@@ -67,6 +85,8 @@ export type EvidenceSource =
   | 'twitter'
   | 'meta'
   | 'heuristic'
+  | 'platform'
+  | 'oembed'
   | 'fetch-html'
   | 'rendered-html'
   | 'browser-extension'

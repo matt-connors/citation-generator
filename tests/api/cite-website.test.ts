@@ -154,6 +154,79 @@ describe('handleCiteWebsite', () => {
     expect(body._quality.acquisition.ai.fieldsFound).toEqual(['author', 'issued']);
   });
 
+  it('rescues an X post via oEmbed when the page is an empty JS shell', async () => {
+    // x.com serves ~nothing to non-browser clients; publish.twitter.com/oembed
+    // is the deterministic source for the post text, author, handle, and date.
+    const shell = '<!doctype html><html><head><title>X</title></head><body></body></html>';
+    const oembed = {
+      url: 'https://x.com/jack/status/20',
+      author_name: 'jack',
+      author_url: 'https://x.com/jack',
+      html: '<blockquote class="twitter-tweet"><p lang="en" dir="ltr">just setting up my twttr</p>&mdash; jack (@jack) <a href="https://x.com/jack/status/20?ref_src=twsrc%5Etfw">March 21, 2006</a></blockquote>',
+    };
+    globalThis.fetch = vi.fn(async (input: any) => {
+      const target = String(typeof input === 'string' ? input : input?.url ?? input);
+      if (target.includes('publish.twitter.com/oembed')) {
+        return new Response(JSON.stringify(oembed), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response(shell, { status: 200, headers: { 'content-type': 'text/html' } });
+    }) as any;
+
+    const res = await handleCiteWebsite(
+      new URL('https://m.com/api/cite-website?url=https%3A%2F%2Fx.com%2Fjack%2Fstatus%2F20'),
+      null,
+      undefined,
+      new Date(Date.UTC(2026, 6, 6)),
+    );
+
+    expect(res.status).toBe(200);
+    const body = await res.json() as any;
+    expect(body.csl.title).toBe('just setting up my twttr');
+    expect(body.csl.author).toEqual([{ family: 'jack' }]);
+    expect(body.csl.issued).toEqual({ 'date-parts': [[2006, 3, 21]] });
+    expect(body.csl['container-title']).toBe('X');
+    expect(body.csl.custom.social).toEqual({ platform: 'x', handle: 'jack', displayName: 'jack', kind: 'post' });
+    expect(body._provenance.title.winner.source).toBe('oembed');
+    expect(body._quality.acquisition.authority.status).toBe('success');
+  });
+
+  it('does not call oEmbed when platform HTML extraction already succeeded', async () => {
+    // A TikTok page whose hydration blob parses fully — no oEmbed round trip.
+    const blob = JSON.stringify({
+      __DEFAULT_SCOPE__: {
+        'webapp.video-detail': {
+          itemInfo: {
+            itemStruct: {
+              desc: 'Fighting fire with fire. #sciencetok #learnontiktok',
+              createTime: '1631899181',
+              id: '7008953610872605957',
+              author: { nickname: 'Phillip Cook', uniqueId: 'chemteacherphil' },
+            },
+          },
+        },
+      },
+    });
+    const page = `<!doctype html><html><head><script id="__UNIVERSAL_DATA_FOR_REHYDRATION__" type="application/json">${blob}</script></head><body>${'TikTok video page content. '.repeat(60)}</body></html>`;
+    const fetchSpy = vi.fn(async () => new Response(page, { status: 200, headers: { 'content-type': 'text/html' } }));
+    globalThis.fetch = fetchSpy as any;
+
+    const res = await handleCiteWebsite(
+      new URL('https://m.com/api/cite-website?url=https%3A%2F%2Fwww.tiktok.com%2F%40chemteacherphil%2Fvideo%2F7008953610872605957'),
+      null,
+      undefined,
+      new Date(Date.UTC(2026, 6, 6)),
+    );
+
+    expect(res.status).toBe(200);
+    const body = await res.json() as any;
+    expect(body.csl.title).toBe('Fighting fire with fire. #sciencetok #learnontiktok');
+    expect(body.csl.author).toEqual([{ family: 'Cook', given: 'Phillip' }]);
+    expect(body.csl.issued).toEqual({ 'date-parts': [[2021, 9, 17]] });
+    expect(body.csl.custom.social.platform).toBe('tiktok');
+    const oembedCalls = fetchSpy.mock.calls.filter((c) => String(c[0]).includes('oembed'));
+    expect(oembedCalls).toHaveLength(0);
+  });
+
   it('allows server policy, not public query params, to disable AI assist', async () => {
     mockHtml(`<!doctype html><html><head><title>Thin Article</title></head>
       <body><main>By Jane Doe. Published January 15, 2026.</main></body></html>`);

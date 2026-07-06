@@ -1,0 +1,11 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "Fighting fire with fire. #sciencetok #learnontiktok",
+  "author": [{ "family": "Cook", "given": "Phillip" }],
+  "issued": { "date-parts": [[2021, 9, 17]] },
+  "accessed": { "date-parts": [[2026, 7, 6]] },
+  "container-title": "TikTok",
+  "URL": "https://www.tiktok.com/@chemteacherphil/video/7008953610872605957",
+  "custom": { "social": { "platform": "tiktok", "handle": "chemteacherphil", "displayName": "Phillip Cook", "kind": "video" } }
+}

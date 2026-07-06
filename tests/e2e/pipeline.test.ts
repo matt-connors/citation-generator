@@ -179,6 +179,80 @@ const CASES: SmokeCase[] = [
     },
   },
   {
+    // The exact video from APA Style's published TikTok guidance — the APA
+    // token below must reproduce their example verbatim, and the MLA token
+    // follows the MLA Style Center's social-media conventions (handle in
+    // brackets, caption as written, protocol-less URL).
+    name: 'TikTok video via hydration blob (platform extraction)',
+    fixture: 'tiktok-video',
+    type: 'webpage',
+    title: 'Fighting fire with fire. #sciencetok #learnontiktok',
+    firstAuthor: { family: 'Cook', given: 'Phillip' },
+    authorCount: 1,
+    containerTitle: 'TikTok',
+    issuedYear: 2021,
+    expectedWarningCodes: [],
+    absentWarningCodes: ['author_not_found', 'date_not_found', 'title_missing'],
+    styleTokens: {
+      'mla-9': ['Cook, Phillip [@chemteacherphil].', '“Fighting fire with fire. #sciencetok #learnontiktok.”', '<i>TikTok</i>, 17 Sept. 2021', 'www.tiktok.com/@chemteacherphil/video/7008953610872605957'],
+      'apa-7': ['Cook, P. [@chemteacherphil]. (2021, September 17).', '<i>Fighting fire with fire. #sciencetok #learnontiktok</i> [Video]. TikTok.', 'https://www.tiktok.com/@chemteacherphil/video/7008953610872605957'],
+    },
+  },
+  {
+    name: 'YouTube watch page (platform extraction)',
+    fixture: 'youtube-watch',
+    type: 'webpage',
+    title: 'Me at the zoo',
+    firstAuthor: { literal: 'jawed' },
+    authorCount: 1,
+    containerTitle: 'YouTube',
+    issuedYear: 2005,
+    expectedWarningCodes: [],
+    absentWarningCodes: ['author_not_found', 'date_not_found'],
+    styleTokens: {
+      'mla-9': ['jawed.', '“Me at the Zoo.”', '<i>YouTube</i>, 23 Apr. 2005'],
+      'apa-7': ['jawed. (2005, April 23).', '<i>Me at the zoo</i> [Video]. YouTube.'],
+    },
+  },
+  {
+    name: 'Instagram post via og-string parsing (platform extraction)',
+    fixture: 'instagram-post',
+    type: 'webpage',
+    title: 'I love @spacecenterhou! Some of the best Spaceflight hardware on display, including a flown @spacex Falcon 9 booster!!!',
+    firstAuthor: { literal: 'Everyday Astronaut' },
+    authorCount: 1,
+    containerTitle: 'Instagram',
+    issuedYear: 2021,
+    expectedWarningCodes: [],
+    absentWarningCodes: ['author_not_found', 'date_not_found'],
+    styleTokens: {
+      // Name and handle are the same modulo spacing, so no [@handle] brackets
+      // (MLA/APA add them only when the two differ).
+      'mla-9': ['Everyday Astronaut.', '<i>Instagram</i>, 29 Sept. 2021', 'www.instagram.com/everydayastronaut/p/CUbHfhpswxt/'],
+      // Caption is 19 words — under APA's 20-word cap, kept whole.
+      'apa-7': ['Everyday Astronaut. (2021, September 29).', '<i>I love @spacecenterhou! Some of the best Spaceflight hardware on display, including a flown @spacex Falcon 9 booster!!!</i> [Photograph]. Instagram.'],
+    },
+  },
+  {
+    name: 'TED talk page (ItemList must not hijack the title)',
+    fixture: 'ted-talk',
+    type: 'webpage',
+    title: 'Your body language may shape who you are',
+    firstAuthor: { family: 'Cuddy', given: 'Amy' },
+    authorCount: 1,
+    containerTitle: 'TED Talks',
+    issuedYear: 2012,
+    // Generic-page extraction: og:title vs JSON-LD candidates and two
+    // publisher spellings in TED's JSON-LD genuinely differ — review flags
+    // are correct here.
+    expectedWarningCodes: ['title_conflict', 'publisher_conflict'],
+    absentWarningCodes: ['author_not_found', 'date_not_found'],
+    styleTokens: {
+      'mla-9': ['Cuddy, Amy.', '“Your Body Language May Shape Who You Are.”'],
+      'apa-7': ['Cuddy, A. (2012, October 1).'],
+    },
+  },
+  {
     name: 'fake DOI-only early-view scholarly article',
     url: 'https://journal.example.test/articles/early-view-reliability',
     html: `<!doctype html><html><head>
@@ -332,5 +406,8 @@ function styleLocatorToken(csl: CSLItem, style: SupportedStyle): string {
   }
   if (style === 'ieee') return '[Online]. Available:';
   if (style === 'vancouver') return 'Available from:';
+  // MLA 9 truncates the protocol from URLs (Handbook §5.95); DOI links above
+  // keep theirs.
+  if (style === 'mla-9') return (csl.URL ?? '').replace(/^https?:\/\//i, '');
   return csl.URL ?? '';
 }

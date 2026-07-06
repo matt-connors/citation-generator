@@ -2,6 +2,7 @@
 import CSL from 'citeproc';
 import { Parser } from 'htmlparser2';
 import type { CSLItem, RichText, SupportedStyle } from '../csl-types';
+import { adaptForStyle } from './social-adapt';
 
 const styles: Map<string, string> = new Map();
 const locales: Map<string, string> = new Map();
@@ -59,6 +60,9 @@ function buildEngine(style: SupportedStyle, item: CSLItem): any {
 }
 
 export function formatCitation(item: CSLItem, style: SupportedStyle): RichText[] {
+  // Style-specific shaping (social-media handles/descriptors, MLA URL
+  // truncation) happens on a render-time copy; the stored item is untouched.
+  item = adaptForStyle(item, style);
   const engine = buildEngine(style, item);
   engine.updateItems([item.id]);
   const bib = engine.makeBibliography();

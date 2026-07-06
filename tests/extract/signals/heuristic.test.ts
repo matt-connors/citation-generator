@@ -64,6 +64,18 @@ describe('heuristicSignal', () => {
     expect(heuristicSignal($).fields.URL).toBe('/articles/canonical');
   });
 
+  it('rejects a canonical URL containing a JS "undefined" artifact segment', () => {
+    // YouTube's consent shell serves <link rel="canonical" href=".../undefined">;
+    // trusting it would replace the pasted URL with garbage.
+    const $ = cheerio.load(`<link rel="canonical" href="https://www.youtube.com/undefined" />`);
+    expect(heuristicSignal($).fields.URL).toBeUndefined();
+    const $2 = cheerio.load(`<link rel="canonical" href="https://example.com/null" />`);
+    expect(heuristicSignal($2).fields.URL).toBeUndefined();
+    // …but a path that merely contains the substring is fine.
+    const $3 = cheerio.load(`<link rel="canonical" href="https://example.com/undefined-behavior-in-c" />`);
+    expect(heuristicSignal($3).fields.URL).toBe('https://example.com/undefined-behavior-in-c');
+  });
+
   it('returns empty when nothing present', () => {
     expect(heuristicSignal(cheerio.load(`<html></html>`)).fields).toEqual({});
   });

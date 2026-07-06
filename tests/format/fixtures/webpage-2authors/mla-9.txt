@@ -1,1 +1,1 @@
-Doe, Jane, and John Smith. “Climate Change Update.” <i>Science Daily</i>, 5 Nov. 2024, https://example.com/climate.
+Doe, Jane, and John Smith. “Climate Change Update.” <i>Science Daily</i>, 5 Nov. 2024, example.com/climate.

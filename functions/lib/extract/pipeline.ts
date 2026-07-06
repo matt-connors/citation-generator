@@ -6,6 +6,7 @@ import { openGraphSignal } from './signals/opengraph';
 import { twitterSignal } from './signals/twitter';
 import { metaSignal } from './signals/meta';
 import { heuristicSignal } from './signals/heuristic';
+import { platformSignal } from './signals/platform';
 import { mergeSignals } from './merge';
 
 const SIGNALS = [
@@ -30,7 +31,14 @@ export interface PipelineOptions {
 
 export function runExtractionPipeline(html: string, url: string, options: PipelineOptions = {}): PipelineResult {
   const $ = cheerio.load(html);
-  const named = SIGNALS.map((s) => ({ name: s.name, ...s.fn($) }));
+  // The platform signal runs first (its confidence outranks the generic
+  // signals) and is the only one that needs the URL — host detection decides
+  // whether a platform-specific parser applies at all.
+  const platform = platformSignal($, url);
+  const named = [
+    { name: 'platform', fields: platform.fields, confidence: platform.confidence },
+    ...SIGNALS.map((s) => ({ name: s.name, ...s.fn($) })),
+  ];
   const { csl: merged, signals, provenance } = mergeSignals(named, options);
   const final: CSLItem = {
     id: url,
@@ -42,6 +50,12 @@ export function runExtractionPipeline(html: string, url: string, options: Pipeli
   ensureInputUrlProvenance(provenance, final.URL, options);
   dedupePublisherContainer(final);
   if (!final.publisher) delete provenance.publisher;
+
+  // Social metadata rides outside the merge: it isn't a bibliographic field,
+  // it's render-time context (handle/descriptor conventions differ per style).
+  if (platform.social) {
+    final.custom = { ...final.custom, social: platform.social };
+  }
 
   // Wikipedia quirk: JSON-LD `headline` is the article description, not the title
   // (e.g. <https://en.wikipedia.org/wiki/Citation> → "reference to a source").

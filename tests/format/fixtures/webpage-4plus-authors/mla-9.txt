@@ -1,1 +1,1 @@
-Doe, Jane, et al. “Quantum Computing Advances.” <i>Nature Tech</i>, 15 June 2025, https://example.com/quantum.
+Doe, Jane, et al. “Quantum Computing Advances.” <i>Nature Tech</i>, 15 June 2025, example.com/quantum.

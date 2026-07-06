@@ -136,6 +136,24 @@ describe('jsonldSignal', () => {
     expect(jsonldSignal(load(html)).fields.title).toBeUndefined();
   });
 
+  it('does not take a title from an ItemList (TED "Related Playlists" regression)', () => {
+    // ted.com talk pages put a "Related Playlists" ItemList before the
+    // VideoObject; its name must not become the citation title.
+    const html = `<html><head><script type="application/ld+json">${JSON.stringify([
+      { '@type': 'ItemList', name: 'Related Playlists', itemListElement: [] },
+      {
+        '@type': 'VideoObject',
+        name: 'Your body language may shape who you are',
+        creator: { '@type': 'Person', name: 'Amy Cuddy' },
+        datePublished: '2012-10-01',
+      },
+    ])}</script></head></html>`;
+    const r = jsonldSignal(load(html));
+    expect(r.fields.title).toBeUndefined(); // VideoObject stays excluded too — og:title covers it
+    expect(r.fields.author).toEqual([{ family: 'Cuddy', given: 'Amy' }]);
+    expect(r.fields.issued).toEqual({ 'date-parts': [[2012, 10, 1]] });
+  });
+
   it('extracts scholarly DOI, volume, issue, pages, and abstract from JSON-LD', () => {
     const html = `<html><head><script type="application/ld+json">${JSON.stringify({
       '@type': 'ScholarlyArticle',

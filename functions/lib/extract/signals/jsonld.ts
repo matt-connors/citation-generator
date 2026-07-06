@@ -38,7 +38,7 @@ const ARTICLE_TYPES = new Set([
   'SocialMediaPosting', 'MedicalScholarlyArticle',
 ]);
 
-const NON_ARTICLE_CONTAINER_RE = /^(WebSite|Organization|NewsMediaOrganization|Person|Corporation|BreadcrumbList|SiteNavigationElement|CollectionPage|ProfilePage|SearchResultsPage|ImageObject|VideoObject)$/i;
+const NON_ARTICLE_CONTAINER_RE = /^(WebSite|Organization|NewsMediaOrganization|Person|Corporation|BreadcrumbList|SiteNavigationElement|CollectionPage|ProfilePage|SearchResultsPage|ImageObject|VideoObject|ItemList|FAQPage)$/i;
 
 function isArticleish(type: string): boolean {
   const types = typeNames(type);

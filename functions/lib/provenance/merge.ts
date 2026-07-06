@@ -21,7 +21,12 @@ export function mergePipelineResults(results: PipelineResult[], fallbackUrl: str
     provenance[field] = {
       winner,
       candidates,
-      conflicts: candidates.filter((candidate) => !sameEvidenceValue(candidate.normalizedValue, winner.normalizedValue)),
+      // Platform winners are structural parses of the host's own data — page
+      // chrome scraped by the generic signals is expected to differ (see
+      // extract/merge.ts for the same rule within one acquisition).
+      conflicts: winner.source === 'platform'
+        ? []
+        : candidates.filter((candidate) => !sameEvidenceValue(candidate.normalizedValue, winner.normalizedValue)),
     };
     signals[field] = winner.source;
   }
@@ -37,6 +42,12 @@ export function mergePipelineResults(results: PipelineResult[], fallbackUrl: str
   }
   merged.URL = typeof merged.URL === 'string' && merged.URL ? merged.URL : fallbackUrl;
   dedupePublisherContainer(merged, provenance);
+
+  // custom.social is render-time context, not a merged bibliographic field —
+  // carry it from the first acquisition that detected the platform (fetch
+  // runs before render in the results list).
+  const social = results.map((result) => result.csl.custom?.social).find(Boolean);
+  if (social) merged.custom = { ...merged.custom, social };
 
   return { csl: merged, signals, provenance };
 }

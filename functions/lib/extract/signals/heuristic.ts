@@ -55,12 +55,21 @@ export function heuristicSignal($: CheerioAPI): SignalResult {
   }
 
   const canonical = $('link[rel="canonical" i]').first().attr('href')?.trim();
-  if (canonical) {
+  if (canonical && !hasJsArtifactSegment(canonical)) {
     fields.URL = canonical;
     confidence.URL = CONF_CANONICAL_URL;
   }
 
   return { fields, confidence };
+}
+
+// Pages whose canonical is assembled client-side can serve a literal
+// "undefined"/"null" path segment in the static HTML (YouTube's consent shell
+// emits <link rel="canonical" href="https://www.youtube.com/undefined">).
+// A canonical like that would outrank the pasted URL in the merge, so the
+// citation's URL field becomes garbage. Skip it and let the input URL win.
+function hasJsArtifactSegment(url: string): boolean {
+  return /\/(?:undefined|null)(?:[/?#]|$)/i.test(url);
 }
 
 function cleanBylineText(text: string): string {

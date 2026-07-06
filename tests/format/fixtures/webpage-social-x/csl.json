@@ -1,0 +1,11 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "Every once in a while, that Gmail notice asking if you meant to reply to a 5-day-old message is quite helpful.",
+  "author": [{ "family": "Fogarty", "given": "Mignon" }],
+  "issued": { "date-parts": [[2019, 2, 13]] },
+  "accessed": { "date-parts": [[2026, 7, 6]] },
+  "container-title": "X",
+  "URL": "https://x.com/GrammarGirl/status/1095734401550303232",
+  "custom": { "social": { "platform": "x", "handle": "GrammarGirl", "displayName": "Mignon Fogarty", "kind": "post" } }
+}

@@ -1,1 +1,1 @@
-Adams, Amy, et al. “Genome Study Results.” <i>Genomics Today</i>, 1 June 2023, https://example.com/genome.
+Adams, Amy, et al. “Genome Study Results.” <i>Genomics Today</i>, 1 June 2023, example.com/genome.

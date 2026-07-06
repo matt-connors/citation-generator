@@ -1,1 +1,1 @@
-Doe, Jane, et al. “AI Breakthrough Discovery.” <i>Tech Crunch</i>, 20 Jan. 2025, https://example.com/ai.
+Doe, Jane, et al. “AI Breakthrough Discovery.” <i>Tech Crunch</i>, 20 Jan. 2025, example.com/ai.

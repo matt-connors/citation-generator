@@ -52,7 +52,14 @@ export function mergeSignals(signals: NamedSignal[], options: MergeOptions = {})
       provenance[field] = {
         winner,
         candidates,
-        conflicts: candidates.filter((candidate) => conflictsForField(field, candidate.normalizedValue, winner.normalizedValue)),
+        // A platform winner is a structural parse of the host's own data
+        // (TikTok's hydration blob, YouTube's video microdata) — generic
+        // signals scraping page chrome (<title>TikTok</title>, og:url
+        // variants) are expected to differ and are not review-worthy
+        // conflicts.
+        conflicts: winner.source === 'platform'
+          ? []
+          : candidates.filter((candidate) => conflictsForField(field, candidate.normalizedValue, winner.normalizedValue)),
       };
     }
   }

@@ -1,0 +1,9 @@
+{
+  "type": "webpage",
+  "title": "Me at the zoo",
+  "author": [{ "literal": "jawed" }],
+  "issued": { "date-parts": [[2005, 4, 23]] },
+  "container-title": "YouTube",
+  "URL": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+  "custom": { "social": { "platform": "youtube", "handle": "jawed", "displayName": "jawed", "kind": "video" } }
+}

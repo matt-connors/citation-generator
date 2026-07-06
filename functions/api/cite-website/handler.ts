@@ -7,6 +7,7 @@ import { writeEvent, fromAttribution, type AnalyticsBinding } from '../../lib/an
 import { analyzeHtmlReadiness, extractReadableText, shouldTryRenderedAcquisition, type PageReadiness } from '../../lib/acquisition/page-readiness';
 import { renderHtmlWithBrowserRun, RenderError, type BrowserRunBinding } from '../../lib/acquisition/browser-run';
 import { mergePipelineResults, addEvidenceToResult, type MergedCitationEvidence } from '../../lib/provenance/merge';
+import { runOembedAssist, shouldRunOembedAssist } from '../../lib/extract/oembed';
 import { validateCitationQuality } from '../../lib/validation/citation-quality';
 import { runAiFieldAssist, type AiBinding } from '../../lib/ai/citation-assist';
 import type { PipelineResult } from '../../lib/extract/pipeline';
@@ -185,6 +186,33 @@ export async function handleCiteWebsite(
   }
 
   let merged = mergePipelineResults(results, finalUrl || target);
+
+  // Platform oEmbed rescue: X serves an empty JS shell to non-browsers, and
+  // TikTok's bot wall can defeat both fetch and render — but their public
+  // oEmbed APIs hand over the post's text, author, and (for X) date. Runs
+  // before AI assist so the deterministic source wins and the LLM step can
+  // usually be skipped entirely.
+  if (shouldRunOembedAssist(merged.csl, target)) {
+    const oembedStart = Date.now();
+    const assist = await runOembedAssist(target, { acquiredAt });
+    attempts.authority = {
+      source: 'authority',
+      status: assist ? 'success' : 'error',
+      reason: assist
+        ? 'Platform oEmbed supplied citation fields.'
+        : 'Platform oEmbed returned no usable fields.',
+      url: target,
+      durationMs: Date.now() - oembedStart,
+      fieldsFound: assist ? assist.evidence.map((item) => String(item.field)) : [],
+    };
+    if (assist) {
+      if (assist.social && !merged.csl.custom?.social) {
+        merged.csl.custom = { ...merged.csl.custom, social: assist.social };
+      }
+      merged = addEvidenceToResult(merged, assist.evidence);
+    }
+  }
+
   if (deps.ai && aiEnabled && shouldRunAiAssist(merged.csl, fetchedHtml, renderedHtml)) {
     const aiStart = Date.now();
     try {
@@ -347,7 +375,12 @@ function shouldRender(
 
 function shouldRunAiAssist(csl: MergedCitationEvidence['csl'], fetchedHtml: string, renderedHtml: string): boolean {
   if (!fetchedHtml && !renderedHtml) return false;
-  return !csl.title || !csl.author?.length || !csl.issued?.['date-parts']?.[0]?.[0] || !csl.publisher || !csl['container-title'];
+  const missingCore = !csl.title || !csl.author?.length || !csl.issued?.['date-parts']?.[0]?.[0];
+  // Social posts have no publisher and their container is fixed by the
+  // platform — asking the AI to fill those invites junk like publisher
+  // "Google LLC" scraped from a YouTube page footer.
+  if (csl.custom?.social) return missingCore;
+  return missingCore || !csl.publisher || !csl['container-title'];
 }
 
 function withAccessDate(result: MergedCitationEvidence, now: Date): MergedCitationEvidence {
