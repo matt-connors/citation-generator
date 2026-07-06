@@ -98,14 +98,12 @@ const {
         max-width: 200px;
     }
     /* The active-tab pill is background-2 on the homepage — invisible against
-       this aside's background-2 surface, so use the white surface here. The
-       More tab's always-on pill re-tints via its custom properties (keeping
-       the module's hover/open rules winning), same reasoning. */
-    .try-generator .try-generator-tool :global([role="tab"][aria-selected="true"]:not([aria-haspopup])) {
+       this aside's background-2 surface, so use the white surface here. Same
+       for the More tab's hover/open pill, via its custom property. */
+    .try-generator .try-generator-tool :global([role="tab"][aria-selected="true"]) {
         background: var(--color-background-1);
     }
     .try-generator .try-generator-tool {
-        --more-tab-bg: var(--color-background-1);
-        --more-tab-bg-active: var(--color-background-3);
+        --more-tab-bg-active: var(--color-background-1);
     }
 </style>

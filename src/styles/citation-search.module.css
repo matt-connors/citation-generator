@@ -164,19 +164,20 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    /* Same pill treatment as an active tab, always visible so the icon-only
-       button reads as a button. The custom properties let embedding contexts
-       (the guide asides sit on background-2) re-tint without a specificity
-       war against the hover/open rules below. */
-    background: var(--more-tab-bg, var(--color-background-2));
+    /* No resting background — the pill (below) appears on hover/open only,
+       matching how the other tabs rest as plain gray text. */
     border-radius: 20px;
 }
 
-/* Hover state, held while the dropdown is open. Compound selectors so this
-   outranks .searchPanelTab.active when a chosen source type is selected. */
+/* The active-tab pill treatment, on hover and held while the dropdown is
+   open: gray background, primary text/stroke (the icon uses currentColor).
+   Compound selectors so this outranks .searchPanelTab.active when a chosen
+   source type is selected. The custom property lets embedding contexts (the
+   guide asides sit on background-2) re-tint the pill without a specificity
+   war. */
 .searchPanelTab.moreTab:hover,
 .searchPanelTab.moreTab.moreTabOpen {
-    background: var(--more-tab-bg-active, var(--color-background-3));
+    background: var(--more-tab-bg-active, var(--color-background-2));
     color: var(--color-text-dark);
 }
 
