@@ -444,10 +444,12 @@
           <text macro="access"/>
         </else-if>
         <else-if type="webpage post-weblog post" match="any">
-          <group delimiter=", " suffix=".">
-            <text macro="title"/>
-            <text variable="container-title"/>
-          </group>
+          <!-- IEEE online sources end the quoted title with a PERIOD inside the
+               closing quote, then the site name as a plain element:
+               "Page Title." Site Name. (Its own examples: J. Smith. "Obama
+               inaugurated as President." CNN.com.) -->
+          <text macro="title" suffix="."/>
+          <text variable="container-title" prefix=" " suffix="."/>
           <text macro="access"/>
         </else-if>
         <else-if type="patent">
@@ -494,7 +496,7 @@
           </group>
           <text macro="access"/>
         </else-if>
-        <else-if type="article-magazine article-newspaper broadcast interview manuscript map patent personal_communication song speech thesis webpage" match="any">
+        <else-if type="article-magazine article-newspaper broadcast interview manuscript map patent personal_communication song speech thesis" match="any">
           <group delimiter=", " suffix=".">
             <text macro="title"/>
             <text variable="container-title" font-style="italic"/>

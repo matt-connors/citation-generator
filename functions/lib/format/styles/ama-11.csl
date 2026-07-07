@@ -209,7 +209,12 @@
                 </group>
               </group>
             </else-if>
-            <else-if match="any" type="post post-weblog webpage">
+            <else-if type="post">
+              <!-- AMA 11 §3.15.4 social-media post: no site name; the date is
+                   fronted with "Posted". The @handle sits in the author slot. -->
+              <date form="text" variable="issued" prefix="Posted "/>
+            </else-if>
+            <else-if match="any" type="post-weblog webpage">
               <text variable="container-title"/>
               <date form="text" variable="issued"/>
             </else-if>

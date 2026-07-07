@@ -122,12 +122,27 @@ export function adaptForStyle(item: CSLItem, style: SupportedStyle): CSLItem {
     return adapted;
   }
 
+  if (style === 'ama-11' && social.platform !== 'youtube') {
+    // AMA 11 §3.15.4 social-media format: the @handle is the author, the post
+    // text is the title, the date is fronted with "Posted", and no site name
+    // is given — e.g. "@AMAManual. [text]. Posted November 1, 2019. Accessed
+    // ... URL". Routing to type 'post' triggers the "Posted"-prefixed date
+    // branch in ama-11.csl.
+    adapted = { ...adapted, type: 'post' as CSLItem['type'] };
+    if (social.handle) adapted.author = [{ literal: `@${social.handle}` }];
+    delete adapted['container-title'];
+    return adapted;
+  }
+
   if (style === 'vancouver') {
     // No NLM social format: render the cleanest generic Web-Sites fallback so
     // the caption (not the platform) is the title and the platform is the
     // publisher, instead of the default which puts the platform in the title
     // slot and orphans the caption.
     adapted = { ...adapted };
+    // A caption ending in a sentence period would collide with the "[Internet]"
+    // that follows the title; drop it.
+    if (adapted.title) adapted.title = adapted.title.replace(/\.\s*$/, '');
     if (item['container-title'] && item.title) {
       adapted.publisher = item['container-title'];
       adapted['publisher-place'] = '[place unknown]';

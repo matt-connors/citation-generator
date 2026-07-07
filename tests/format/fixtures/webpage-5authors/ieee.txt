@@ -1,1 +1,1 @@
-[1] A. Adams, B. Brown, C. Clark, D. Davis, and E. Evans, “Genome Study Results,” Genomics Today. Accessed: May 31, 2026. [Online]. Available: https://example.com/genome
+[1] A. Adams, B. Brown, C. Clark, D. Davis, and E. Evans, “Genome Study Results.” Genomics Today. Accessed: May 31, 2026. [Online]. Available: https://example.com/genome
