@@ -145,7 +145,13 @@
         </group>
       </if>
       <else>
-        <text variable="title" form="long" quotes="true"/>
+        <!-- Cite Them Right brackets the medium after quoted titles too:
+             social-media and blog templates read 'Title of post' [X] /
+             [Blog] / [TikTok]. Rendered only when a medium is present. -->
+        <group delimiter=" ">
+          <text variable="title" form="long" quotes="true"/>
+          <text variable="medium" prefix="[" suffix="]"/>
+        </group>
       </else>
     </choose>
   </macro>
@@ -305,11 +311,25 @@
         <text macro="secondary-contributors"/>
         <text macro="publisher"/>
       </group>
-      <group delimiter=", " prefix=", ">
-        <text macro="locator"/>
-        <text macro="published-date"/>
-        <text macro="pages"/>
-      </group>
+      <choose>
+        <!-- Cite Them Right's social/blog templates run straight from the
+             bracketed medium into the day-month date with no comma:
+             'Title of post' [X] 4 June. -->
+        <if type="post-weblog">
+          <group delimiter=" " prefix=" ">
+            <text macro="locator"/>
+            <text macro="published-date"/>
+            <text macro="pages"/>
+          </group>
+        </if>
+        <else>
+          <group delimiter=", " prefix=", ">
+            <text macro="locator"/>
+            <text macro="published-date"/>
+            <text macro="pages"/>
+          </group>
+        </else>
+      </choose>
       <text macro="access" prefix=". "/>
     </layout>
   </bibliography>

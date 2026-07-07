@@ -12,6 +12,13 @@ import type { CSLItem, CSLName, SocialMeta, SupportedStyle } from '../csl-types'
 //            bracketed descriptor: [Post] for X, [Video] for TikTok/YouTube/
 //            Reels, [Photograph] for Instagram photos (APA Style social
 //            media reference pages).
+//   Harvard — Cite Them Right's social-media template: "Author and username
+//            if available", the post text in single quotes, the platform as
+//            a bracketed medium, then the day-month date: Fogarty, M.
+//            [@GrammarGirl] (2019) 'Every once in a while…' [X] 13 February.
+//            Rendered by switching the item to post-weblog with the platform
+//            as medium. YouTube stays a webpage (CTR treats videos, not
+//            posts).
 //   Others — no platform-specific official rule; their standard web-source
 //            formats apply unchanged.
 //
@@ -57,7 +64,25 @@ export function adaptForStyle(item: CSLItem, style: SupportedStyle): CSLItem {
     return adapted;
   }
 
+  if (style === 'harvard' && social.platform !== 'youtube') {
+    adapted = { ...adapted, type: 'post-weblog' as CSLItem['type'] };
+    const author = socialAuthorLiteral(item.author, social, 'initials');
+    if (author) adapted.author = [author];
+    // CTR's bracketed medium names the platform; the container would repeat
+    // it ('…' [TikTok], TikTok), so it comes off for this rendering.
+    (adapted as CSLItem & { medium?: string }).medium = harvardMedium(social);
+    delete adapted['container-title'];
+    return adapted;
+  }
+
   return adapted;
+}
+
+function harvardMedium(social: SocialMeta): string {
+  if (social.platform === 'x') return 'X';
+  if (social.platform === 'tiktok') return 'TikTok';
+  if (social.platform === 'instagram') return 'Instagram';
+  return 'Post';
 }
 
 // Builds "Name [@handle]" from the item's CURRENT author (so user edits
