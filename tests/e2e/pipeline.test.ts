@@ -404,7 +404,9 @@ function styleLocatorToken(csl: CSLItem, style: SupportedStyle): string {
       ? `https://doi.org/${csl.DOI}`
       : `doi:${csl.DOI}`;
   }
-  if (style === 'ieee') return '[Online]. Available:';
+  // YouTube videos route to IEEE's online-video template ([Online Video]);
+  // other online sources use the generic [Online].
+  if (style === 'ieee') return csl.custom?.social?.platform === 'youtube' ? '[Online Video]. Available:' : '[Online]. Available:';
   if (style === 'vancouver') return 'Available from:';
   // MLA 9 truncates the protocol from URLs (Handbook §5.95); DOI links above
   // keep theirs.

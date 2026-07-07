@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only">
   <info>
-    <title>Cite Them Right 12th edition (author-date/Harvard)</title>
+    <title>Cite Them Right 13th edition (author-date/Harvard)</title>
     <id>http://www.zotero.org/styles/harvard-cite-them-right</id>
     <link href="http://www.zotero.org/styles/harvard-cite-them-right" rel="self"/>
     <link href="http://www.zotero.org/styles/harvard-cite-them-right-11th-edition" rel="template"/>
@@ -11,7 +11,7 @@
     </author>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <summary>Harvard according to Cite Them Right, 11th edition.</summary>
+    <summary>Harvard according to Cite Them Right (author-date). Core author-date format tracks the 13th edition (2025); the social-media, video, and web rules are verified against current Cite Them Right guidance.</summary>
     <updated>2026-02-12T10:08:06+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
@@ -220,7 +220,7 @@
   </macro>
   <macro name="published-date">
     <choose>
-      <if type="article-newspaper article-magazine post-weblog speech" match="any">
+      <if type="article-newspaper article-magazine post-weblog speech motion_picture" match="any">
         <date variable="issued">
           <date-part name="day" suffix=" "/>
           <date-part name="month" form="long"/>
@@ -322,6 +322,11 @@
             <text macro="pages"/>
           </group>
         </if>
+        <else-if type="motion_picture">
+          <!-- CTR video (e.g. YouTube): Creator (Year) *Title*. Day Month.
+               Available at: URL — the upload date is its own sentence. -->
+          <text macro="published-date" prefix=". "/>
+        </else-if>
         <else>
           <group delimiter=", " prefix=", ">
             <text macro="locator"/>

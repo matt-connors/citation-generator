@@ -163,9 +163,14 @@
   </macro>
   <macro name="title">
     <choose>
-      <if type="bill book graphic legal_case legislation motion_picture song standard software" match="any">
+      <if type="bill book graphic legal_case legislation song standard software" match="any">
         <text variable="title" font-style="italic"/>
       </if>
+      <else-if type="motion_picture">
+        <!-- IEEE online-video titles are in initial caps, neither italicized
+             nor quoted. -->
+        <text variable="title"/>
+      </else-if>
       <else>
         <text variable="title" quotes="true"/>
       </else>
@@ -453,10 +458,11 @@
           </group>
           <text macro="access"/>
         </else-if>
-        <!-- Online Video -->
+        <!-- Online Video: Creator. Title. (Release date). Accessed: ...
+             [Online Video]. Available: URL -->
         <else-if type="motion_picture">
           <text macro="geographic-location" suffix=". "/>
-          <group delimiter=", " suffix=".">
+          <group delimiter=". " suffix=".">
             <text macro="title"/>
             <text macro="issued"/>
           </group>
