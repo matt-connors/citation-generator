@@ -1,6 +1,7 @@
 ---
 title: 'How to Cite a Lecture or PowerPoint in MLA, APA & 5 More Styles'
 pubDate: 2026-07-04
+updatedDate: 2026-07-07
 description: 'Cite a lecture, PowerPoint slides, or class notes in MLA 9 and APA 7: official templates, Canvas/Zoom examples, in-text citations, and a free generator.'
 category: 'how-to'
 keywords: ['how to cite a lecture in mla', 'how to cite a lecture', 'how to cite a powerpoint in apa', 'how to cite a powerpoint in mla', 'how to cite lecture notes apa 7', 'how to cite lecture slides', 'how to cite a lecture apa 7th edition', 'how to cite class notes mla', 'how to cite a powerpoint presentation', 'how to cite lecture slides from canvas', 'apa citation powerpoint slides', 'mla citation for a lecture']
@@ -33,7 +34,7 @@ import TryGenerator from "../../components/astro/TryGenerator.astro";
 
 A lecture is one source that can reach you four different ways — a live talk you sat through, a slide deck on Canvas, a PowerPoint on the open web, a Zoom recording — and each way changes the citation. Worse, the two major styles disagree at the root: MLA gives an unrecorded lecture a full works-cited entry, while APA says an unrecorded lecture is a personal communication that never appears in the reference list at all. Most of the confusion around citing "my professor's PowerPoint" is really confusion about which of these situations you are in. This guide sorts them out, with the official MLA and APA templates and the same real slide deck rendered in all seven styles the site supports.
 
-> The shortest answer: in MLA, slides your class can retrieve are cited like any material posted to a website — presenter's name, the deck title in italics, the site or LMS name in italics as the container, the date posted, and the URL, with "PowerPoint presentation." added at the end if the format matters. A live lecture gets its title in quotation marks instead, followed by the event or course name, the date, and the venue. In-text, cite the last name alone: (Carson), or (Carson, slide 4) if the slides are numbered.
+> The shortest answer: in MLA, slides your class can retrieve are cited like any material posted to a website — presenter's name, the deck title in italics, the site or LMS name in italics as the container, the date posted, and the URL, with "*PowerPoint* presentation." added at the end if the format matters. A live lecture gets its title in quotation marks instead, followed by the event or course name, the date, and the venue. In-text, cite the last name alone: (Carson), or (Carson, slide 4) if the slides are numbered.
 
 ## What counts as a lecture or PowerPoint
 
@@ -71,14 +72,14 @@ The example below is the worked example from APA Style's official "PowerPoint sl
 <CitationExampleTable
   source={{ id: 'lecture-jones', type: 'webpage', title: 'Guided Reading: Making the Most of It', author: [{ family: 'Jones', given: 'Jen' }], 'container-title': 'SlideShare', issued: { 'date-parts': [[2016, 3, 23]] }, accessed: { 'date-parts': [[2026, 7, 4]] }, URL: 'https://www.slideshare.net/hellojenjones/guided-reading-making-the-most-of-it' }}
   overrides={{
-    'mla-9': 'Jones, Jen. <em>Guided Reading: Making the Most of It</em>. <em>SlideShare</em>, 23 Mar. 2016, www.slideshare.net/hellojenjones/guided-reading-making-the-most-of-it. PowerPoint presentation.',
+    'mla-9': 'Jones, Jen. <em>Guided Reading: Making the Most of It</em>. <em>SlideShare</em>, 23 Mar. 2016, www.slideshare.net/hellojenjones/guided-reading-making-the-most-of-it. <em>PowerPoint</em> presentation.',
     'apa-7': 'Jones, J. (2016, March 23). <em>Guided reading: Making the most of it</em> [PowerPoint slides]. SlideShare. https://www.slideshare.net/hellojenjones/guided-reading-making-the-most-of-it',
   }}
 />
 
 Two structural decisions split the styles. The first is **whether the deck is a standalone work**. MLA and APA both say yes and italicize the title — MLA in title case, APA in sentence case. Chicago and the numeric styles treat it like an ordinary web page, with the title in quotation marks or roman type.
 
-The second is **where the format is recorded**. APA puts `[PowerPoint slides]` in brackets straight after the title; that bracket is part of the official template, not decoration. MLA allows "PowerPoint presentation." as an optional supplemental element at the end of the entry. Vancouver falls back on its generic `[Internet]` label, and the rest say nothing about format at all.
+The second is **where the format is recorded**. APA puts `[PowerPoint slides]` in brackets straight after the title; that bracket is part of the official template, not decoration. MLA allows "*PowerPoint* presentation." as an optional supplemental element at the end of the entry. Vancouver falls back on its generic `[Internet]` label, and the rest say nothing about format at all.
 
 The in-text citation for the same deck, with slide 7 cited specifically:
 
@@ -97,11 +98,11 @@ MLA has two patterns, depending on whether you used posted slides or attended a 
 
 **Slides posted to an LMS or website.** The MLA Style Center's instruction is to cite a slide presentation uploaded to a learning management system "the same way you would cite any material posted to a website," following the MLA format template:
 
-> Author's Last Name, First Name. *Title of the Presentation*. *Site or LMS Name*, uploaded by Name, Day Month Year, URL. PowerPoint presentation.
+> Author's Last Name, First Name. *Title of the Presentation*. *Site or LMS Name*, uploaded by Name, Day Month Year, URL. *PowerPoint* presentation.
 
 MLA's own example:
 
-> Carson, Sandy. *Introduction to Digital Humanities*. *Blackboard*, uploaded by Carson, 20 Oct. 2019, blackboard.ucla.edu/. PowerPoint presentation.
+> Carson, Sandy. *Introduction to Digital Humanities*. *Blackboard*, uploaded by Carson, 20 Oct. 2019, blackboard.ucla.edu/. *PowerPoint* presentation.
 
 Note the details: the deck title is italicized as a standalone work, the LMS name is italicized as the container, the URL drops `https://`, and the format note at the end is an optional supplemental element — include it when knowing the source was a slide deck helps your reader.
 

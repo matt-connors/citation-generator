@@ -1,6 +1,7 @@
 ---
 title: 'How to Cite a Tweet (X Post) in MLA, APA, and 5 More Styles'
 pubDate: 2026-07-04
+updatedDate: 2026-07-07
 description: 'Cite a tweet or X post in MLA 9 and APA 7 with official templates, examples, and in-text citations, plus deleted posts, threads, hashtags, and the X rename.'
 category: 'how-to'
 keywords: ['how to cite a tweet MLA', 'how to cite a tweet in APA', 'how to cite an X post', 'how to cite a tweet APA 7', 'MLA tweet citation', 'cite a tweet MLA format', 'how to cite a Twitter post', 'APA Twitter citation', 'how to cite a deleted tweet', 'how to cite a Twitter thread', 'tweet citation example', 'tweet citation generator']
@@ -66,24 +67,19 @@ The example below is the MLA Style Center's own worked example, a 2019 post by G
 > **The source:** Mignon Fogarty, posting as @GrammarGirl. Post text: "Every once in a while, that Gmail notice asking if you meant to reply to a 5-day-old message is quite helpful." Posted February 13, 2019. URL: https://x.com/GrammarGirl/status/1095734401550303232. Accessed July 4, 2026.
 
 <CitationExampleTable
-  source={{ id: 'tweet-fogarty', type: 'webpage', title: 'Every once in a while, that Gmail notice asking if you meant to reply to a 5-day-old message is quite helpful', author: [{ family: 'Fogarty', given: 'Mignon' }], 'container-title': 'X', issued: { 'date-parts': [[2019, 2, 13]] }, accessed: { 'date-parts': [[2026, 7, 4]] }, URL: 'https://x.com/GrammarGirl/status/1095734401550303232' }}
-  overrides={{
-    'mla-9': 'Fogarty, Mignon [@GrammarGirl]. “Every once in a while, that Gmail notice asking if you meant to reply to a 5-day-old message is quite helpful.” <em>X</em>, 13 Feb. 2019, x.com/GrammarGirl/status/1095734401550303232.',
-    'apa-7': 'Fogarty, M. [@GrammarGirl]. (2019, February 13). <em>Every once in a while, that Gmail notice asking if you meant to reply to a 5-day-old message is quite</em> [Post]. X. https://x.com/GrammarGirl/status/1095734401550303232',
-    'harvard': '@GrammarGirl (2019) [X] 13 February. Available at: https://x.com/GrammarGirl/status/1095734401550303232 (Accessed: 4 July 2026).',
-  }}
+  source={{ id: 'tweet-fogarty', type: 'webpage', title: 'Every once in a while, that Gmail notice asking if you meant to reply to a 5-day-old message is quite helpful', author: [{ family: 'Fogarty', given: 'Mignon' }], 'container-title': 'X', issued: { 'date-parts': [[2019, 2, 13]] }, accessed: { 'date-parts': [[2026, 7, 4]] }, URL: 'https://x.com/GrammarGirl/status/1095734401550303232', custom: { social: { platform: 'x', handle: 'GrammarGirl', displayName: 'Mignon Fogarty', kind: 'post' } } }}
 />
 
-Two structural decisions split the styles. The first is **what stands in for the missing title**. MLA quotes the entire post, verbatim, in quotation marks — capitalization, hashtags, and typos preserved exactly as posted. APA takes only the first twenty words and italicizes them like a standalone work's title; the example post is twenty-one words long, so APA cuts it off mid-sentence at "quite," with no ellipsis. Chicago and the numeric styles treat the text as an ordinary web-page title, and Harvard (Cite Them Right) skips the text entirely, identifying the post by account, date, and URL alone.
+Two structural decisions split the styles. The first is **what stands in for the missing title**. MLA quotes the entire post, verbatim, in quotation marks — capitalization, hashtags, and typos preserved exactly as posted. APA takes only the first twenty words and italicizes them like a standalone work's title; the example post is twenty-one words long, so APA cuts it off mid-sentence at "quite," with no ellipsis. Chicago and the numeric styles treat the text as an ordinary web-page title, and Harvard (Cite Them Right) puts the post's text — or the shortest portion of it that makes sense to a reader — in single quotation marks as the title, before the [X] platform bracket.
 
-The second is **where the handle goes**. MLA and APA both attach it in square brackets after the real name: `Fogarty, Mignon [@GrammarGirl]` and `Fogarty, M. [@GrammarGirl]`. Harvard leads with the handle as the author. The remaining styles use the plain name; add the handle only when it is the sole name you have. One more note: Chicago normally cites posts in a footnote rather than the bibliography — First Last (@handle), "text of the post up to 160 characters," X, Month Day, Year, URL — and the row above shows the author-date form the generator produces.
+The second is **where the handle goes**. MLA and APA both attach it in square brackets after the real name: `Fogarty, Mignon [@GrammarGirl]` and `Fogarty, M. [@GrammarGirl]`. Harvard gives the author's name with the username where available — `Fogarty, M. [@GrammarGirl]` — and leads with the handle only when no real name is known. The remaining styles use the plain name; add the handle only when it is the sole name you have. One more note: Chicago normally cites posts in a footnote rather than the bibliography — First Last (@handle), "text of the post up to 280 characters," X, Month Day, Year, URL — and the row above shows the author-date form the generator produces.
 
 The in-text citation for the same post:
 
 - **MLA:** (Fogarty) — whatever begins the entry, no page number; (@GrammarGirl) if the entry starts with the handle
 - **APA 7:** (Fogarty, 2019) in parentheses; Fogarty (2019) narratively
 - **Chicago author–date:** (Fogarty 2019)
-- **Harvard:** (@GrammarGirl, 2019)
+- **Harvard:** (Fogarty, 2019)
 - **Vancouver, AMA:** the entry's number, e.g. superscript ⁵
 - **IEEE:** [5]
 
@@ -127,7 +123,7 @@ Element by element:
 
 In-text, APA is standard author-date: `(CDC, 2020)` parenthetically, `CDC (2020)` narratively. The handle does not appear in-text.
 
-**Citing an entire profile** works differently: `Fogarty, M. [@GrammarGirl]. (n.d.). Posts [X profile]. X. Retrieved July 4, 2026, from https://x.com/GrammarGirl` — the date is `(n.d.)` and a retrieval date is required, because a profile is designed to change and is not archived.
+**Citing an entire profile** works differently: Fogarty, M. [@GrammarGirl]. (n.d.). *Posts* [X profile]. X. Retrieved July 4, 2026, from https://x.com/GrammarGirl — the title element *Posts* is italicized, the date is (n.d.), and a retrieval date is required, because a profile is designed to change and is not archived.
 
 ## Edge cases: deleted posts, threads, profiles
 
