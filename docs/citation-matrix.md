@@ -58,6 +58,39 @@ caption is the title and the platform is the publisher. If a future edition adds
 a real social format, the corresponding adapter branch supersedes the fallback.
 
 Known fallback imperfections (documented, not bugs): Vancouver renders the
-posting date at year precision (its generic webpage behavior) and uses the
-`[Internet]` medium designator rather than NLM's `[video on the Internet]`; IEEE
-posts use IEEE's quoted-title-plus-comma convention shared with all web sources.
+posting date at year precision (its generic webpage behavior, permitted by NLM
+— month/day are optional) and uses the `[Internet]` medium designator rather
+than NLM's `[video on the Internet]`.
+
+## Cells that sit within legitimate interpretive range
+
+Three full adversarial verification rounds (each: an independent researcher +
+an adversarial verifier per cell, against the official source) converged on the
+table above. A few cells are grounded in a deliberate, defensible choice rather
+than a single unambiguous answer, because the authorities themselves disagree
+or the data isn't available:
+
+- **Harvard / TikTok–X–Instagram — the `[@handle]` bracket after a person's
+  name.** Cite Them Right-following university guides split on this: Newcastle's
+  CTR FAQ and the University of the West of Scotland guide **bracket** the handle
+  (`Holthaus, E. [@EricHolthaus]`); UCL's guide **omits** it (`Matafeo, R.
+  (2021)`). The generator brackets it — it preserves the account identity,
+  parallels the APA/MLA/Chicago handle conventions, and matches these guides'
+  own worked examples. A reader following a bracket-omitting interpretation can
+  drop it in the editor.
+- **Chicago / YouTube — the fuller online-video form.** CMOS 18's audiovisual
+  example includes the running time and a "Posted [date]" phrase
+  (`YouTube video, 0:19. Posted April 23, 2005.`). The generator does not
+  extract video duration, so it renders the well-formed generic author-date web
+  form instead; the guide page for YouTube documents the fuller CMOS form by
+  hand.
+- **IEEE / YouTube — creator punctuation.** IEEE's online-video template is
+  "Creator, Location. Title." With no location, the creator is followed by the
+  comma reserved for that slot (`jawed, Me at the Zoo.`); the alternative reads
+  the empty location as collapsing to a period. Both are defensible; the
+  generator keeps the comma (its standard author separator, shared with every
+  other IEEE type).
+
+Everything else in the matrix is pinned to a golden fixture in
+`tests/format/fixtures/webpage-social-*` and re-derived from the extracted CSL
+at render time, so it cannot drift from what the tool produces.
