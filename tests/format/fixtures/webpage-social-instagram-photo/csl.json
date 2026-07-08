@@ -1,0 +1,11 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "Golden hour over the dunes.",
+  "author": [{ "family": "Rivera", "given": "Ana" }],
+  "issued": { "date-parts": [[2022, 8, 5]] },
+  "accessed": { "date-parts": [[2026, 7, 6]] },
+  "container-title": "Instagram",
+  "URL": "https://www.instagram.com/p/CdEfGhIjkl/",
+  "custom": { "social": { "platform": "instagram", "handle": "anarivera", "displayName": "Ana Rivera", "kind": "photo" } }
+}

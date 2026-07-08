@@ -86,6 +86,43 @@ describe('validateCitationQuality', () => {
     expect(warning?.severity).toBe('review');
   });
 
+  it('flags a social/video URL that produced no platform metadata as an error', () => {
+    const quality = validateCitationQuality({
+      id: 'https://www.tiktok.com/@x/video/1',
+      type: 'webpage',
+      title: 'Someone on TikTok',
+      URL: 'https://www.tiktok.com/@x/video/1',
+    });
+    const warning = quality.warnings.find((w) => w.code === 'social_unresolved');
+    expect(warning).toBeDefined();
+    expect(warning?.severity).toBe('error');
+    expect(warning?.action).toBe('use-extension');
+    expect(warning?.message).toContain('TikTok');
+  });
+
+  it('does not flag social_unresolved once platform metadata is present', () => {
+    const quality = validateCitationQuality({
+      id: 'https://www.tiktok.com/@x/video/1',
+      type: 'webpage',
+      title: 'A real caption',
+      URL: 'https://www.tiktok.com/@x/video/1',
+      author: [{ family: 'Cook', given: 'Phillip' }],
+      issued: { 'date-parts': [[2021, 9, 17]] },
+      custom: { social: { platform: 'tiktok', handle: 'x', kind: 'video' } },
+    });
+    expect(quality.warnings.some((w) => w.code === 'social_unresolved')).toBe(false);
+  });
+
+  it('does not flag social_unresolved for a non-social URL', () => {
+    const quality = validateCitationQuality({
+      id: 'https://example.com/p',
+      type: 'webpage',
+      title: 'Example',
+      URL: 'https://example.com/p',
+    });
+    expect(quality.warnings.some((w) => w.code === 'social_unresolved')).toBe(false);
+  });
+
   it('does not flag AI-suggested for a normally-extracted winner', () => {
     const winner: FieldEvidence = {
       field: 'publisher',

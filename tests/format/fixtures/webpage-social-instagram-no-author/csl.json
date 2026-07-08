@@ -1,0 +1,10 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "Community cleanup this Saturday, all volunteers welcome.",
+  "issued": { "date-parts": [[2023, 5, 1]] },
+  "accessed": { "date-parts": [[2026, 7, 6]] },
+  "container-title": "Instagram",
+  "URL": "https://www.instagram.com/p/CrXyZ12345/",
+  "custom": { "social": { "platform": "instagram", "handle": "greentownorg", "kind": "photo" } }
+}

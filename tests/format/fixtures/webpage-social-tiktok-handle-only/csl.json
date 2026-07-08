@@ -1,0 +1,11 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "When the magic works on the first try.",
+  "author": [{ "literal": "@zachking" }],
+  "issued": { "date-parts": [[2023, 3, 10]] },
+  "accessed": { "date-parts": [[2026, 7, 6]] },
+  "container-title": "TikTok",
+  "URL": "https://www.tiktok.com/@zachking/video/7208954321098765432",
+  "custom": { "social": { "platform": "tiktok", "handle": "zachking", "kind": "video" } }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "Language changes over time, and that is perfectly okay.",
+  "author": [{ "family": "Fogarty", "given": "Mignon" }],
+  "accessed": { "date-parts": [[2026, 7, 6]] },
+  "container-title": "X",
+  "URL": "https://x.com/GrammarGirl/status/1700000000000000000",
+  "custom": { "social": { "platform": "x", "handle": "GrammarGirl", "displayName": "Mignon Fogarty", "kind": "post" } }
+}

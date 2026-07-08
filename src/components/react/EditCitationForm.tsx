@@ -191,6 +191,9 @@ function conciseWarningMessage(warning: CitationQualityWarning): string {
 }
 
 function warningResolved(warning: CitationQualityWarning, csl: CSLItem): boolean {
+    // Once the user supplies a title, they have taken over the (unreadable)
+    // social post, so the "couldn't read this automatically" flag is resolved.
+    if (warning.code === 'social_unresolved') return hasStringValue(csl.title);
     if (!warning.code.includes('missing') && !warning.code.includes('not_found')) return false;
     const field = warning.field;
     if (warning.code === 'journal_locator_missing') {
