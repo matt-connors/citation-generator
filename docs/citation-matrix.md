@@ -94,3 +94,78 @@ or the data isn't available:
 Everything else in the matrix is pinned to a golden fixture in
 `tests/format/fixtures/webpage-social-*` and re-derived from the extracted CSL
 at render time, so it cannot drift from what the tool produces.
+
+## Re-verification (2026-07)
+
+The full 4×7 matrix was re-verified against the official sources by an
+adversarial workflow (one independent researcher per style + a skeptical
+refuter on every flagged cell). **All 28 base cells were confirmed correct or a
+documented defensible fallback** — no base-matrix errors. The three interpretive
+cells above (Harvard `[@handle]`, Chicago/YouTube duration, IEEE/YouTube comma)
+were re-confirmed as deliberate, defensible choices.
+
+Edge-case golden coverage was added (`tests/format/fixtures/webpage-social-*`):
+handle-only author, single photo (`[Photograph]`), no-date post, emoji/CJK
+caption over APA's 20-word cut, and a no-author post. Verified findings:
+
+- **Handle-only accounts** (no real name, e.g. `@zachking`) render the username
+  in the author slot across all styles. MLA's own rule is to *omit* a handle
+  that duplicates the author name, so a leading `@` with no bracketed repeat is
+  correct; the other styles follow suit. Defensible.
+- **Name identical to handle** (e.g. an account named "NASA" posting as
+  `@NASA`): the adapter omits the `[@handle]` bracket when the display name and
+  handle are the same string. This is explicitly correct for **MLA** ("do not
+  repeat the username if it is the same as the name") and sits in the same
+  repeat-the-handle interpretive range as the Harvard cell for **APA/Chicago**
+  (Chicago always shows the bracket; APA arguably retains it). Deferred to the
+  product owner rather than "fixed" blindly. The edge fixture uses a distinct
+  name and handle so it does not conflate this with the caption tests.
+- **No-date posts** render each style's dateless form correctly: MLA adds an
+  access date, APA `(n.d.)` + `Retrieved … from`, Chicago `n.d.` + access date,
+  Harvard `(no date)`, AMA drops the `Posted` date. A no-date X post defaults to
+  Chicago's `Twitter (now X)` label (the `isBeforeXRename` fallback assumes
+  pre-rename when no date is available — conservative, since the true post date
+  is unknown).
+- **No-author posts** (rare in practice — a detected social URL almost always
+  yields at least the @handle, which becomes the author): MLA, IEEE, AMA, and
+  Vancouver render correctly (title-first; AMA uses the @handle). **Known
+  imperfections**, from CSL's generic no-author handling (the title moves into
+  the author slot): APA floats the `[Photograph]` descriptor after the date
+  instead of adjoining the title, and Harvard places `(year)` after the medium.
+  These are the same for any no-author webpage, not social-specific; not fixed
+  here to avoid CSL surgery affecting the whole 600-fixture corpus.
+
+## Live extraction reliability (2026-07)
+
+Formatting is only half the job — the citation is only correct if the *facts*
+are extracted correctly. Cloudflare's datacenter egress is bot-walled or
+rate-limited by every one of these platforms, so the extraction path is hardened
+to either produce a correct citation end-to-end or **fail honestly** (never a
+plausible-looking wrong citation):
+
+| Platform | Production extraction | Date source | If it can't be read |
+|----------|----------------------|-------------|---------------------|
+| **TikTok** | oEmbed (`tiktok.com/oembed`) → caption + creator, egress-independent | posting date recovered from the **video-ID timestamp bits** (no fetch needed) | honest-failure flag |
+| **X / Twitter** | syndication API (`cdn.syndication.twimg.com/tweet-result`) → text + author + handle + date | native (`created_at`) | deleted posts return a **TweetTombstone** → honest-failure flag |
+| **YouTube** | oEmbed → title + channel; `ytInitialData` parsed from the page for the date; render is triggered even on a 429 | microdata `datePublished`, else `ytInitialData` `publishDate` | honest-failure flag |
+| **Instagram** | og-string parse when the page is readable | og-string date | **no keyless path** — Instagram's oEmbed needs a Meta app token, so a bot-walled Instagram fails honestly |
+
+**Honest-failure guarantee.** When a recognized social/video URL yields no
+platform metadata (`custom.social` absent after every rescue), the page's chrome
+title ("Phillip Cook on TikTok", "- YouTube") is dropped and an **error-severity
+`social_unresolved`** warning is raised, pointing the user at the browser
+extension or manual entry. The tool never emits a citation that looks finished
+but is wrong. The warning clears once the user supplies a real title.
+
+**Residual limitations:**
+
+- **Instagram** has no keyless server-side extraction path (Graph oEmbed
+  requires a Meta app token). A bot-walled Instagram post fails honestly; the
+  browser extension or manual entry is the reliable route.
+- **YouTube** date depends on the page being fetched or rendered. If Cloudflare
+  is hard-rate-limited (429) *and* rendering is unavailable, only the oEmbed
+  title + channel survive and the citation carries the style's no-date fallback
+  (flagged `date_not_found`) rather than a wrong date.
+- The `publish.twitter.com/oembed` endpoint the code previously used is **dead**
+  (it 301s to `publish.x.com`, which serves an HTML error page); it was replaced
+  by the syndication API, which also detects deleted posts.

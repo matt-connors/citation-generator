@@ -2,10 +2,10 @@
   "id": "fixture",
   "type": "webpage",
   "title": "Big news today 🎉🚀 我们正在发布一个全新的功能 and we could not be more excited to finally share every single detail with all of you wonderful people around the entire world right now.",
-  "author": [{ "literal": "NASA" }],
+  "author": [{ "literal": "European Space Agency" }],
   "issued": { "date-parts": [[2024, 1, 20]] },
   "accessed": { "date-parts": [[2026, 7, 6]] },
   "container-title": "X",
-  "URL": "https://x.com/NASA/status/1748000000000000000",
-  "custom": { "social": { "platform": "x", "handle": "NASA", "displayName": "NASA", "kind": "post" } }
+  "URL": "https://x.com/esa/status/1748000000000000000",
+  "custom": { "social": { "platform": "x", "handle": "esa", "displayName": "European Space Agency", "kind": "post" } }
 }
