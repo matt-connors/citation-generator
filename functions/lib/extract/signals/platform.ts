@@ -175,21 +175,35 @@ function instagram($: CheerioAPI): PlatformSignalResult {
 // but the channel name must NOT go through person-name parsing (channels are
 // labels: "Chem Teacher Phil", "NASA Goddard"). The @handle hides in the
 // author scope's <link itemprop="url"> href.
+//
+// When the page comes back bot-walled the microdata is stripped, but the
+// ytInitialData / player-response JSON is still inlined and carries the title,
+// channel, and posting date — so parse those as a fallback before giving up.
+// A bare "- YouTube" chrome <title> is never a usable citation title.
 // ---------------------------------------------------------------------------
 function youtube($: CheerioAPI): PlatformSignalResult {
   const scope = $('[itemprop="author"]').first();
-  const channelName = scope.find('link[itemprop="name"], meta[itemprop="name"]').attr('content')?.trim();
+  const channelFromMicro = scope.find('link[itemprop="name"], meta[itemprop="name"]').attr('content')?.trim();
   const channelUrl = scope.find('link[itemprop="url"]').attr('href') ?? '';
-  const handle = channelUrl.match(/youtube\.com\/@([^/?#]+)/)?.[1];
 
   // The video's own name is a <meta itemprop="name"> OUTSIDE the author scope
   // (the channel name is another itemprop="name" inside it).
-  const title = $('meta[itemprop="name"]')
+  const titleFromMicro = $('meta[itemprop="name"]')
     .filter((_, el) => $(el).closest('[itemprop="author"]').length === 0)
     .first()
-    .attr('content')?.trim() || metaContent($, 'og:title');
-  const published = $('meta[itemprop="datePublished"]').first().attr('content')
+    .attr('content')?.trim();
+  const publishedFromMicro = $('meta[itemprop="datePublished"]').first().attr('content')
     ?? $('meta[itemprop="uploadDate"]').first().attr('content');
+
+  const inline = youtubeInlineData($);
+  const ogTitle = metaContent($, 'og:title');
+  const ogTitleClean = ogTitle && !looksLikeYoutubeChrome(ogTitle) ? ogTitle : undefined;
+
+  const title = titleFromMicro || inline.title || ogTitleClean;
+  const channelName = channelFromMicro || inline.channel;
+  const published = publishedFromMicro || inline.published;
+  const handle = (channelUrl.match(/youtube\.com\/@([^/?#]+)/)?.[1])
+    ?? inline.handle;
 
   if (!title && !channelName) return EMPTY;
 
@@ -214,6 +228,59 @@ function youtube($: CheerioAPI): PlatformSignalResult {
     confidence,
     social: { platform: 'youtube', handle, displayName: channelName, kind: 'video' },
   };
+}
+
+function looksLikeYoutubeChrome(title: string): boolean {
+  return /-\s*YouTube$/i.test(title.trim()) || /^-?\s*YouTube$/i.test(title.trim());
+}
+
+// Pull title / channel / date / handle out of the inlined ytInitialData and
+// ytInitialPlayerResponse JSON. Regex rather than a full JSON.parse: the blobs
+// are large and we only want a handful of well-known keys.
+function youtubeInlineData($: CheerioAPI): {
+  title?: string;
+  channel?: string;
+  published?: string;
+  handle?: string;
+} {
+  let blob = '';
+  $('script').each((_, el) => {
+    const text = $(el).contents().text();
+    if (text.includes('ytInitialData') || text.includes('ytInitialPlayerResponse')) blob += text;
+  });
+  if (!blob) return {};
+
+  const title = decodeJsonString(
+    blob.match(/"videoPrimaryInfoRenderer":\{"title":\{"runs":\[\{"text":"((?:[^"\\]|\\.)*)"/)?.[1]
+    ?? blob.match(/"videoDetails":\{[^}]*?"title":"((?:[^"\\]|\\.)*)"/)?.[1],
+  );
+  const channel = decodeJsonString(
+    blob.match(/"videoDetails":\{[^}]*?"author":"((?:[^"\\]|\\.)*)"/)?.[1]
+    ?? blob.match(/"ownerChannelName":"((?:[^"\\]|\\.)*)"/)?.[1]
+    ?? blob.match(/"videoOwnerRenderer":\{"[^}]*?"title":\{"runs":\[\{"text":"((?:[^"\\]|\\.)*)"/)?.[1]
+    ?? blob.match(/"channel":\{"simpleText":"((?:[^"\\]|\\.)*)"/)?.[1],
+  );
+  // ISO upload date (player response) is the most precise; the human "Apr 23,
+  // 2005" from publishDate/dateText is the fallback.
+  const published = decodeJsonString(
+    blob.match(/"uploadDate":"((?:[^"\\]|\\.)*)"/)?.[1]
+    ?? blob.match(/"publishDate":\{"simpleText":"((?:[^"\\]|\\.)*)"/)?.[1]
+    ?? blob.match(/"dateText":\{"simpleText":"((?:[^"\\]|\\.)*)"/)?.[1],
+  );
+  const handle = blob.match(/"canonicalBaseUrl":"\/@([^"\\/]+)"/)?.[1]
+    ?? blob.match(/youtube\.com\/@([^"\\/?#]+)/)?.[1];
+
+  return { title, channel, published, handle };
+}
+
+function decodeJsonString(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  try {
+    const decoded = JSON.parse(`"${value}"`) as string;
+    return decoded.trim() || undefined;
+  } catch {
+    return value.trim() || undefined;
+  }
 }
 
 function metaContent($: CheerioAPI, prop: string): string | undefined {

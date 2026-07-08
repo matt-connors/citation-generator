@@ -8,6 +8,7 @@ import { analyzeHtmlReadiness, extractReadableText, shouldTryRenderedAcquisition
 import { renderHtmlWithBrowserRun, RenderError, type BrowserRunBinding } from '../../lib/acquisition/browser-run';
 import { mergePipelineResults, addEvidenceToResult, type MergedCitationEvidence } from '../../lib/provenance/merge';
 import { runOembedAssist, shouldRunOembedAssist } from '../../lib/extract/oembed';
+import { socialPlatformOf, looksLikePlatformChrome } from '../../lib/extract/social-host';
 import { validateCitationQuality } from '../../lib/validation/citation-quality';
 import { runAiFieldAssist, type AiBinding } from '../../lib/ai/citation-assist';
 import type { PipelineResult } from '../../lib/extract/pipeline';
@@ -138,7 +139,15 @@ export async function handleCiteWebsite(
   }
 
   const fetchResult = results[0];
-  const renderWanted = deps.renderingEnabled !== false && shouldRender(mode, fetchResult, attempts.fetch, fetchReadiness);
+  // TikTok/YouTube/Instagram hide their citation data behind JavaScript, so a
+  // bot-walled or rate-limited fetch (429/403) yields nothing usable — render
+  // the page so the platform signal can read the hydrated JSON. X is excluded:
+  // it relies on the syndication API, which a browser render can't reach.
+  const socialNeedsRender = socialPlatformOf(target) !== null
+    && socialPlatformOf(target) !== 'x'
+    && (!fetchResult || attempts.fetch?.status === 'error');
+  const renderWanted = deps.renderingEnabled !== false
+    && (shouldRender(mode, fetchResult, attempts.fetch, fetchReadiness) || (mode !== 'fetch' && socialNeedsRender));
   if (renderWanted) {
     if (!deps.browser) {
       attempts.render = {
@@ -211,6 +220,17 @@ export async function handleCiteWebsite(
       }
       merged = addEvidenceToResult(merged, assist.evidence);
     }
+  }
+
+  // If every acquisition path failed on a recognized social/video URL, the only
+  // "title" left is the page's chrome ("Phillip Cook on TikTok", "- YouTube").
+  // That reads like a finished citation while being wrong, so drop it — a
+  // missing title fails visibly (error warning) and points the user at the
+  // extension, which is the honest outcome. Never emit a plausible-wrong one.
+  const platform = socialPlatformOf(target);
+  if (platform && !merged.csl.custom?.social && looksLikePlatformChrome(merged.csl.title, platform)) {
+    delete merged.csl.title;
+    delete merged.provenance.title;
   }
 
   if (deps.ai && aiEnabled && shouldRunAiAssist(merged.csl, fetchedHtml, renderedHtml)) {

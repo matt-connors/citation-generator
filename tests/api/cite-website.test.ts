@@ -154,20 +154,22 @@ describe('handleCiteWebsite', () => {
     expect(body._quality.acquisition.ai.fieldsFound).toEqual(['author', 'issued']);
   });
 
-  it('rescues an X post via oEmbed when the page is an empty JS shell', async () => {
-    // x.com serves ~nothing to non-browser clients; publish.twitter.com/oembed
-    // is the deterministic source for the post text, author, handle, and date.
+  it('rescues an X post via the syndication API when the page is an empty JS shell', async () => {
+    // x.com serves ~nothing to non-browser clients; cdn.syndication.twimg.com is
+    // the deterministic source for the post text, author, handle, and date.
     const shell = '<!doctype html><html><head><title>X</title></head><body></body></html>';
-    const oembed = {
-      url: 'https://x.com/jack/status/20',
-      author_name: 'jack',
-      author_url: 'https://x.com/jack',
-      html: '<blockquote class="twitter-tweet"><p lang="en" dir="ltr">just setting up my twttr</p>&mdash; jack (@jack) <a href="https://x.com/jack/status/20?ref_src=twsrc%5Etfw">March 21, 2006</a></blockquote>',
+    const syndication = {
+      __typename: 'Tweet',
+      id_str: '20',
+      text: 'just setting up my twttr',
+      created_at: '2006-03-21T20:50:14.000Z',
+      display_text_range: [0, 24],
+      user: { name: 'jack', screen_name: 'jack' },
     };
     globalThis.fetch = vi.fn(async (input: any) => {
       const target = String(typeof input === 'string' ? input : input?.url ?? input);
-      if (target.includes('publish.twitter.com/oembed')) {
-        return new Response(JSON.stringify(oembed), { status: 200, headers: { 'content-type': 'application/json' } });
+      if (target.includes('cdn.syndication.twimg.com')) {
+        return new Response(JSON.stringify(syndication), { status: 200, headers: { 'content-type': 'application/json' } });
       }
       return new Response(shell, { status: 200, headers: { 'content-type': 'text/html' } });
     }) as any;
@@ -225,6 +227,134 @@ describe('handleCiteWebsite', () => {
     expect(body.csl.custom.social.platform).toBe('tiktok');
     const oembedCalls = fetchSpy.mock.calls.filter((c) => String(c[0]).includes('oembed'));
     expect(oembedCalls).toHaveLength(0);
+  });
+
+  it('rescues a bot-walled TikTok (no hydration blob) via oEmbed with a URL-derived date', async () => {
+    // What Cloudflare's egress gets: the platform blob is gone, only the chrome
+    // og:title survives. oEmbed supplies the caption + creator; the date comes
+    // from the video ID. The result must be the real caption, never "… on TikTok".
+    const walled = `<!doctype html><html><head>
+      <meta property="og:title" content="Phillip Cook on TikTok">
+      <title>Phillip Cook on TikTok</title></head><body>${'walled shell '.repeat(40)}</body></html>`;
+    const oembed = {
+      title: 'Fighting fire with fire. #sciencetok #learnontiktok',
+      author_name: 'Phillip Cook',
+      author_url: 'https://www.tiktok.com/@chemteacherphil',
+    };
+    globalThis.fetch = vi.fn(async (input: any) => {
+      const target = String(typeof input === 'string' ? input : input?.url ?? input);
+      if (target.includes('tiktok.com/oembed')) {
+        return new Response(JSON.stringify(oembed), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response(walled, { status: 200, headers: { 'content-type': 'text/html' } });
+    }) as any;
+
+    const res = await handleCiteWebsite(
+      new URL('https://m.com/api/cite-website?url=https%3A%2F%2Fwww.tiktok.com%2F%40chemteacherphil%2Fvideo%2F7008953610872605957&nocache=1'),
+      null,
+      undefined,
+      new Date(Date.UTC(2026, 6, 6)),
+    );
+
+    expect(res.status).toBe(200);
+    const body = await res.json() as any;
+    expect(body.csl.title).toBe('Fighting fire with fire. #sciencetok #learnontiktok');
+    expect(body.csl.author).toEqual([{ family: 'Cook', given: 'Phillip' }]);
+    expect(body.csl.issued).toEqual({ 'date-parts': [[2021, 9, 17]] });
+    expect(body.csl.custom.social.platform).toBe('tiktok');
+  });
+
+  it('fails honestly when a social URL cannot be extracted (no plausible-wrong citation)', async () => {
+    // Fully walled: no blob, oEmbed returns nothing usable. The chrome title
+    // ("Phillip Cook on TikTok") must be dropped and an error warning raised.
+    const walled = `<!doctype html><html><head>
+      <meta property="og:title" content="Phillip Cook on TikTok">
+      <title>Phillip Cook on TikTok</title></head><body>${'walled shell '.repeat(40)}</body></html>`;
+    globalThis.fetch = vi.fn(async (input: any) => {
+      const target = String(typeof input === 'string' ? input : input?.url ?? input);
+      if (target.includes('tiktok.com/oembed')) {
+        return new Response('{}', { status: 404, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response(walled, { status: 200, headers: { 'content-type': 'text/html' } });
+    }) as any;
+
+    const res = await handleCiteWebsite(
+      new URL('https://m.com/api/cite-website?url=https%3A%2F%2Fwww.tiktok.com%2F%40chemteacherphil%2Fvideo%2F7008953610872605957&nocache=1'),
+      null,
+      undefined,
+      new Date(Date.UTC(2026, 6, 6)),
+    );
+
+    expect(res.status).toBe(200);
+    const body = await res.json() as any;
+    // The chrome title is suppressed rather than presented as a real citation.
+    expect(body.csl.title).toBeUndefined();
+    expect(body.csl.custom?.social).toBeUndefined();
+    const codes = body._quality.warnings.map((w: any) => w.code);
+    expect(codes).toContain('social_unresolved');
+    const social = body._quality.warnings.find((w: any) => w.code === 'social_unresolved');
+    expect(social.severity).toBe('error');
+    expect(social.action).toBe('use-extension');
+  });
+
+  it('fails honestly on a deleted X post (syndication tombstone)', async () => {
+    const shell = '<!doctype html><html><head><title>X</title></head><body></body></html>';
+    globalThis.fetch = vi.fn(async (input: any) => {
+      const target = String(typeof input === 'string' ? input : input?.url ?? input);
+      if (target.includes('cdn.syndication.twimg.com')) {
+        return new Response(JSON.stringify({ __typename: 'TweetTombstone', tombstone: { text: { text: 'deleted' } } }),
+          { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response(shell, { status: 404, headers: { 'content-type': 'text/html' } });
+    }) as any;
+
+    const res = await handleCiteWebsite(
+      new URL('https://m.com/api/cite-website?url=https%3A%2F%2Fx.com%2Fx%2Fstatus%2F1095734401550303232&nocache=1'),
+      null,
+      undefined,
+      new Date(Date.UTC(2026, 6, 6)),
+      { browser: { quickAction: vi.fn(async () => new Response(shell, { headers: { 'content-type': 'text/html' } })) } },
+    );
+
+    expect(res.status).toBe(200);
+    const body = await res.json() as any;
+    expect(body.csl.custom?.social).toBeUndefined();
+    const codes = body._quality.warnings.map((w: any) => w.code);
+    expect(codes).toContain('social_unresolved');
+  });
+
+  it('recovers a YouTube date from ytInitialData when the fetch is rate-limited', async () => {
+    // Cloudflare gets 429 on the watch page; render returns the walled page whose
+    // ytInitialData still carries title + publishDate. oEmbed supplies the author.
+    const rendered = `<!doctype html><html><head><title> - YouTube</title>
+      <meta property="og:title" content=""></head><body>
+      <script>var ytInitialData = {"contents":{"videoPrimaryInfoRenderer":{"title":{"runs":[{"text":"Me at the zoo"}]},"dateText":{"simpleText":"Apr 23, 2005"},"publishDate":{"simpleText":"Apr 23, 2005"}}}};</script>
+      ${'video page body '.repeat(40)}</body></html>`;
+    const oembed = { title: 'Me at the zoo', author_name: 'jawed', author_url: 'https://www.youtube.com/@jawed' };
+    globalThis.fetch = vi.fn(async (input: any) => {
+      const target = String(typeof input === 'string' ? input : input?.url ?? input);
+      if (target.includes('youtube.com/oembed')) {
+        return new Response(JSON.stringify(oembed), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response('rate limited', { status: 429, headers: { 'content-type': 'text/html' } });
+    }) as any;
+    const browser = { quickAction: vi.fn(async () => new Response(rendered, { headers: { 'content-type': 'text/html', 'X-Browser-Ms-Used': '900' } })) };
+
+    const res = await handleCiteWebsite(
+      new URL('https://m.com/api/cite-website?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DjNQXAC9IVRw&nocache=1'),
+      null,
+      undefined,
+      new Date(Date.UTC(2026, 6, 6)),
+      { browser },
+    );
+
+    expect(res.status).toBe(200);
+    const body = await res.json() as any;
+    expect(browser.quickAction).toHaveBeenCalled();
+    expect(body.csl.title).toBe('Me at the zoo');
+    expect(body.csl.author).toEqual([{ literal: 'jawed' }]);
+    expect(body.csl.issued).toEqual({ 'date-parts': [[2005, 4, 23]] });
+    expect(body.csl.custom.social.platform).toBe('youtube');
   });
 
   it('allows server policy, not public query params, to disable AI assist', async () => {

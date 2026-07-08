@@ -8,6 +8,7 @@ import type {
   SupportedStyle,
   ExtractQuality,
 } from '../csl-types';
+import { socialPlatformOf, platformLabel } from '../extract/social-host';
 
 export interface ValidateCitationOptions {
   style?: SupportedStyle;
@@ -18,6 +19,21 @@ export interface ValidateCitationOptions {
 export function validateCitationQuality(csl: CSLItem, options: ValidateCitationOptions = {}): ExtractQuality {
   const warnings: CitationQualityWarning[] = [];
   const provenance = options.provenance ?? {};
+
+  // A recognized social/video URL that produced no platform metadata means every
+  // extraction path was bot-walled: whatever fields survived are page chrome, not
+  // the post. Surface this as an error with clear guidance rather than letting a
+  // plausible-looking wrong citation through.
+  const socialPlatform = socialPlatformOf(typeof csl.URL === 'string' ? csl.URL : '');
+  if (socialPlatform && !csl.custom?.social) {
+    warnings.push({
+      code: 'social_unresolved',
+      field: 'title',
+      severity: 'error',
+      message: `We couldn't automatically read this ${platformLabel(socialPlatform)} post. Its details may be incomplete or wrong — paste the post text, or use the browser extension, before relying on this citation.`,
+      action: 'use-extension',
+    });
+  }
 
   if (!hasText(csl.title)) {
     warnings.push({

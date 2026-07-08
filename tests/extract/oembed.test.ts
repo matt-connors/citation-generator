@@ -1,15 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import { oembedEndpointFor, shouldRunOembedAssist, runOembedAssist } from '../../functions/lib/extract/oembed';
+import { oembedEndpointFor, shouldRunOembedAssist, runOembedAssist, tiktokDateFromUrl } from '../../functions/lib/extract/oembed';
 import type { CSLItem } from '../../functions/lib/csl-types';
 
-// Real payload shape returned by publish.twitter.com/oembed for x.com/jack/status/20.
+// Real payload shape returned by cdn.syndication.twimg.com/tweet-result for
+// x.com/jack/status/20.
 const X_PAYLOAD = {
-  url: 'https://x.com/jack/status/20',
-  author_name: 'jack',
-  author_url: 'https://x.com/jack',
-  html: '<blockquote class="twitter-tweet"><p lang="en" dir="ltr">just setting up my twttr</p>&mdash; jack (@jack) <a href="https://x.com/jack/status/20?ref_src=twsrc%5Etfw">March 21, 2006</a></blockquote>\n',
-  provider_name: 'X',
-  version: '1.0',
+  __typename: 'Tweet',
+  id_str: '20',
+  text: 'just setting up my twttr',
+  created_at: '2006-03-21T20:50:14.000Z',
+  display_text_range: [0, 24],
+  user: { name: 'jack', screen_name: 'jack' },
 };
 
 const TIKTOK_PAYLOAD = {
@@ -18,6 +19,12 @@ const TIKTOK_PAYLOAD = {
   title: 'Fighting fire with fire. #sciencetok #learnontiktok',
   author_url: 'https://www.tiktok.com/@chemteacherphil',
   author_name: 'Phillip Cook',
+};
+
+const YOUTUBE_PAYLOAD = {
+  title: 'Me at the zoo',
+  author_name: 'jawed',
+  author_url: 'https://www.youtube.com/@jawed',
 };
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -29,9 +36,10 @@ function bareItem(url: string): CSLItem {
 }
 
 describe('oembedEndpointFor', () => {
-  it('maps X status URLs (x.com and twitter.com) to publish.twitter.com', () => {
-    expect(oembedEndpointFor('https://x.com/jack/status/20')).toContain('publish.twitter.com/oembed');
-    expect(oembedEndpointFor('https://twitter.com/jack/status/20')).toContain('publish.twitter.com/oembed');
+  it('maps X status URLs (x.com and twitter.com) to the syndication API', () => {
+    expect(oembedEndpointFor('https://x.com/jack/status/20')).toContain('cdn.syndication.twimg.com/tweet-result');
+    expect(oembedEndpointFor('https://x.com/jack/status/20')).toContain('id=20');
+    expect(oembedEndpointFor('https://twitter.com/jack/status/20')).toContain('cdn.syndication.twimg.com');
   });
 
   it('does not fire for X profile pages', () => {
@@ -41,6 +49,7 @@ describe('oembedEndpointFor', () => {
   it('maps TikTok video URLs and YouTube watch URLs', () => {
     expect(oembedEndpointFor('https://www.tiktok.com/@x/video/123')).toContain('tiktok.com/oembed');
     expect(oembedEndpointFor('https://www.youtube.com/watch?v=abc')).toContain('youtube.com/oembed');
+    expect(oembedEndpointFor('https://youtu.be/abc')).toContain('youtube.com/oembed');
   });
 
   it('ignores other hosts and malformed URLs', () => {
@@ -68,8 +77,25 @@ describe('shouldRunOembedAssist', () => {
   });
 });
 
-describe('runOembedAssist: X', () => {
-  it('extracts post text, author, handle, date, and container from the embed html', async () => {
+describe('tiktokDateFromUrl', () => {
+  it('recovers the posting date from the video ID timestamp bits', () => {
+    // 7008953610872605957 >> 32 === 1631899180 === 2021-09-17 UTC.
+    expect(tiktokDateFromUrl('https://www.tiktok.com/@chemteacherphil/video/7008953610872605957'))
+      .toEqual([2021, 9, 17]);
+  });
+
+  it('returns null for a URL without a video ID', () => {
+    expect(tiktokDateFromUrl('https://www.tiktok.com/@chemteacherphil')).toBeNull();
+  });
+
+  it('rejects an out-of-range (pre-2015) timestamp', () => {
+    // A small numeric ID shifts to a timestamp near the Unix epoch.
+    expect(tiktokDateFromUrl('https://www.tiktok.com/@x/video/123456')).toBeNull();
+  });
+});
+
+describe('runOembedAssist: X (syndication)', () => {
+  it('extracts post text, author, handle, date, and container', async () => {
     const result = await runOembedAssist('https://x.com/jack/status/20', {
       fetchFn: async () => jsonResponse(X_PAYLOAD),
       acquiredAt: '2026-07-06T00:00:00.000Z',
@@ -87,32 +113,50 @@ describe('runOembedAssist: X', () => {
     }
   });
 
-  it('flattens multi-line posts into a single-line title', async () => {
+  it('trims trailing media t.co links using display_text_range', async () => {
     const payload = {
-      ...X_PAYLOAD,
-      html: '<blockquote class="twitter-tweet"><p>line one<br>line two</p>&mdash; NASA (@NASA) <a href="https://x.com/NASA/status/1">November 23, 2023</a></blockquote>',
-      author_name: 'NASA',
-      author_url: 'https://x.com/NASA',
+      __typename: 'Tweet',
+      text: 'Look at this photo https://t.co/abc123',
+      created_at: '2023-11-23T00:00:00.000Z',
+      display_text_range: [0, 18],
+      user: { name: 'NASA', screen_name: 'NASA' },
     };
-    const result = await runOembedAssist('https://x.com/NASA/status/1', {
-      fetchFn: async () => jsonResponse(payload),
-    });
+    const result = await runOembedAssist('https://x.com/NASA/status/1', { fetchFn: async () => jsonResponse(payload) });
     const byField = Object.fromEntries(result!.evidence.map((e) => [e.field, e.normalizedValue]));
-    expect(byField.title).toBe('line one line two');
+    expect(byField.title).toBe('Look at this photo');
     expect(byField.author).toEqual([{ literal: 'NASA' }]);
+  });
+
+  it('returns null for a deleted post (TweetTombstone) — fail honestly, do not invent', async () => {
+    const tombstone = { __typename: 'TweetTombstone', tombstone: { text: { text: 'This Post was deleted' } } };
+    const result = await runOembedAssist('https://x.com/x/status/1', { fetchFn: async () => jsonResponse(tombstone) });
+    expect(result).toBeNull();
   });
 });
 
 describe('runOembedAssist: TikTok', () => {
-  it('supplies caption and creator (no date — oEmbed does not carry one)', async () => {
+  it('supplies caption, creator, and the URL-derived posting date', async () => {
     const result = await runOembedAssist('https://www.tiktok.com/@chemteacherphil/video/7008953610872605957', {
       fetchFn: async () => jsonResponse(TIKTOK_PAYLOAD),
     });
     const byField = Object.fromEntries(result!.evidence.map((e) => [e.field, e.normalizedValue]));
     expect(byField.title).toBe('Fighting fire with fire. #sciencetok #learnontiktok');
     expect(byField.author).toEqual([{ family: 'Cook', given: 'Phillip' }]);
-    expect(byField.issued).toBeUndefined();
+    expect(byField.issued).toEqual({ 'date-parts': [[2021, 9, 17]] });
     expect(result!.social?.handle).toBe('chemteacherphil');
+  });
+});
+
+describe('runOembedAssist: YouTube', () => {
+  it('supplies title and channel as a literal author (no date from oEmbed)', async () => {
+    const result = await runOembedAssist('https://www.youtube.com/watch?v=jNQXAC9IVRw', {
+      fetchFn: async () => jsonResponse(YOUTUBE_PAYLOAD),
+    });
+    const byField = Object.fromEntries(result!.evidence.map((e) => [e.field, e.normalizedValue]));
+    expect(byField.title).toBe('Me at the zoo');
+    expect(byField.author).toEqual([{ literal: 'jawed' }]);
+    expect(byField.issued).toBeUndefined();
+    expect(result!.social).toEqual({ platform: 'youtube', handle: 'jawed', displayName: 'jawed', kind: 'video' });
   });
 });
 
