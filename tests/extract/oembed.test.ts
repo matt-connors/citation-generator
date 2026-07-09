@@ -63,13 +63,25 @@ describe('shouldRunOembedAssist', () => {
     expect(shouldRunOembedAssist(bareItem('https://x.com/jack/status/20'), 'https://x.com/jack/status/20')).toBe(true);
   });
 
-  it('skips when the HTML extraction already produced title and author', () => {
+  it('skips when the item is fully resolved (title, author, and social metadata)', () => {
     const csl: CSLItem = {
       ...bareItem('https://www.tiktok.com/@x/video/1'),
       title: 'caption',
       author: [{ family: 'Cook', given: 'Phillip' }],
+      custom: { social: { platform: 'tiktok', handle: 'x', kind: 'video' } },
     };
     expect(shouldRunOembedAssist(csl, 'https://www.tiktok.com/@x/video/1')).toBe(false);
+  });
+
+  it('still runs when a social post has title+author but no platform metadata', () => {
+    // e.g. an X post whose og-tags gave a title and author but not the handle,
+    // date, and [Post] descriptor the syndication API provides.
+    const csl: CSLItem = {
+      ...bareItem('https://x.com/jack/status/20'),
+      title: 'just setting up my twttr',
+      author: [{ family: 'jack' }],
+    };
+    expect(shouldRunOembedAssist(csl, 'https://x.com/jack/status/20')).toBe(true);
   });
 
   it('never runs for non-platform URLs', () => {

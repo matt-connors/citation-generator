@@ -67,10 +67,15 @@ export function oembedEndpointFor(url: string): string | null {
 }
 
 // Whether the merged item is missing enough that an oEmbed lookup is worth a
-// network round trip. Title and author are the make-or-break fields.
+// network round trip. Title and author are the make-or-break fields — but a
+// social post also needs custom.social (handle, platform, kind), which drives
+// correct per-style formatting. An X post's og-tags can supply a title and
+// author while the handle, exact date, and [Post] descriptor still only come
+// from the syndication API, so run the rescue whenever a social URL lacks that
+// platform metadata even if title/author are present.
 export function shouldRunOembedAssist(csl: CSLItem, url: string): boolean {
   if (!oembedEndpointFor(url)) return false;
-  return !csl.title || !csl.author?.length;
+  return !csl.title || !csl.author?.length || !csl.custom?.social;
 }
 
 export async function runOembedAssist(
