@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { writeEvent } from '../functions/lib/analytics';
+import { writeEvent, sessionAttribution, fromAttribution } from '../functions/lib/analytics';
 
 describe('writeEvent', () => {
   it('writes blobs, doubles, indexes in positional order', () => {
@@ -56,5 +56,49 @@ describe('writeEvent', () => {
       doubles: [],
       indexes: ['noop'],
     });
+  });
+});
+
+describe('sessionAttribution', () => {
+  const at = (qs: string) => new URL(`https://m.com/api/cite-website?url=https://x.com${qs}`);
+
+  it('returns validated sid/uid when both are well-shaped', () => {
+    expect(sessionAttribution(at('&sid=abc12345&uid=xyz98765def0'))).toEqual({
+      sid: 'abc12345',
+      uid: 'xyz98765def0',
+    });
+  });
+
+  it('returns empty strings when the params are absent', () => {
+    expect(sessionAttribution(at(''))).toEqual({ sid: '', uid: '' });
+  });
+
+  it('rejects tags shorter than 8 chars', () => {
+    expect(sessionAttribution(at('&sid=short&uid=seven77'))).toEqual({ sid: '', uid: '' });
+  });
+
+  it('rejects tags longer than 32 chars', () => {
+    const long = 'a'.repeat(33);
+    expect(sessionAttribution(at(`&sid=${long}`)).sid).toBe('');
+  });
+
+  it('rejects tags with illegal characters (uppercase, dash, dot, slash)', () => {
+    expect(sessionAttribution(at('&sid=ABCD1234')).sid).toBe('');
+    expect(sessionAttribution(at('&sid=has-a-dash1')).sid).toBe('');
+    expect(sessionAttribution(at('&sid=has.a.dot1')).sid).toBe('');
+    expect(sessionAttribution(at('&uid=' + encodeURIComponent('a/b/c/d/e'))).uid).toBe('');
+  });
+
+  it('validates sid and uid independently', () => {
+    expect(sessionAttribution(at('&sid=validsid123&uid=BAD'))).toEqual({
+      sid: 'validsid123',
+      uid: '',
+    });
+  });
+
+  it('does not interfere with fromAttribution on the same URL', () => {
+    const url = at('&from=how-to-cite-a-tweet&sid=validsid123&uid=validuid456');
+    expect(fromAttribution(url)).toBe('how-to-cite-a-tweet');
+    expect(sessionAttribution(url)).toEqual({ sid: 'validsid123', uid: 'validuid456' });
   });
 });

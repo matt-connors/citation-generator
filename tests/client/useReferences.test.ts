@@ -77,6 +77,22 @@ describe('useReferences', () => {
     expect((globalThis.fetch as any).mock.calls[0][0]).not.toContain('from=');
   });
 
+  it('forwards anonymous sid/uid analytics tags on the cite request', async () => {
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: new URL('http://localhost/my-references?website=https://x.com/p'),
+    });
+    globalThis.fetch = vi.fn(async () => new Response(JSON.stringify({
+      uuid: 'https://x.com/p', type: 'webpage', csl: { id: 'u', type: 'webpage', title: 'T' },
+    }), { status: 200 })) as any;
+
+    const { result } = renderHook(() => useReferences());
+    await waitFor(() => expect(result.current.sourceCount).toBe(1));
+    const url = (globalThis.fetch as any).mock.calls[0][0] as string;
+    expect(url).toMatch(/&sid=[a-z0-9]{8,32}/);
+    expect(url).toMatch(/&uid=[a-z0-9]{8,32}/);
+  });
+
   it('stores citation quality metadata returned by cite endpoints', async () => {
     Object.defineProperty(window, 'location', {
       writable: true,
@@ -144,7 +160,7 @@ describe('useReferences', () => {
     const { result } = renderHook(() => useReferences());
     await waitFor(() => expect(result.current.sourceCount).toBe(1));
     expect((globalThis.fetch as any).mock.calls[0][0])
-      .toBe('/api/cite-journal?doi=10.1038%2Fs41586-021-03828-1');
+      .toContain('/api/cite-journal?doi=10.1038%2Fs41586-021-03828-1');
   });
 
   it('also accepts ?doi= as a journal lookup alias', async () => {

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { loadSources, saveSources, STORAGE_KEY, type StoredSource } from './storage';
+import { sessionQueryParams } from './identity';
 import { decodeInlineCslParam, INLINE_CSL_PARAM } from './inline-csl';
 import type { CSLItem, ExtractQuality, FieldProvenance, SupportedStyle } from '../citations/csl-types';
 
@@ -118,10 +119,15 @@ export function useReferences(): UseReferencesReturn {
     // which records it as an analytics dimension. Slug-shaped values only.
     const from = params.get('from');
     const fromParam = from && /^[a-z0-9-]{1,64}$/.test(from) ? `&from=${from}` : '';
+    // Anonymous session/user tags for analytics (sessions, unique users, return
+    // users). Read at request time so the 30-min session window reflects the
+    // moment of the citation, not of page load. Empty when storage is disabled.
+    const idParams = sessionQueryParams();
+    const trailingParams = `${fromParam}${idParams}`;
     let requestUrl: string | null = null;
-    if (website) requestUrl = `/api/cite-website?url=${encodeURIComponent(website)}${fromParam}`;
-    else if (book) requestUrl = `/api/cite-book?isbn=${encodeURIComponent(book)}${fromParam}`;
-    else if (journal) requestUrl = `/api/cite-journal?doi=${encodeURIComponent(journal)}${fromParam}`;
+    if (website) requestUrl = `/api/cite-website?url=${encodeURIComponent(website)}${trailingParams}`;
+    else if (book) requestUrl = `/api/cite-book?isbn=${encodeURIComponent(book)}${trailingParams}`;
+    else if (journal) requestUrl = `/api/cite-journal?doi=${encodeURIComponent(journal)}${trailingParams}`;
     if (!requestUrl) return;
 
     // Show a loading skeleton for this request immediately (component-only

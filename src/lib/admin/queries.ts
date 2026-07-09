@@ -9,7 +9,7 @@
  * parse.
  */
 
-export type RenderKind = 'tiles' | 'sparkline' | 'table';
+export type RenderKind = 'tiles' | 'sparkline' | 'table' | 'scalar' | 'linechart' | 'barchart';
 
 export interface QueryDef {
   key: string;
@@ -31,13 +31,197 @@ export interface QueryDef {
   sparklineBucketKey?: string;
   sparklineValueKey?: string;
   sparklineWindowLabel?: string;
+  /**
+   * Scalar (KPI) panels read a single row and surface one tile per entry here.
+   * `unit: 'pct'` renders the value as a percentage; `hint` is small helper text.
+   */
+  scalarTiles?: Array<{ key: string; label: string; unit?: 'pct'; hint?: string }>;
+  /** Line-chart panels: `lineXKey` labels the x-axis; each series maps a column to a color. */
+  lineXKey?: string;
+  lineSeries?: Array<{ key: string; label: string; color: string }>;
+  /** Bar-chart panels: `barLabelKey` labels each bar, `barValueKey` is its height. */
+  barLabelKey?: string;
+  barValueKey?: string;
   sql: string;
 }
 
 export function buildQueries(dataset: string): QueryDef[] {
   const J = 'FORMAT JSON';
 
+  // sid/uid live at different blob positions per event (cite_website appends
+  // them at blob7/blob8, cite_book & cite_journal at blob4/blob5). Normalize
+  // them to bare `sid`/`uid` columns in an inner subquery so every outer
+  // aggregate — count(DISTINCT …), quantileExactWeighted(…) — operates on a
+  // plain column, the only form Analytics Engine reliably supports.
+  const SID = "if(index1 = 'cite_website', blob7, blob4)";
+  const UID = "if(index1 = 'cite_website', blob8, blob5)";
+  const CITE = "index1 IN ('cite_website', 'cite_book', 'cite_journal')";
+  // Rows carrying a usable identity in the last 30 days. `uid` is the gate:
+  // pre-feature rows (and any request from storage-disabled browsers) have
+  // uid='' and are excluded so session metrics reflect only identifiable traffic.
+  const identifiedCites = (extraCols: string) => `
+        SELECT ${SID} AS sid, ${UID} AS uid${extraCols}
+        FROM ${dataset}
+        WHERE ${CITE}
+          AND ${UID} <> ''
+          AND timestamp >= NOW() - INTERVAL '30' DAY`;
+
   return [
+    {
+      key: 'session_kpis',
+      title: 'Sessions (last 30d)',
+      description:
+        'The headline funnel: anonymous sessions and users citing sources, and how many citations each produces. '
+        + 'A session rolls over after 30 min idle; a user is a persistent anonymous browser tag. Identified traffic only.',
+      render: 'scalar',
+      scalarTiles: [
+        { key: 'sessions', label: 'sessions', hint: 'distinct 30-min visits' },
+        { key: 'users', label: 'unique users', hint: 'distinct browsers' },
+        { key: 'citations', label: 'citations', hint: 'cite events with identity' },
+        { key: 'cites_per_session', label: 'cites / session' },
+        { key: 'cites_per_user', label: 'cites / user' },
+      ],
+      sql: `
+        SELECT
+          count(DISTINCT sid) AS sessions,
+          count(DISTINCT uid) AS users,
+          count() AS citations,
+          round(count() / count(DISTINCT sid), 2) AS cites_per_session,
+          round(count() / count(DISTINCT uid), 2) AS cites_per_user
+        FROM (${identifiedCites('')})
+        ${J}
+      `,
+    },
+    {
+      key: 'engagement_kpis',
+      title: 'Engagement (last 30d)',
+      description:
+        'Median citations the typical user makes (robust to power users), and the share of users who came back for '
+        + 'a second session — the two numbers that say whether the tool earns repeat use.',
+      render: 'scalar',
+      scalarTiles: [
+        { key: 'return_users', label: 'return users', hint: '≥ 2 sessions' },
+        { key: 'return_rate', label: 'return rate', unit: 'pct' },
+        { key: 'median_sessions_per_user', label: 'median sessions / user' },
+      ],
+      // One per-user rollup (sessions per user) drives all three tiles. The
+      // per-user citation median needs a different rollup (raw cite counts, not
+      // distinct sessions) and Analytics Engine has no JOIN to combine them in
+      // one row, so it lives in its own panel below.
+      sql: `
+        SELECT
+          sum(if(s >= 2, 1, 0)) AS return_users,
+          count() AS total_users,
+          round(sum(if(s >= 2, 1, 0)) / count(), 4) AS return_rate,
+          quantileExactWeighted(0.5)(s, 1) AS median_sessions_per_user
+        FROM (
+          SELECT uid, count(DISTINCT sid) AS s
+          FROM (${identifiedCites('')})
+          GROUP BY uid
+        )
+        ${J}
+      `,
+    },
+    {
+      key: 'median_cites_kpi',
+      title: 'Typical citation depth (last 30d)',
+      description:
+        'Median and 90th-percentile citations per user — how deep the middle user and the heaviest users go. '
+        + 'Median resists the long tail that skews the mean.',
+      render: 'scalar',
+      scalarTiles: [
+        { key: 'median_cites_per_user', label: 'median cites / user' },
+        { key: 'p90_cites_per_user', label: 'p90 cites / user' },
+        { key: 'max_cites_per_user', label: 'most by one user' },
+      ],
+      sql: `
+        SELECT
+          quantileExactWeighted(0.5)(c, 1) AS median_cites_per_user,
+          quantileExactWeighted(0.9)(c, 1) AS p90_cites_per_user,
+          max(c) AS max_cites_per_user
+        FROM (
+          SELECT uid, count() AS c
+          FROM (${identifiedCites('')})
+          GROUP BY uid
+        )
+        ${J}
+      `,
+    },
+    {
+      key: 'sessions_daily',
+      title: 'Sessions, users & citations per day (last 30d)',
+      description: 'Daily distinct sessions and users alongside raw citation volume — the primary growth trend.',
+      render: 'linechart',
+      lineXKey: 'day',
+      lineSeries: [
+        { key: 'sessions', label: 'Sessions', color: '#3987e5' },
+        { key: 'users', label: 'Users', color: '#199e70' },
+        { key: 'citations', label: 'Citations', color: '#c98500' },
+      ],
+      sql: `
+        SELECT
+          day,
+          count(DISTINCT sid) AS sessions,
+          count(DISTINCT uid) AS users,
+          count() AS citations
+        FROM (${identifiedCites(", toStartOfInterval(timestamp, INTERVAL '1' DAY) AS day")})
+        GROUP BY day
+        ORDER BY day ASC
+        ${J}
+      `,
+    },
+    {
+      key: 'cites_per_user_dist',
+      title: 'Citations-per-user distribution (last 30d)',
+      description:
+        'How many users made exactly N citations. A tall left bar (most users cite once or twice) with a long thin '
+        + 'tail is the normal shape; the median tile above marks the middle of this distribution.',
+      render: 'barchart',
+      barLabelKey: 'cites',
+      barValueKey: 'users',
+      sql: `
+        SELECT c AS cites, count() AS users
+        FROM (
+          SELECT uid, count() AS c
+          FROM (${identifiedCites('')})
+          GROUP BY uid
+        )
+        GROUP BY cites
+        ORDER BY cites ASC
+        LIMIT 40
+        ${J}
+      `,
+    },
+    {
+      key: 'hosts_by_session',
+      title: 'Websites by session reach (last 30d)',
+      description:
+        'Which sites the most distinct sessions cite — session reach, not raw hits, so one power user hammering a '
+        + 'domain does not dominate. This is the explicit "what sessions are citing what websites" view.',
+      render: 'table',
+      columns: [
+        { key: 'host', label: 'Host' },
+        { key: 'sessions', label: 'Sessions', align: 'right', bar: true },
+        { key: 'citations', label: 'Citations', align: 'right' },
+      ],
+      // cite_website only, so sid is blob7 and host is blob4 at fixed positions —
+      // no cross-event normalization needed; count(DISTINCT blob7) is a bare column.
+      sql: `
+        SELECT
+          blob4 AS host,
+          count(DISTINCT blob7) AS sessions,
+          count() AS citations
+        FROM ${dataset}
+        WHERE index1 = 'cite_website'
+          AND blob4 <> ''
+          AND blob7 <> ''
+          AND timestamp >= NOW() - INTERVAL '30' DAY
+        GROUP BY host
+        ORDER BY sessions DESC
+        LIMIT 20
+        ${J}
+      `,
+    },
     {
       key: 'headline',
       title: 'Activity (last 24h)',

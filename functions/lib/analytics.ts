@@ -41,6 +41,35 @@ export function fromAttribution(requestUrl: URL): string {
   return /^[a-z0-9-]{1,64}$/.test(raw) ? raw : '';
 }
 
+/**
+ * Opaque anonymous session / user tags forwarded by the client (see
+ * `src/lib/references/identity.ts`). Both are random, non-identifying
+ * strings the browser mints and stores locally:
+ *
+ *   - `uid` — persistent (localStorage), one per browser. Lets the dashboard
+ *     count unique users and detect return users across sessions.
+ *   - `sid` — rolling (rotates after 30 min of inactivity). Lets the dashboard
+ *     count sessions and citations-per-session.
+ *
+ * They carry no PII — the server never sets or reads a cookie, and never
+ * stores IPs or user agents (see docs/analytics.md). We accept only the
+ * random shape the client emits (`^[a-z0-9]{8,32}$`); anything else — a
+ * hand-crafted param, an over-long value, a probe — collapses to '' so a
+ * caller can unconditionally append it as a trailing analytics dimension.
+ * Appending at the END of an event's dimension list is the only
+ * positional-storage-safe schema change.
+ */
+export function sessionAttribution(requestUrl: URL): { sid: string; uid: string } {
+  return {
+    sid: validSessionTag(requestUrl.searchParams.get('sid')),
+    uid: validSessionTag(requestUrl.searchParams.get('uid')),
+  };
+}
+
+function validSessionTag(raw: string | null): string {
+  return raw && /^[a-z0-9]{8,32}$/.test(raw) ? raw : '';
+}
+
 export function writeEvent(
   analytics: AnalyticsBinding | undefined,
   event: string,

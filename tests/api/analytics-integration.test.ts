@@ -59,8 +59,8 @@ describe('analytics integration', () => {
       const shape = shapeOf(writeDataPoint.mock.calls[0][0]);
       expect(shape.event).toBe('cite_book');
       expect(shape.index).toBe('cite_book');
-      // [source, from] — from is '' for searches not started on a guide page
-      expect(shape.dimensions).toEqual(['openlibrary', '']);
+      // [source, from, sid, uid] — all trailing dims empty for a bare search
+      expect(shape.dimensions).toEqual(['openlibrary', '', '', '']);
       // metrics: [latency_ms, cache_hit]. Latency is wall-clock so just bounds-check.
       expect(shape.metrics[0]).toBeGreaterThanOrEqual(0);
       expect(shape.metrics[1]).toBe(0);
@@ -76,7 +76,34 @@ describe('analytics integration', () => {
         null, undefined, binding,
       );
       const shape = shapeOf(writeDataPoint.mock.calls[0][0]);
-      expect(shape.dimensions).toEqual(['openlibrary', 'how-to-cite-a-book']);
+      expect(shape.dimensions).toEqual(['openlibrary', 'how-to-cite-a-book', '', '']);
+    });
+
+    it('records anonymous sid/uid tags in the trailing dimensions', async () => {
+      const body = loadFixtureFile(OL_FIX, '9780553418811.json');
+      mockOnce(new Response(body, { status: 200, headers: { 'content-type': 'application/json' } }));
+      const { binding, writeDataPoint } = makeAnalytics();
+
+      await handleCiteBook(
+        new URL('https://m.com/api/cite-book?isbn=9780553418811&sid=abcd1234efgh&uid=zzzz9999yyyy'),
+        null, undefined, binding,
+      );
+      const shape = shapeOf(writeDataPoint.mock.calls[0][0]);
+      expect(shape.dimensions).toEqual(['openlibrary', '', 'abcd1234efgh', 'zzzz9999yyyy']);
+    });
+
+    it('drops malformed sid/uid tags to empty strings', async () => {
+      const body = loadFixtureFile(OL_FIX, '9780553418811.json');
+      mockOnce(new Response(body, { status: 200, headers: { 'content-type': 'application/json' } }));
+      const { binding, writeDataPoint } = makeAnalytics();
+
+      await handleCiteBook(
+        // uid too short; sid contains an illegal char — both must collapse to ''.
+        new URL('https://m.com/api/cite-book?isbn=9780553418811&sid=has-a-dash&uid=short'),
+        null, undefined, binding,
+      );
+      const shape = shapeOf(writeDataPoint.mock.calls[0][0]);
+      expect(shape.dimensions).toEqual(['openlibrary', '', '', '']);
     });
 
     it('drops a non-slug-shaped from value', async () => {
@@ -89,7 +116,7 @@ describe('analytics integration', () => {
         null, undefined, binding,
       );
       const shape = shapeOf(writeDataPoint.mock.calls[0][0]);
-      expect(shape.dimensions).toEqual(['openlibrary', '']);
+      expect(shape.dimensions).toEqual(['openlibrary', '', '', '']);
     });
 
     it('emits cite_book with source=googlebooks when OL is empty', async () => {
@@ -174,6 +201,20 @@ describe('analytics integration', () => {
       expect(shape.metrics[0]).toBeGreaterThanOrEqual(0);
       expect(shape.metrics[1]).toBeGreaterThanOrEqual(0);
       expect(shape.metrics[2]).toBe(0);
+    });
+
+    it('appends sid/uid after from on cite_website (blob7/blob8)', async () => {
+      mockOnce(new Response(HTML, { status: 200, headers: { 'content-type': 'text/html' } }));
+      const { binding, writeDataPoint } = makeAnalytics();
+      await handleCiteWebsite(
+        new URL('https://m.com/api/cite-website?url=https://example.com/page&from=how-to-cite-a-webpage&sid=sess1234abcd&uid=user5678wxyz'),
+        null, binding,
+      );
+      const shape = shapeOf(writeDataPoint.mock.calls[0][0]);
+      // [signal_winner_title, signal_winner_url, host, url, from, sid, uid]
+      expect(shape.dimensions[4]).toBe('how-to-cite-a-webpage');
+      expect(shape.dimensions[5]).toBe('sess1234abcd');
+      expect(shape.dimensions[6]).toBe('user5678wxyz');
     });
 
     it('emits cite_website with cache_hit=1 when cache is warm', async () => {

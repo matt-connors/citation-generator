@@ -3,7 +3,7 @@ import { fetchGoogleBooks } from '../../lib/book/googlebooks';
 import { normalizeOpenLibrary, normalizeGoogleBooks } from '../../lib/book/normalize';
 import { TTL } from '../../lib/cache';
 import type { ExtractEnvelope } from '../../lib/csl-types';
-import { writeEvent, fromAttribution, type AnalyticsBinding } from '../../lib/analytics';
+import { writeEvent, fromAttribution, sessionAttribution, type AnalyticsBinding } from '../../lib/analytics';
 
 const ISBN_RE = /^(97[89])?\d{9}[\dX]$/;
 
@@ -31,6 +31,7 @@ export async function handleCiteBook(
   }
 
   const from = fromAttribution(requestUrl);
+  const { sid, uid } = sessionAttribution(requestUrl);
   const cacheKey = `https://cache.mlagenerator/book/${isbn}`;
   const bypassCache = requestUrl.searchParams.get('nocache') === '1';
   if (cache && !bypassCache) {
@@ -39,7 +40,7 @@ export async function handleCiteBook(
       const body = await hit.json() as ExtractEnvelope;
       body._cached = true;
       writeEvent(analytics, 'cite_book',
-        { source: '', from },
+        { source: '', from, sid, uid },
         { latency_ms: Date.now() - start, cache_hit: 1 },
       );
       return jsonResponse(body);
@@ -67,7 +68,7 @@ export async function handleCiteBook(
   // Emit before cache.put: a cache-write failure shouldn't shadow the
   // success event for an otherwise-completed citation.
   writeEvent(analytics, 'cite_book',
-    { source, from },
+    { source, from, sid, uid },
     { latency_ms: Date.now() - start, cache_hit: 0 },
   );
 

@@ -3,7 +3,7 @@ import { fetchHtml, FetchError } from '../../lib/extract/fetch';
 import { normalizeUrl } from '../../lib/extract/url-normalize';
 import { TTL } from '../../lib/cache';
 import type { AcquisitionAttempt, AcquisitionSource, CSLDate, CSLItem, ExtractEnvelope } from '../../lib/csl-types';
-import { writeEvent, fromAttribution, type AnalyticsBinding } from '../../lib/analytics';
+import { writeEvent, fromAttribution, sessionAttribution, type AnalyticsBinding } from '../../lib/analytics';
 import { analyzeHtmlReadiness, extractReadableText, shouldTryRenderedAcquisition, type PageReadiness } from '../../lib/acquisition/page-readiness';
 import { renderHtmlWithBrowserRun, RenderError, type BrowserRunBinding } from '../../lib/acquisition/browser-run';
 import { mergePipelineResults, addEvidenceToResult, type MergedCitationEvidence } from '../../lib/provenance/merge';
@@ -55,6 +55,7 @@ export async function handleCiteWebsite(
 
   const host = hostOf(target);
   const from = fromAttribution(requestUrl);
+  const { sid, uid } = sessionAttribution(requestUrl);
   const mode = deps.acquisitionMode ?? 'auto';
   const aiEnabled = deps.aiAssistEnabled !== false;
 
@@ -77,6 +78,8 @@ export async function handleCiteWebsite(
           host,
           url: target,
           from,
+          sid,
+          uid,
         },
         { html_size_kb: 0, extraction_ms: 0, cache_hit: 1, fetch_ms: 0 },
       );
@@ -321,6 +324,8 @@ export async function handleCiteWebsite(
       host,
       url: target,
       from,
+      sid,
+      uid,
     },
     {
       html_size_kb: Math.round((fetchedHtml || renderedHtml).length / 1024),

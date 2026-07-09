@@ -4,7 +4,7 @@ import { normalizeCrossref, normalizeOpenAlex } from '../../lib/journal/normaliz
 import { validateDoi } from '../../lib/journal/doi-detect';
 import { TTL } from '../../lib/cache';
 import type { ExtractEnvelope } from '../../lib/csl-types';
-import { writeEvent, fromAttribution, type AnalyticsBinding } from '../../lib/analytics';
+import { writeEvent, fromAttribution, sessionAttribution, type AnalyticsBinding } from '../../lib/analytics';
 
 export interface MinCache {
   get(key: string): Promise<Response | undefined>;
@@ -37,6 +37,7 @@ export async function handleCiteJournal(
   }
 
   const from = fromAttribution(requestUrl);
+  const { sid, uid } = sessionAttribution(requestUrl);
   const cacheKey = `https://cache.mlagenerator/journal/${doi}`;
   const bypassCache = requestUrl.searchParams.get('nocache') === '1';
   if (cache && !bypassCache) {
@@ -45,7 +46,7 @@ export async function handleCiteJournal(
       const body = await hit.json() as ExtractEnvelope;
       body._cached = true;
       writeEvent(analytics, 'cite_journal',
-        { source: '', from },
+        { source: '', from, sid, uid },
         { latency_ms: Date.now() - start, cache_hit: 1 },
       );
       return jsonResponse(body);
@@ -73,7 +74,7 @@ export async function handleCiteJournal(
   // Emit before cache.put: a cache-write failure shouldn't shadow the
   // success event for an otherwise-completed citation.
   writeEvent(analytics, 'cite_journal',
-    { source, from },
+    { source, from, sid, uid },
     { latency_ms: Date.now() - start, cache_hit: 0 },
   );
 

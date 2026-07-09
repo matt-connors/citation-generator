@@ -89,6 +89,47 @@ WHERE index1 = 'cite_website' AND blob6 <> '' AND timestamp > NOW() - INTERVAL '
 GROUP BY guide ORDER BY citations DESC
 ```
 
+### Session & user tags (`sid`, `uid`), added 2026-07-09
+
+All three cite events carry two more trailing dimensions after `from`, so the dashboard can measure **sessions**, **unique users**, **return users**, and **citations-per-user**:
+
+| Event          | `sid` (session) | `uid` (user) |
+| -------------- | --------------- | ------------ |
+| `cite_website` | `blob7`         | `blob8`      |
+| `cite_book`    | `blob4`         | `blob5`      |
+| `cite_journal` | `blob4`         | `blob5`      |
+
+Both are random, non-identifying strings the **browser** mints and stores in `localStorage` (see `src/lib/references/identity.ts`): `uid` is persistent (one per browser profile), `sid` rotates after 30 minutes of inactivity (the standard web-analytics session window). They are forwarded as `?sid=`/`?uid=` query params and validated to the shape `^[a-z0-9]{8,32}$` by `sessionAttribution` in `functions/lib/analytics.ts`; anything else is stored as `''`. Older rows and any request from a storage-disabled browser have `''` for both — session queries gate on `uid <> ''` so they reflect only identifiable traffic.
+
+Because the two tags sit at **different blob positions per event** (`blob7`/`blob8` for `cite_website`, `blob4`/`blob5` for the others), cross-event session queries normalize them in an inner subquery before aggregating — Analytics Engine supports subqueries in `FROM` but has no `JOIN`, no `uniq()`, and no window functions, so the pattern is:
+
+```sql
+-- Sessions, unique users, and median citations per user (last 30d)
+SELECT count(DISTINCT sid) AS sessions, count(DISTINCT uid) AS users, count() AS citations
+FROM (
+  SELECT if(index1 = 'cite_website', blob7, blob4) AS sid,
+         if(index1 = 'cite_website', blob8, blob5) AS uid
+  FROM citation_generator_events
+  WHERE index1 IN ('cite_website', 'cite_book', 'cite_journal')
+    AND if(index1 = 'cite_website', blob8, blob5) <> ''
+    AND timestamp >= NOW() - INTERVAL '30' DAY
+)
+```
+
+Distinct counts use `count(DISTINCT col)` (AE has no `uniq()`), and medians use `quantileExactWeighted(0.5)(col, 1)` — the only quantile function AE exposes — over a per-user subquery. See `src/lib/admin/queries.ts` for the full panel set (`session_kpis`, `engagement_kpis`, `median_cites_kpi`, `sessions_daily`, `cites_per_user_dist`, `hosts_by_session`).
+
+The "what sessions are citing what websites" view counts distinct sessions per host (session reach, not raw hits, so one power user can't dominate). Since it is `cite_website`-only, `sid` is at the fixed `blob7` and no normalization is needed:
+
+```sql
+SELECT blob4 AS host, count(DISTINCT blob7) AS sessions, count() AS citations
+FROM citation_generator_events
+WHERE index1 = 'cite_website' AND blob4 <> '' AND blob7 <> ''
+  AND timestamp >= NOW() - INTERVAL '30' DAY
+GROUP BY host ORDER BY sessions DESC LIMIT 20
+```
+
+> **Cardinality & sampling.** `sid`/`uid` are high-cardinality (one value per session / browser), like `url`. Analytics Engine can sample high-volume datasets; `count(DISTINCT …)` is **not** sampling-corrected, so on a heavily-sampled dataset distinct counts under-count — for this site's volume sampling is unlikely to trigger, but treat the session KPIs as close estimates rather than exact ledgers. To redact, do it at the writer or the cite call sites, not the query layer.
+
 On a cache hit, `source` for cite_book / cite_journal is `''` (empty string) because we didn't talk to either upstream; the `cache_hit` metric is the source of truth for "this was a cache hit". **Per-source SQL slices should filter on the metric, not on `blob2`** — e.g. to count fresh OpenLibrary hits, write `WHERE index1 = 'cite_book' AND double2 = 0 AND blob2 = 'openlibrary'`, not `WHERE blob2 = 'openlibrary'` alone (that's already correct, but the omission of `double2 = 0` would silently exclude cache hits even though they came from "openlibrary" originally — usually the desired behavior, but be explicit). cite_website on a cache hit carries the cached signal-winner dimensions but `html_size_kb` and `extraction_ms` are both 0.
 
 ## Sample queries
