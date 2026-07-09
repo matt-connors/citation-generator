@@ -19,6 +19,47 @@ export function socialPlatformOf(url: string): SocialPlatform | null {
   return null;
 }
 
+// When a recognized social page is readable enough to yield real content (a
+// caption/tweet that survived the chrome check) but no platform hydration blob
+// or keyless data API was reachable — X's syndication CDN blocks Cloudflare's
+// datacenter egress, and a page can render without its __UNIVERSAL_DATA__ blob —
+// the post's account handle is still sitting in the URL path. Recovering it lets
+// the citation render in the correct per-style social format (handle bracket,
+// [Post]/[Video] descriptor, platform container) instead of the generic-web
+// fallback, with no dependence on a bot-walled API.
+//
+// Only platforms whose handle lives in the URL qualify: X (`/<handle>/status/`)
+// and TikTok (`/@<handle>/video/`). YouTube (`/watch?v=`) and Instagram (`/p/`)
+// carry a video id / shortcode rather than the channel or account, so they
+// return null and keep relying on oEmbed or failing honestly. The caller only
+// invokes this once a real title has survived the chrome check, so a walled page
+// (whose chrome title was dropped) never reaches here and still fails honestly.
+export function socialHandleFromUrl(
+  url: string,
+): { platform: SocialPlatform; handle: string; kind: 'post' | 'video' } | null {
+  const platform = socialPlatformOf(url);
+  if (!platform) return null;
+  let path: string;
+  try {
+    path = new URL(url).pathname;
+  } catch {
+    return null;
+  }
+  if (platform === 'x') {
+    const handle = path.match(/^\/([^/]+)\/status(?:es)?\/\d+/i)?.[1];
+    // `/i/status/…`, `/i/web/status/…` are X's intent/redirect paths, not a
+    // real account — reject them rather than cite "i" as the author.
+    if (handle && !/^i$/i.test(handle)) return { platform, handle, kind: 'post' };
+    return null;
+  }
+  if (platform === 'tiktok') {
+    const handle = path.match(/^\/@([^/]+)\/video\/\d+/i)?.[1];
+    if (handle) return { platform, handle, kind: 'video' };
+    return null;
+  }
+  return null;
+}
+
 export function platformLabel(platform: SocialPlatform): string {
   switch (platform) {
     case 'tiktok': return 'TikTok';

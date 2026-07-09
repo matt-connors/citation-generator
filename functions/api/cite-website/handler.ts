@@ -2,13 +2,13 @@ import { runExtractionPipeline } from '../../lib/extract/pipeline';
 import { fetchHtml, FetchError } from '../../lib/extract/fetch';
 import { normalizeUrl } from '../../lib/extract/url-normalize';
 import { TTL } from '../../lib/cache';
-import type { AcquisitionAttempt, AcquisitionSource, CSLDate, ExtractEnvelope } from '../../lib/csl-types';
+import type { AcquisitionAttempt, AcquisitionSource, CSLDate, CSLItem, ExtractEnvelope } from '../../lib/csl-types';
 import { writeEvent, fromAttribution, type AnalyticsBinding } from '../../lib/analytics';
 import { analyzeHtmlReadiness, extractReadableText, shouldTryRenderedAcquisition, type PageReadiness } from '../../lib/acquisition/page-readiness';
 import { renderHtmlWithBrowserRun, RenderError, type BrowserRunBinding } from '../../lib/acquisition/browser-run';
 import { mergePipelineResults, addEvidenceToResult, type MergedCitationEvidence } from '../../lib/provenance/merge';
 import { runOembedAssist, shouldRunOembedAssist } from '../../lib/extract/oembed';
-import { socialPlatformOf, looksLikePlatformChrome } from '../../lib/extract/social-host';
+import { socialPlatformOf, looksLikePlatformChrome, socialHandleFromUrl, platformLabel } from '../../lib/extract/social-host';
 import { validateCitationQuality } from '../../lib/validation/citation-quality';
 import { runAiFieldAssist, type AiBinding } from '../../lib/ai/citation-assist';
 import type { PipelineResult } from '../../lib/extract/pipeline';
@@ -233,6 +233,34 @@ export async function handleCiteWebsite(
     delete merged.provenance.title;
   }
 
+  // The page yielded real content (a caption/tweet that survived the chrome
+  // check above) but no platform metadata was reachable — X's syndication CDN
+  // blocks Cloudflare's egress, and a page can render without its hydration
+  // blob. The account handle is still in the URL, so recover it and shape the
+  // post into the correct per-style social format instead of the generic-web
+  // fallback. Only fires with a surviving title, so a walled page (title just
+  // dropped) still fails honestly rather than being dressed up as a real post.
+  if (platform && !merged.csl.custom?.social && merged.csl.title) {
+    const fromUrl = socialHandleFromUrl(target);
+    if (fromUrl) {
+      merged.csl.custom = {
+        ...merged.csl.custom,
+        social: {
+          platform: fromUrl.platform,
+          handle: fromUrl.handle,
+          displayName: authorDisplayName(merged.csl.author),
+          kind: fromUrl.kind,
+        },
+      };
+      // Normalize the container to the canonical platform name ("X", not the
+      // og:site_name "X (formerly Twitter)"); the platform is authoritative here
+      // and the syndication path sets it the same way. Style-specific containers
+      // (Chicago's "Twitter (now X)", Harvard/AMA/Vancouver) are still derived by
+      // the adapter at render time.
+      merged.csl['container-title'] = platformLabel(fromUrl.platform);
+    }
+  }
+
   if (deps.ai && aiEnabled && shouldRunAiAssist(merged.csl, fetchedHtml, renderedHtml)) {
     const aiStart = Date.now();
     try {
@@ -338,6 +366,18 @@ export function acquisitionMode(value: string | null): AcquisitionMode {
 
 function cacheKeyFor(target: string): string {
   return `https://cache.mlagenerator.local/${WEBSITE_CACHE_VERSION}?url=${encodeURIComponent(target)}`;
+}
+
+// The account's display name, for SocialMeta.displayName (informational — the
+// per-style bracket decision keys off the CSL author vs. handle, not this).
+function authorDisplayName(authors: CSLItem['author']): string | undefined {
+  const name = authors?.[0];
+  if (!name) return undefined;
+  if ('literal' in name && name.literal) return name.literal;
+  if ('family' in name && name.family) {
+    return name.given ? `${name.given} ${name.family}` : name.family;
+  }
+  return undefined;
 }
 
 function statusFromFetchError(err: FetchError): AcquisitionAttempt['status'] {

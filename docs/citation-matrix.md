@@ -146,13 +146,26 @@ plausible-looking wrong citation):
 | Platform | Production extraction | Date source | If it can't be read |
 |----------|----------------------|-------------|---------------------|
 | **TikTok** | oEmbed (`tiktok.com/oembed`) → caption + creator, egress-independent | posting date recovered from the **video-ID timestamp bits** (no fetch needed) | honest-failure flag |
-| **X / Twitter** | syndication API (`cdn.syndication.twimg.com/tweet-result`) → text + author + handle + date | native (`created_at`) | deleted posts return a **TweetTombstone** → honest-failure flag |
+| **X / Twitter** | server fetch of the post page → tweet text + author; **handle recovered from the URL** so the citation renders in proper `[Post]` form. The syndication API (`cdn.syndication.twimg.com/tweet-result`) is tried first for the exact `created_at` date but **X blocks Cloudflare's datacenter egress** (200 from a normal host, empty from CF), so it usually only supplies the date when reachable | syndication `created_at` when reachable, else the page's og/JSON date | a walled page with only chrome ("jack on X") drops its title → honest-failure flag; deleted posts return a **TweetTombstone** |
 | **YouTube** | oEmbed → title + channel; `ytInitialData` parsed from the page for the date; render is triggered even on a 429 | microdata `datePublished`, else `ytInitialData` `publishDate` | honest-failure flag |
 | **Instagram** | og-string parse when the page is readable | og-string date | **no keyless path** — Instagram's oEmbed needs a Meta app token, so a bot-walled Instagram fails honestly |
 
+**URL-handle recovery.** X and TikTok carry the account handle in the URL path
+(`x.com/<handle>/status/…`, `tiktok.com/@<handle>/video/…`). When the page fetch
+yields real content (a caption/tweet that survives the chrome check) but no
+platform metadata was reachable — X's syndication CDN blocks Cloudflare egress, a
+page can render without its hydration blob — the handle is recovered straight
+from the URL and the post is shaped into the correct per-style social format,
+with the platform name normalized to its canonical form ("X", not the
+og:site_name "X (formerly Twitter)"). This is what keeps X citations in proper
+`[Post]` form in production despite the syndication block. YouTube (`/watch`) and
+Instagram (`/p/`) carry a video id / shortcode rather than the account, so they
+have no URL-handle fallback and rely on oEmbed or fail honestly.
+
 **Honest-failure guarantee.** When a recognized social/video URL yields no
-platform metadata (`custom.social` absent after every rescue), the page's chrome
-title ("Phillip Cook on TikTok", "- YouTube") is dropped and an **error-severity
+platform metadata (`custom.social` absent after every rescue *and* no handle
+recoverable from a real-content page), the page's chrome title ("Phillip Cook on
+TikTok", "- YouTube", "jack on X") is dropped and an **error-severity
 `social_unresolved`** warning is raised, pointing the user at the browser
 extension or manual entry. The tool never emits a citation that looks finished
 but is wrong. The warning clears once the user supplies a real title.

@@ -192,6 +192,74 @@ describe('handleCiteWebsite', () => {
     expect(body._quality.acquisition.authority.status).toBe('success');
   });
 
+  it('recovers the X social format from the URL when syndication is blocked but the page is readable', async () => {
+    // Cloudflare's egress is blocked by X's syndication CDN (403), but the server
+    // fetch of the post page still yields the real tweet text. The account handle
+    // is in the URL, so the citation must still render as a proper [Post] (handle,
+    // platform container) — never the generic-web fallback — and must NOT trip the
+    // social_unresolved warning, because the content is correct.
+    const page = `<!doctype html><html><head>
+      <meta property="og:title" content="just setting up my twttr">
+      <meta property="og:site_name" content="X (formerly Twitter)">
+      <meta name="author" content="jack">
+      <title>just setting up my twttr</title></head><body>${'tweet page body '.repeat(40)}</body></html>`;
+    globalThis.fetch = vi.fn(async (input: any) => {
+      const target = String(typeof input === 'string' ? input : input?.url ?? input);
+      if (target.includes('cdn.syndication.twimg.com')) {
+        // What CF's datacenter IPs actually get from the syndication CDN.
+        return new Response('blocked', { status: 403, headers: { 'content-type': 'text/html' } });
+      }
+      return new Response(page, { status: 200, headers: { 'content-type': 'text/html' } });
+    }) as any;
+
+    const res = await handleCiteWebsite(
+      new URL('https://m.com/api/cite-website?url=https%3A%2F%2Fx.com%2Fjack%2Fstatus%2F20&nocache=1'),
+      null,
+      undefined,
+      new Date(Date.UTC(2026, 6, 6)),
+    );
+
+    expect(res.status).toBe(200);
+    const body = await res.json() as any;
+    expect(body.csl.title).toBe('just setting up my twttr');
+    expect(body.csl.custom.social).toMatchObject({ platform: 'x', handle: 'jack', kind: 'post' });
+    expect(body.csl['container-title']).toBe('X');
+    // The syndication rescue was attempted and failed, but the URL fallback covered it.
+    expect(body._quality.acquisition.authority.status).toBe('error');
+    const codes = body._quality.warnings.map((w: any) => w.code);
+    expect(codes).not.toContain('social_unresolved');
+  });
+
+  it('still fails honestly on a walled X page (only chrome) even when the URL carries a handle', async () => {
+    // Same syndication block, but the page has only the chrome title "jack on X" —
+    // no real content. The chrome must be dropped and the URL-handle recovery must
+    // NOT fire (guarded on a surviving title), so the post fails honestly.
+    const walled = `<!doctype html><html><head>
+      <meta property="og:title" content="jack on X">
+      <title>jack on X</title></head><body>${'walled shell '.repeat(40)}</body></html>`;
+    globalThis.fetch = vi.fn(async (input: any) => {
+      const target = String(typeof input === 'string' ? input : input?.url ?? input);
+      if (target.includes('cdn.syndication.twimg.com')) {
+        return new Response('blocked', { status: 403, headers: { 'content-type': 'text/html' } });
+      }
+      return new Response(walled, { status: 200, headers: { 'content-type': 'text/html' } });
+    }) as any;
+
+    const res = await handleCiteWebsite(
+      new URL('https://m.com/api/cite-website?url=https%3A%2F%2Fx.com%2Fjack%2Fstatus%2F20&nocache=1'),
+      null,
+      undefined,
+      new Date(Date.UTC(2026, 6, 6)),
+    );
+
+    expect(res.status).toBe(200);
+    const body = await res.json() as any;
+    expect(body.csl.custom?.social).toBeUndefined();
+    expect(body.csl.title).toBeUndefined();
+    const codes = body._quality.warnings.map((w: any) => w.code);
+    expect(codes).toContain('social_unresolved');
+  });
+
   it('does not call oEmbed when platform HTML extraction already succeeded', async () => {
     // A TikTok page whose hydration blob parses fully — no oEmbed round trip.
     const blob = JSON.stringify({

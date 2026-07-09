@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { oembedEndpointFor, shouldRunOembedAssist, runOembedAssist, tiktokDateFromUrl } from '../../functions/lib/extract/oembed';
+import { socialHandleFromUrl } from '../../functions/lib/extract/social-host';
 import type { CSLItem } from '../../functions/lib/csl-types';
 
 // Real payload shape returned by cdn.syndication.twimg.com/tweet-result for
@@ -86,6 +87,34 @@ describe('shouldRunOembedAssist', () => {
 
   it('never runs for non-platform URLs', () => {
     expect(shouldRunOembedAssist(bareItem('https://example.com'), 'https://example.com')).toBe(false);
+  });
+});
+
+describe('socialHandleFromUrl', () => {
+  it('recovers the X handle and post kind from a status URL', () => {
+    expect(socialHandleFromUrl('https://x.com/jack/status/20')).toEqual({ platform: 'x', handle: 'jack', kind: 'post' });
+    expect(socialHandleFromUrl('https://twitter.com/NASA/status/123?s=20')).toEqual({ platform: 'x', handle: 'NASA', kind: 'post' });
+  });
+
+  it('rejects X intent/redirect paths (/i/status) that carry no real account', () => {
+    expect(socialHandleFromUrl('https://x.com/i/status/123')).toBeNull();
+    expect(socialHandleFromUrl('https://x.com/i/web/status/123')).toBeNull();
+  });
+
+  it('recovers the TikTok handle and video kind', () => {
+    expect(socialHandleFromUrl('https://www.tiktok.com/@chemteacherphil/video/7008953610872605957'))
+      .toEqual({ platform: 'tiktok', handle: 'chemteacherphil', kind: 'video' });
+  });
+
+  it('returns null for platforms whose handle is not in the URL (YouTube watch, Instagram shortcode)', () => {
+    expect(socialHandleFromUrl('https://www.youtube.com/watch?v=abc')).toBeNull();
+    expect(socialHandleFromUrl('https://www.instagram.com/p/C1YsScyR2Xz/')).toBeNull();
+  });
+
+  it('returns null for non-social and malformed URLs, and X profile pages', () => {
+    expect(socialHandleFromUrl('https://example.com/a')).toBeNull();
+    expect(socialHandleFromUrl('not a url')).toBeNull();
+    expect(socialHandleFromUrl('https://x.com/jack')).toBeNull();
   });
 });
 
