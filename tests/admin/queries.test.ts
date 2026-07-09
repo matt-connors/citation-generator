@@ -94,12 +94,22 @@ describe('buildQueries — session panels exist and target cite events', () => {
     ]);
   });
 
-  it('scopes session metrics to the three cite events and drops empty uid', () => {
+  it('scopes session metrics to the three cite events and gates on both tags', () => {
     for (const key of ['session_kpis', 'engagement_kpis', 'median_cites_kpi', 'sessions_daily', 'cites_per_user_dist']) {
       const sql = byKey[key].sql;
       expect(sql, key).toContain("index1 IN ('cite_website', 'cite_book', 'cite_journal')");
-      expect(sql, key).toMatch(/<>\s*''/); // a uid<>'' guard
+      // Both uid and sid must be non-empty so counts reconcile with hosts_by_session.
+      expect(sql, key).toContain("if(index1 = 'cite_website', blob8, blob5) <> ''");
+      expect(sql, key).toContain("if(index1 = 'cite_website', blob7, blob4) <> ''");
     }
+  });
+
+  it('weights citation volume by _sample_interval (AE sampling correctness)', () => {
+    // count()-based citation totals under-report under AE sampling; the volume
+    // counters must use sum(_sample_interval) like the latency panels do.
+    expect(byKey['session_kpis'].sql).toContain('sum(_sample_interval) AS citations');
+    expect(byKey['sessions_daily'].sql).toContain('sum(_sample_interval) AS citations');
+    expect(byKey['hosts_by_session'].sql).toContain('sum(_sample_interval) AS citations');
   });
 
   it('normalizes sid/uid across events (blob7/8 for website, blob4/5 otherwise)', () => {

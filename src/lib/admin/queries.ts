@@ -56,14 +56,19 @@ export function buildQueries(dataset: string): QueryDef[] {
   const SID = "if(index1 = 'cite_website', blob7, blob4)";
   const UID = "if(index1 = 'cite_website', blob8, blob5)";
   const CITE = "index1 IN ('cite_website', 'cite_book', 'cite_journal')";
-  // Rows carrying a usable identity in the last 30 days. `uid` is the gate:
-  // pre-feature rows (and any request from storage-disabled browsers) have
-  // uid='' and are excluded so session metrics reflect only identifiable traffic.
+  // Rows carrying a usable identity in the last 30 days. BOTH tags must be
+  // present: pre-feature rows and storage-disabled browsers emit uid='', and a
+  // partial-storage browser can emit a valid uid with an empty sid — counting
+  // that '' as a distinct session would inflate the session totals and stop them
+  // reconciling with hosts_by_session (which gates blob7<>''). `_sample_interval`
+  // is projected so citation volume can be reconstructed under AE sampling with
+  // sum(_sample_interval) rather than the sampled row count().
   const identifiedCites = (extraCols: string) => `
-        SELECT ${SID} AS sid, ${UID} AS uid${extraCols}
+        SELECT ${SID} AS sid, ${UID} AS uid, _sample_interval${extraCols}
         FROM ${dataset}
         WHERE ${CITE}
           AND ${UID} <> ''
+          AND ${SID} <> ''
           AND timestamp >= NOW() - INTERVAL '30' DAY`;
 
   return [
@@ -85,9 +90,9 @@ export function buildQueries(dataset: string): QueryDef[] {
         SELECT
           count(DISTINCT sid) AS sessions,
           count(DISTINCT uid) AS users,
-          count() AS citations,
-          round(count() / count(DISTINCT sid), 2) AS cites_per_session,
-          round(count() / count(DISTINCT uid), 2) AS cites_per_user
+          sum(_sample_interval) AS citations,
+          round(sum(_sample_interval) / count(DISTINCT sid), 2) AS cites_per_session,
+          round(sum(_sample_interval) / count(DISTINCT uid), 2) AS cites_per_user
         FROM (${identifiedCites('')})
         ${J}
       `,
@@ -96,8 +101,8 @@ export function buildQueries(dataset: string): QueryDef[] {
       key: 'engagement_kpis',
       title: 'Engagement (last 30d)',
       description:
-        'Median citations the typical user makes (robust to power users), and the share of users who came back for '
-        + 'a second session — the two numbers that say whether the tool earns repeat use.',
+        'The share of users who came back for a second session, and how many sessions the typical user runs — '
+        + 'the numbers that say whether the tool earns repeat use. (Median citations per user is the panel below.)',
       render: 'scalar',
       scalarTiles: [
         { key: 'return_users', label: 'return users', hint: '≥ 2 sessions' },
@@ -140,7 +145,7 @@ export function buildQueries(dataset: string): QueryDef[] {
           quantileExactWeighted(0.9)(c, 1) AS p90_cites_per_user,
           max(c) AS max_cites_per_user
         FROM (
-          SELECT uid, count() AS c
+          SELECT uid, sum(_sample_interval) AS c
           FROM (${identifiedCites('')})
           GROUP BY uid
         )
@@ -163,7 +168,7 @@ export function buildQueries(dataset: string): QueryDef[] {
           day,
           count(DISTINCT sid) AS sessions,
           count(DISTINCT uid) AS users,
-          count() AS citations
+          sum(_sample_interval) AS citations
         FROM (${identifiedCites(", toStartOfInterval(timestamp, INTERVAL '1' DAY) AS day")})
         GROUP BY day
         ORDER BY day ASC
@@ -210,7 +215,7 @@ export function buildQueries(dataset: string): QueryDef[] {
         SELECT
           blob4 AS host,
           count(DISTINCT blob7) AS sessions,
-          count() AS citations
+          sum(_sample_interval) AS citations
         FROM ${dataset}
         WHERE index1 = 'cite_website'
           AND blob4 <> ''

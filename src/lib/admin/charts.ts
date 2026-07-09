@@ -57,6 +57,19 @@ function fmtNum(v: number): string {
 }
 
 /**
+ * Number of gridline intervals to draw across a `niceCeil` maximum so that
+ * every tick value is a whole number — the chart data is always integer counts,
+ * so a max of 1 must show ticks {0,1}, not {0,0.25,0.5,0.75,1}. `niceCeil`
+ * always returns 1/2/5 × 10ⁿ, all of which divide evenly by one of 5/2/1.
+ */
+export function tickCountFor(yMax: number): number {
+  for (const c of [5, 4, 3, 2, 1]) {
+    if (yMax % c === 0) return c;
+  }
+  return 1;
+}
+
+/**
  * Multi-series line chart with a zeroed y-axis, four gridlines, x-axis labels
  * (thinned to avoid collisions), per-point `<title>` tooltips, and a direct
  * end-label on each series. `xLabels` aligns index-for-index with each series'
@@ -80,9 +93,10 @@ export function renderLineChart(series: LineSeries[], xLabels: string[], opts: C
 
   const parts: string[] = [];
 
-  // Horizontal gridlines + y-axis tick labels at 0, ¼, ½, ¾, full.
-  for (let t = 0; t <= 4; t++) {
-    const val = (yMax * t) / 4;
+  // Horizontal gridlines + y-axis tick labels at whole-number steps.
+  const yTicks = tickCountFor(yMax);
+  for (let t = 0; t <= yTicks; t++) {
+    const val = (yMax * t) / yTicks;
     const y = yOf(val);
     parts.push(
       `<line x1="${m.left}" y1="${y.toFixed(1)}" x2="${(width - m.right).toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--panel-border)" stroke-width="1" />`,
@@ -98,20 +112,23 @@ export function renderLineChart(series: LineSeries[], xLabels: string[], opts: C
     );
   }
 
-  // One path + labelled points per series.
+  // One path + labelled points per series. Colors come from our own palette,
+  // but they still flow through escapeXml to keep the module's "every dynamic
+  // value is escaped" invariant true regardless of caller.
   for (const s of live) {
+    const color = escapeXml(s.color);
     const pts = s.values.map((v, i) => [xOf(i), yOf(v)] as const);
     const d = pts.map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
-    parts.push(`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />`);
+    parts.push(`<path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />`);
     for (let i = 0; i < pts.length; i++) {
       const [x, y] = pts[i];
       parts.push(
-        `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="${s.color}"><title>${escapeXml(s.label)} · ${escapeXml(xLabels[i] ?? '')}: ${escapeXml(fmtNum(s.values[i]))}</title></circle>`,
+        `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="${color}"><title>${escapeXml(s.label)} · ${escapeXml(xLabels[i] ?? '')}: ${escapeXml(fmtNum(s.values[i]))}</title></circle>`,
       );
     }
     const [lastX, lastY] = pts[pts.length - 1];
     parts.push(
-      `<text x="${(lastX + 6).toFixed(1)}" y="${(lastY + 3).toFixed(1)}" class="chart-endlabel" fill="${s.color}">${escapeXml(fmtNum(s.values[s.values.length - 1]))}</text>`,
+      `<text x="${(lastX + 6).toFixed(1)}" y="${(lastY + 3).toFixed(1)}" class="chart-endlabel" fill="${color}">${escapeXml(fmtNum(s.values[s.values.length - 1]))}</text>`,
     );
   }
 
@@ -126,9 +143,11 @@ export interface Bar {
 }
 
 /**
- * Vertical bar chart / histogram with a zeroed y-axis, gridlines, per-bar
- * `<title>` tooltips, and value labels above each bar. A 2px surface gap sits
- * between adjacent bars (dataviz spacer rule). Returns '' when there is no data.
+ * Vertical bar chart / histogram with a zeroed y-axis, whole-number gridlines,
+ * and a per-bar native `<title>` tooltip carrying the exact value (kept off the
+ * bars themselves so a dense histogram of 40 bars doesn't collide). A 2px
+ * surface gap sits between adjacent bars (dataviz spacer rule). Returns '' when
+ * there is no data.
  */
 export function renderBarChart(bars: Bar[], opts: ChartOpts = {}): string {
   const width = opts.width ?? BAR_DEFAULTS.width;
@@ -145,11 +164,12 @@ export function renderBarChart(bars: Bar[], opts: ChartOpts = {}): string {
   const slot = plotW / bars.length;
   const gap = bars.length > 1 ? 2 : 0;
   const barW = Math.max(1, slot - gap);
-  const color = SERIES_COLORS[0];
+  const color = escapeXml(SERIES_COLORS[0]);
 
   const parts: string[] = [];
-  for (let t = 0; t <= 4; t++) {
-    const val = (yMax * t) / 4;
+  const yTicks = tickCountFor(yMax);
+  for (let t = 0; t <= yTicks; t++) {
+    const val = (yMax * t) / yTicks;
     const y = yOf(val);
     parts.push(
       `<line x1="${m.left}" y1="${y.toFixed(1)}" x2="${(width - m.right).toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--panel-border)" stroke-width="1" />`,

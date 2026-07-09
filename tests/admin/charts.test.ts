@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   escapeXml,
   niceCeil,
+  tickCountFor,
   renderLineChart,
   renderBarChart,
   SERIES_COLORS,
@@ -35,6 +36,33 @@ describe('niceCeil', () => {
     expect(niceCeil(0)).toBe(1);
     expect(niceCeil(-5)).toBe(1);
     expect(niceCeil(NaN)).toBe(1);
+  });
+});
+
+describe('tickCountFor', () => {
+  it('yields whole-number tick steps for every niceCeil maximum', () => {
+    // niceCeil only ever returns 1/2/5 × 10ⁿ; each must divide evenly.
+    for (const yMax of [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000]) {
+      const ticks = tickCountFor(yMax);
+      expect(yMax % ticks, `yMax=${yMax}`).toBe(0);
+      for (let t = 0; t <= ticks; t++) {
+        expect(Number.isInteger((yMax * t) / ticks), `yMax=${yMax} t=${t}`).toBe(true);
+      }
+    }
+  });
+
+  it('shows {0,1} for a max of 1 rather than fractional ticks', () => {
+    expect(tickCountFor(1)).toBe(1);
+  });
+});
+
+describe('renderLineChart / renderBarChart — integer y-axis', () => {
+  it('never emits a fractional y-tick label for small integer maxima', () => {
+    const svg = renderLineChart([{ label: 'S', color: SERIES_COLORS[0], values: [0, 1, 1] }], ['a', 'b', 'c']);
+    // No tick text like "0.3" / "0.5" / "0.8".
+    expect(svg).not.toMatch(/>0\.\d</);
+    const bar = renderBarChart([{ label: '1', value: 1 }]);
+    expect(bar).not.toMatch(/>0\.\d</);
   });
 });
 
