@@ -121,13 +121,18 @@ describe('buildQueries — session panels exist and target cite events', () => {
     ]);
   });
 
-  it('scopes session metrics to the three cite events and gates on both tags', () => {
+  it('scopes session metrics to cite_website (fixed blob7/blob8) and gates on both tags', () => {
+    // Analytics Engine's GROUP BY takes only bare column names, so a cross-event
+    // if()-normalized identity is impossible; these panels scope to cite_website
+    // where sid=blob7 and uid=blob8 are fixed columns.
     for (const key of ['session_kpis', 'engagement_kpis', 'median_cites_kpi', 'sessions_daily', 'cites_per_user_dist']) {
       const sql = byKey[key].sql;
-      expect(sql, key).toContain("index1 IN ('cite_website', 'cite_book', 'cite_journal')");
+      expect(sql, key).toContain("index1 = 'cite_website'");
       // Both uid and sid must be non-empty so counts reconcile with hosts_by_session.
-      expect(sql, key).toContain("if(index1 = 'cite_website', blob8, blob5) <> ''");
-      expect(sql, key).toContain("if(index1 = 'cite_website', blob7, blob4) <> ''");
+      expect(sql, key).toContain("blob8 <> ''");
+      expect(sql, key).toContain("blob7 <> ''");
+      // No cross-event if()-normalization survives (GROUP BY would reject it).
+      expect(sql, key).not.toContain("if(index1 = 'cite_website', blob8, blob5)");
     }
   });
 
@@ -139,10 +144,23 @@ describe('buildQueries — session panels exist and target cite events', () => {
     expect(byKey['hosts_by_session'].sql).toContain('sum(_sample_interval) AS citations');
   });
 
-  it('normalizes sid/uid across events (blob7/8 for website, blob4/5 otherwise)', () => {
+  it('reads sid/uid from the fixed cite_website columns (blob7/blob8)', () => {
     const sql = byKey['session_kpis'].sql;
-    expect(sql).toContain("if(index1 = 'cite_website', blob7, blob4)");
-    expect(sql).toContain("if(index1 = 'cite_website', blob8, blob5)");
+    expect(sql).toContain('count(DISTINCT blob7) AS sessions');
+    expect(sql).toContain('count(DISTINCT blob8) AS users');
+  });
+
+  // Analytics Engine rejects an expression in GROUP BY ("you may only provide
+  // column names"). Assert every GROUP BY clause lists bare identifiers only —
+  // no `(`, which would signal an if()/toStartOfInterval()/other expression.
+  it('never groups by an expression (Analytics Engine columns-only GROUP BY)', () => {
+    for (const q of queries) {
+      const clauses = q.sql.match(/GROUP BY[^)]*?(?=\n|ORDER BY|LIMIT|FORMAT|$)/gi) ?? [];
+      for (const clause of clauses) {
+        const body = clause.replace(/^GROUP BY/i, '');
+        expect(body, `${q.key}: ${clause.trim()}`).not.toContain('(');
+      }
+    }
   });
 
   it('uses quantileExactWeighted for medians (the only AE quantile fn)', () => {

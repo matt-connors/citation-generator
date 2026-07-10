@@ -48,50 +48,44 @@ export interface QueryDef {
 export function buildQueries(dataset: string): QueryDef[] {
   const J = 'FORMAT JSON';
 
-  // sid/uid live at different blob positions per event (cite_website appends
-  // them at blob7/blob8, cite_book & cite_journal at blob4/blob5). Normalize
-  // them to bare `sid`/`uid` columns in an inner subquery so every outer
-  // aggregate — count(DISTINCT …), quantileExactWeighted(…) — operates on a
-  // plain column, the only form Analytics Engine reliably supports.
-  const SID = "if(index1 = 'cite_website', blob7, blob4)";
-  const UID = "if(index1 = 'cite_website', blob8, blob5)";
-  const CITE = "index1 IN ('cite_website', 'cite_book', 'cite_journal')";
-  // Rows carrying a usable identity in the last 30 days. BOTH tags must be
-  // present: pre-feature rows and storage-disabled browsers emit uid='', and a
-  // partial-storage browser can emit a valid uid with an empty sid — counting
-  // that '' as a distinct session would inflate the session totals and stop them
-  // reconciling with hosts_by_session (which gates blob7<>''). `_sample_interval`
-  // is projected so citation volume can be reconstructed under AE sampling with
-  // sum(_sample_interval) rather than the sampled row count().
-  const identifiedCites = (extraCols: string) => `
-        SELECT ${SID} AS sid, ${UID} AS uid, _sample_interval${extraCols}
-        FROM ${dataset}
-        WHERE ${CITE}
-          AND ${UID} <> ''
-          AND ${SID} <> ''
-          AND timestamp >= NOW() - INTERVAL '30' DAY`;
+  // Session/identity metrics are scoped to cite_website, where the session tag
+  // (sid) and user tag (uid) sit at fixed columns blob7 and blob8. Two Analytics
+  // Engine limits force this: GROUP BY accepts only bare column names (not an
+  // if()/expression), and a subquery cannot be nested inside another subquery.
+  // A cross-event identity would need an if() to normalize sid/uid across blob
+  // positions — which GROUP BY rejects — and moving that normalization into a
+  // projection subquery, then grouping in a second, exceeds the one-subquery
+  // limit. cite_website is the dominant citation path, so the panels scope to it
+  // directly (as hosts_by_session already does) and every GROUP BY is a column.
+  // Blob map for cite_website: blob4=host, blob5=url, blob6=from, blob7=sid,
+  // blob8=uid; double3=cache_hit.
+  //
+  // BOTH tags must be non-empty: pre-feature rows and storage-disabled browsers
+  // emit uid='', and a partial-storage browser can emit a valid uid with an empty
+  // sid — counting that '' as a distinct session would inflate totals and stop
+  // them reconciling with hosts_by_session (which gates blob7<>''). Citation
+  // volume uses sum(_sample_interval), not count(), so it survives AE sampling.
+  const IDENT_WHERE = "index1 = 'cite_website' AND blob8 <> '' AND blob7 <> '' AND timestamp >= NOW() - INTERVAL '30' DAY";
 
-  // Per-user rollups (median sessions, citation depth, the distribution) need
-  // two aggregation passes: group rows into users, then aggregate across users.
-  // Analytics Engine forbids nesting a subquery inside a subquery, so the pass
-  // that turns rows into one-row-per-user MUST read straight from the dataset
-  // (a single subquery), not from the identifiedCites subquery — otherwise the
-  // outer aggregate becomes a second nesting level and the query 422s. The
-  // identity normalization therefore happens inline here, in the GROUP BY.
-  const IDENT_WHERE = `${CITE} AND ${UID} <> '' AND ${SID} <> '' AND timestamp >= NOW() - INTERVAL '30' DAY`;
+  // Per-user rollup: one row per user (uid = blob8), computed in a single
+  // subquery that reads straight from the dataset and groups by the bare blob8
+  // column — so it satisfies both the no-nested-subquery and columns-only-GROUP-BY
+  // limits. The outer query then aggregates across users on the plain column `v`.
   const perUser = (agg: string) => `
-        SELECT ${UID} AS uid, ${agg} AS v
+        SELECT blob8 AS uid, ${agg} AS v
         FROM ${dataset}
         WHERE ${IDENT_WHERE}
-        GROUP BY ${UID}`;
+        GROUP BY blob8`;
 
   return [
     {
       key: 'session_kpis',
       title: 'Sessions (last 30d)',
       description:
-        'The headline funnel: anonymous sessions and users citing sources, and how many citations each produces. '
-        + 'A session rolls over after 30 min idle; a user is a persistent anonymous browser tag. Identified traffic only.',
+        'The headline funnel: anonymous sessions and users citing web pages, and how many citations each produces. '
+        + 'A session rolls over after 30 min idle; a user is a persistent anonymous browser tag. Web citations '
+        + '(cite_website) with an identity only — the dominant path; book/journal lookups are excluded so all the '
+        + 'session panels count one consistent population.',
       render: 'scalar',
       scalarTiles: [
         { key: 'sessions', label: 'sessions', hint: 'distinct 30-min visits' },
@@ -102,12 +96,13 @@ export function buildQueries(dataset: string): QueryDef[] {
       ],
       sql: `
         SELECT
-          count(DISTINCT sid) AS sessions,
-          count(DISTINCT uid) AS users,
+          count(DISTINCT blob7) AS sessions,
+          count(DISTINCT blob8) AS users,
           sum(_sample_interval) AS citations,
-          round(sum(_sample_interval) / count(DISTINCT sid), 2) AS cites_per_session,
-          round(sum(_sample_interval) / count(DISTINCT uid), 2) AS cites_per_user
-        FROM (${identifiedCites('')})
+          round(sum(_sample_interval) / count(DISTINCT blob7), 2) AS cites_per_session,
+          round(sum(_sample_interval) / count(DISTINCT blob8), 2) AS cites_per_user
+        FROM ${dataset}
+        WHERE ${IDENT_WHERE}
         ${J}
       `,
     },
@@ -133,7 +128,7 @@ export function buildQueries(dataset: string): QueryDef[] {
           count() AS total_users,
           round(sum(if(v >= 2, 1, 0)) / count(), 4) AS return_rate,
           quantileExactWeighted(0.5)(v, 1) AS median_sessions_per_user
-        FROM (${perUser(`count(DISTINCT ${SID})`)})
+        FROM (${perUser('count(DISTINCT blob7)')})
         ${J}
       `,
     },
@@ -169,13 +164,21 @@ export function buildQueries(dataset: string): QueryDef[] {
         { key: 'users', label: 'Users', color: '#199e70' },
         { key: 'citations', label: 'Citations', color: '#c98500' },
       ],
+      // GROUP BY needs a bare column, so the day bucket is projected as a column
+      // in a single subquery (the toStartOfInterval expression can't sit in the
+      // GROUP BY directly), then grouped by that column name in the outer query.
       sql: `
         SELECT
           day,
           count(DISTINCT sid) AS sessions,
           count(DISTINCT uid) AS users,
           sum(_sample_interval) AS citations
-        FROM (${identifiedCites(", toStartOfInterval(timestamp, INTERVAL '1' DAY) AS day")})
+        FROM (
+          SELECT blob7 AS sid, blob8 AS uid, _sample_interval,
+                 toStartOfInterval(timestamp, INTERVAL '1' DAY) AS day
+          FROM ${dataset}
+          WHERE ${IDENT_WHERE}
+        )
         GROUP BY day
         ORDER BY day ASC
         ${J}
