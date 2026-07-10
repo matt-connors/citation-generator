@@ -315,15 +315,21 @@ function sparklinePath(rows: Array<Record<string, unknown>>, valueKey: string, w
       color: var(--muted);
       font-size: 11px;
     }
+    /* Wide tables (e.g. the 7-column timing panel) scroll horizontally inside
+       the panel instead of pushing the page layout — the panel never overflows. */
+    .table-scroll { width: 100%; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
     th, td {
       padding: 6px 8px;
       text-align: left;
       border-bottom: 1px solid var(--panel-border);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      /* Long text (a cited URL can be hundreds of chars) breaks within its cell
+         rather than forcing the column — and the table — past the container. */
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
+    /* Numeric / bar columns stay on one line so figures don't wrap mid-number. */
+    th.r, td.r, td.bar-cell { white-space: nowrap; overflow-wrap: normal; word-break: normal; }
     th { color: var(--muted); font-weight: 500; }
     tr:nth-child(even) td { background: var(--row-alt); }
     td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
@@ -500,31 +506,33 @@ function sparklinePath(rows: Array<Record<string, unknown>>, valueKey: string, w
           ) : rows.length === 0 ? (
             <div class="empty">No data in window.</div>
           ) : (
-            <table>
-              <thead>
-                <tr>
-                  {def.columns?.map((c) => (
-                    <th class={c.align === 'right' ? 'r' : ''}>{c.label}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => (
+            <div class="table-scroll">
+              <table>
+                <thead>
                   <tr>
                     {def.columns?.map((c) => (
-                      c.bar ? (
-                        <td class="bar-cell">
-                          <span class="bar-fill" style={`width: ${pctOf(row[c.key], barMaxes[c.key] || 0).toFixed(1)}%`}></span>
-                          <span class="bar-value">{fmt(row[c.key])}</span>
-                        </td>
-                      ) : (
-                        <td class={c.align === 'right' ? 'r' : ''} title={fmt(row[c.key])}>{fmt(row[c.key])}</td>
-                      )
+                      <th class={c.align === 'right' ? 'r' : ''}>{c.label}</th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <tr>
+                      {def.columns?.map((c) => (
+                        c.bar ? (
+                          <td class="bar-cell">
+                            <span class="bar-fill" style={`width: ${pctOf(row[c.key], barMaxes[c.key] || 0).toFixed(1)}%`}></span>
+                            <span class="bar-value">{fmt(row[c.key])}</span>
+                          </td>
+                        ) : (
+                          <td class={c.align === 'right' ? 'r' : ''} title={fmt(row[c.key])}>{fmt(row[c.key])}</td>
+                        )
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </section>
       ))}

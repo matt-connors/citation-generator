@@ -17,6 +17,33 @@ describe('buildQueries — structural integrity', () => {
     }
   });
 
+  // Analytics Engine SQL rejects a subquery nested inside another subquery
+  // ("cannot nest subqueries inside subqueries", HTTP 422). A FROM-subquery may
+  // read from the dataset but not from a second FROM-subquery. This walks the
+  // parens, marking each one opened right after `FROM `, and asserts no query
+  // ever has two such subquery parens open at once.
+  it('never nests a subquery inside a subquery (Analytics Engine 422 guard)', () => {
+    const maxSubqueryDepth = (sql: string): number => {
+      const s = sql.replace(/\s+/g, ' ');
+      const stack: boolean[] = [];
+      let max = 0;
+      for (let i = 0; i < s.length; i++) {
+        if (s[i] === '(') {
+          const isSubquery = /FROM $/i.test(s.slice(Math.max(0, i - 5), i));
+          stack.push(isSubquery);
+          const depth = stack.filter(Boolean).length;
+          if (depth > max) max = depth;
+        } else if (s[i] === ')') {
+          stack.pop();
+        }
+      }
+      return max;
+    };
+    for (const q of queries) {
+      expect(maxSubqueryDepth(q.sql), q.key).toBeLessThanOrEqual(1);
+    }
+  });
+
   it('every render kind carries the metadata its renderer needs', () => {
     for (const q of queries) {
       switch (q.render) {

@@ -71,6 +71,20 @@ export function buildQueries(dataset: string): QueryDef[] {
           AND ${SID} <> ''
           AND timestamp >= NOW() - INTERVAL '30' DAY`;
 
+  // Per-user rollups (median sessions, citation depth, the distribution) need
+  // two aggregation passes: group rows into users, then aggregate across users.
+  // Analytics Engine forbids nesting a subquery inside a subquery, so the pass
+  // that turns rows into one-row-per-user MUST read straight from the dataset
+  // (a single subquery), not from the identifiedCites subquery — otherwise the
+  // outer aggregate becomes a second nesting level and the query 422s. The
+  // identity normalization therefore happens inline here, in the GROUP BY.
+  const IDENT_WHERE = `${CITE} AND ${UID} <> '' AND ${SID} <> '' AND timestamp >= NOW() - INTERVAL '30' DAY`;
+  const perUser = (agg: string) => `
+        SELECT ${UID} AS uid, ${agg} AS v
+        FROM ${dataset}
+        WHERE ${IDENT_WHERE}
+        GROUP BY ${UID}`;
+
   return [
     {
       key: 'session_kpis',
@@ -115,15 +129,11 @@ export function buildQueries(dataset: string): QueryDef[] {
       // one row, so it lives in its own panel below.
       sql: `
         SELECT
-          sum(if(s >= 2, 1, 0)) AS return_users,
+          sum(if(v >= 2, 1, 0)) AS return_users,
           count() AS total_users,
-          round(sum(if(s >= 2, 1, 0)) / count(), 4) AS return_rate,
-          quantileExactWeighted(0.5)(s, 1) AS median_sessions_per_user
-        FROM (
-          SELECT uid, count(DISTINCT sid) AS s
-          FROM (${identifiedCites('')})
-          GROUP BY uid
-        )
+          round(sum(if(v >= 2, 1, 0)) / count(), 4) AS return_rate,
+          quantileExactWeighted(0.5)(v, 1) AS median_sessions_per_user
+        FROM (${perUser(`count(DISTINCT ${SID})`)})
         ${J}
       `,
     },
@@ -141,14 +151,10 @@ export function buildQueries(dataset: string): QueryDef[] {
       ],
       sql: `
         SELECT
-          quantileExactWeighted(0.5)(c, 1) AS median_cites_per_user,
-          quantileExactWeighted(0.9)(c, 1) AS p90_cites_per_user,
-          max(c) AS max_cites_per_user
-        FROM (
-          SELECT uid, sum(_sample_interval) AS c
-          FROM (${identifiedCites('')})
-          GROUP BY uid
-        )
+          quantileExactWeighted(0.5)(v, 1) AS median_cites_per_user,
+          quantileExactWeighted(0.9)(v, 1) AS p90_cites_per_user,
+          max(v) AS max_cites_per_user
+        FROM (${perUser('sum(_sample_interval)')})
         ${J}
       `,
     },
@@ -185,12 +191,8 @@ export function buildQueries(dataset: string): QueryDef[] {
       barLabelKey: 'cites',
       barValueKey: 'users',
       sql: `
-        SELECT c AS cites, count() AS users
-        FROM (
-          SELECT uid, count() AS c
-          FROM (${identifiedCites('')})
-          GROUP BY uid
-        )
+        SELECT v AS cites, count() AS users
+        FROM (${perUser('count()')})
         GROUP BY cites
         ORDER BY cites ASC
         LIMIT 40
