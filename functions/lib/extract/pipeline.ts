@@ -1,5 +1,11 @@
 import * as cheerio from 'cheerio';
-import type { AcquisitionSource, CSLItem, FieldEvidence, FieldProvenance } from '../csl-types';
+import type {
+  AcquisitionSource,
+  CitationQualityWarning,
+  CSLItem,
+  FieldEvidence,
+  FieldProvenance,
+} from '../csl-types';
 import { jsonldSignal } from './signals/jsonld';
 import { microdataSignal } from './signals/microdata';
 import { openGraphSignal } from './signals/opengraph';
@@ -8,6 +14,7 @@ import { metaSignal } from './signals/meta';
 import { heuristicSignal } from './signals/heuristic';
 import { platformSignal } from './signals/platform';
 import { mergeSignals } from './merge';
+import { collectPageTypeHints, inferSourceType } from './infer-type';
 
 const SIGNALS = [
   { name: 'jsonld', fn: jsonldSignal },
@@ -22,6 +29,8 @@ export interface PipelineResult {
   csl: CSLItem;
   signals: Record<string, string>;
   provenance: Partial<Record<keyof CSLItem, FieldProvenance>>;
+  /** Type-inference review warnings (e.g. ambiguous government pages). */
+  typeWarnings?: CitationQualityWarning[];
 }
 
 export interface PipelineOptions {
@@ -40,14 +49,22 @@ export function runExtractionPipeline(html: string, url: string, options: Pipeli
     ...SIGNALS.map((s) => ({ name: s.name, ...s.fn($) })),
   ];
   const { csl: merged, signals, provenance } = mergeSignals(named, options);
+  const hints = collectPageTypeHints($);
+  const inference = inferSourceType(merged, url, hints);
   const final: CSLItem = {
     id: url,
-    type: inferType(merged),
     URL: url,
     ...merged,
+    ...inference.fieldPatches,
+    type: inference.type,
   };
   final.URL = resolveUrl(final.URL, url);
   ensureInputUrlProvenance(provenance, final.URL, options);
+  // Record inference patches in provenance so multi-pass merge (cite-website)
+  // keeps genre/container-title that no HTML signal extracted (e.g. YouTube Video).
+  applyFieldPatchesToProvenance(provenance, inference.fieldPatches, options);
+  // YouTube container patches are intentional style fields; keep them even when
+  // publisher matched the pre-patch container.
   dedupePublisherContainer(final);
   if (!final.publisher) delete provenance.publisher;
 
@@ -77,19 +94,14 @@ export function runExtractionPipeline(html: string, url: string, options: Pipeli
     }
   }
 
-  return { csl: final, signals, provenance };
-}
-
-function inferType(item: Partial<CSLItem>): CSLItem['type'] {
-  // A pasted URL can point at a journal article landing page. When the page
-  // exposes journal-style container metadata plus a scholarly locator, format
-  // it as an article-journal so CSL can render those details. DOI-only landing
-  // pages are common for early-online articles and should not fall back to a
-  // generic webpage.
-  if (item['container-title'] && (item.volume || item.issue || item.page || item.DOI)) {
-    return 'article-journal';
-  }
-  return 'webpage';
+  return {
+    csl: final,
+    signals,
+    provenance,
+    // Always pass an array (possibly empty) so quality validation does not
+    // re-run host heuristics that the pipeline already resolved.
+    typeWarnings: inference.warnings,
+  };
 }
 
 function resolveUrl(value: string | undefined, base: string): string {
@@ -148,4 +160,45 @@ function ensureInputUrlProvenance(
     candidates: [evidence],
     conflicts: [],
   };
+}
+
+function applyFieldPatchesToProvenance(
+  provenance: Partial<Record<keyof CSLItem, FieldProvenance>>,
+  patches: Partial<CSLItem>,
+  options: PipelineOptions,
+): void {
+  for (const [key, value] of Object.entries(patches) as Array<[keyof CSLItem, unknown]>) {
+    if (value === undefined || value === null) continue;
+    if (key === 'id' || key === 'type' || key === 'custom') continue;
+    const evidence: FieldEvidence = {
+      field: key,
+      normalizedValue: value,
+      rawValue: typeof value === 'string' ? value : undefined,
+      source: 'type-inference',
+      acquisition: options.acquisition ?? 'input',
+      confidence: 0.98,
+      acquiredAt: options.acquiredAt,
+      locator: 'source-type-inference',
+    };
+    const existing = provenance[key];
+    if (!existing) {
+      provenance[key] = { winner: evidence, candidates: [evidence], conflicts: [] };
+      continue;
+    }
+    const candidates = [...existing.candidates, evidence];
+    const winner = evidence.confidence >= (existing.winner?.confidence ?? 0)
+      ? evidence
+      : existing.winner ?? evidence;
+    provenance[key] = {
+      winner,
+      candidates,
+      conflicts: candidates.filter((c) => {
+        try {
+          return JSON.stringify(c.normalizedValue) !== JSON.stringify(winner.normalizedValue);
+        } catch {
+          return c.normalizedValue !== winner.normalizedValue;
+        }
+      }),
+    };
+  }
 }

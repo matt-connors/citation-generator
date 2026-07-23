@@ -9,11 +9,14 @@ import type {
   ExtractQuality,
 } from '../csl-types';
 import { socialPlatformOf, platformLabel } from '../extract/social-host';
+import { isGovernmentHost } from '../extract/infer-type';
 
 export interface ValidateCitationOptions {
   style?: SupportedStyle;
   provenance?: Partial<Record<keyof CSLItem, FieldProvenance>>;
   acquisition?: Partial<Record<AcquisitionSource, AcquisitionAttempt>>;
+  /** Extra warnings from extraction type inference (ambiguous source types). */
+  typeWarnings?: CitationQualityWarning[];
 }
 
 export function validateCitationQuality(csl: CSLItem, options: ValidateCitationOptions = {}): ExtractQuality {
@@ -65,13 +68,30 @@ export function validateCitationQuality(csl: CSLItem, options: ValidateCitationO
     });
   }
 
-  if (csl.type === 'webpage' && !hasText(csl.URL)) {
+  if ((csl.type === 'webpage' || csl.type === 'article-newspaper' || csl.type === 'article-magazine')
+    && !hasText(csl.URL)) {
     warnings.push({
       code: 'url_missing',
       field: 'URL',
       severity: 'error',
       message: 'No URL was found for this web source. Add the source URL before using the citation.',
       action: 'review-field',
+    });
+  }
+
+  // Ambiguous government pages: suggest choosing source type rather than silently
+  // promoting to report. When the pipeline supplied typeWarnings (even empty),
+  // trust that decision so scholarly .gov pages are not re-flagged.
+  if (options.typeWarnings !== undefined) {
+    warnings.push(...options.typeWarnings);
+  } else if (csl.type === 'webpage' && isAmbiguousGovernmentCitation(csl)) {
+    warnings.push({
+      code: 'source_type_ambiguous',
+      field: 'type',
+      severity: 'review',
+      message:
+        'This looks like a government or agency page. Confirm whether it should be cited as a webpage, newspaper, journal, or another source type.',
+      action: 'choose-source-type',
     });
   }
 
@@ -155,6 +175,22 @@ export function validateCitationQuality(csl: CSLItem, options: ValidateCitationO
     warnings: dedupeWarnings(warnings),
     acquisition: options.acquisition,
   };
+}
+
+function isAmbiguousGovernmentCitation(csl: CSLItem): boolean {
+  const host = hostOf(csl.URL || csl.id);
+  if (!isGovernmentHost(host)) return false;
+  // Scholarly locators mean journal inference should have fired; skip if present.
+  if (hasText(csl.DOI) || hasText(csl.volume) || hasText(csl.issue)) return false;
+  return true;
+}
+
+function hostOf(url: string): string {
+  try {
+    return new URL(url).hostname.toLowerCase();
+  } catch {
+    return '';
+  }
 }
 
 function hasText(value: unknown): boolean {

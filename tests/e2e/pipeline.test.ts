@@ -88,7 +88,7 @@ const CASES: SmokeCase[] = [
   {
     name: 'news article with two reporters',
     fixture: 'apnews-news',
-    type: 'webpage',
+    type: 'article-newspaper',
     title: '1 dead and 9 missing after chemical tank implosion at Washington mill',
     firstAuthor: { family: 'Rush', given: 'Claire' },
     authorCount: 2,
@@ -101,8 +101,9 @@ const CASES: SmokeCase[] = [
     absentWarningCodes: ['author_not_found', 'date_not_found', 'url_missing'],
     styleTokens: {
       'mla-9': ['Rush, Claire, and Rebecca Boone.', '<i>AP News</i>', '26 May 2026'],
-      'apa-7': ['Rush, C., & Boone, R. (2026, May 26).', 'AP News.'],
-      'chicago-18': ['Rush, Claire, and Rebecca Boone. 2026.', 'AP News, May 26.'],
+      // Newspaper type italicizes the paper name in APA; Chicago author-date keeps year after author.
+      'apa-7': ['Rush, C., & Boone, R. (2026, May 26).', '<i>AP News</i>.'],
+      'chicago-18': ['Rush, Claire, and Rebecca Boone. 2026.', '<i>AP News</i>', 'May 26.'],
       ieee: ['[1] C. Rush and R. Boone', '[Online]. Available:'],
       vancouver: ['Rush C, Boone R.', 'Available from:'],
     },
@@ -116,7 +117,8 @@ const CASES: SmokeCase[] = [
     authorCount: 1,
     containerTitle: 'Diabetes',
     issuedYear: 2026,
-    expectedWarningCodes: ['issued_conflict'],
+    // .gov host is ambiguous (webpage vs report) — suggest choose-source-type.
+    expectedWarningCodes: ['source_type_ambiguous', 'issued_conflict'],
     absentWarningCodes: ['author_not_found', 'date_not_found', 'url_missing'],
     styleTokens: {
       'mla-9': ['CDC.', '<i>Diabetes</i>'],
@@ -298,7 +300,7 @@ const CASES: SmokeCase[] = [
         mainEntityOfPage: 'https://news.example.test/city/council-vote',
       })}</script>
     </head><body><article><h1>Council Approves Transit Plan After Marathon Meeting</h1></article></body></html>`,
-    type: 'webpage',
+    type: 'article-newspaper',
     title: 'Council Approves Transit Plan After Marathon Meeting',
     firstAuthor: { family: 'Lee', given: 'Jordan' },
     authorCount: 1,
@@ -308,14 +310,15 @@ const CASES: SmokeCase[] = [
     absentWarningCodes: ['author_not_found', 'date_not_found', 'url_missing'],
     styleTokens: {
       'mla-9': ['Lee, Jordan.', '<i>Example Daily</i>', '4 Feb. 2026'],
-      'apa-7': ['Lee, J. (2026, February 4).'],
-      'chicago-18': ['Lee, Jordan. 2026.', 'Example Daily, February 4.'],
+      'apa-7': ['Lee, J. (2026, February 4).', '<i>Example Daily</i>.'],
+      'chicago-18': ['Lee, Jordan. 2026.', '<i>Example Daily</i>', 'February 4.'],
       ieee: ['[1] J. Lee'],
-      vancouver: ['Lee J. Example Daily [Internet]. 2026.'],
+      vancouver: ['Lee J.', 'Example Daily', '2026'],
     },
   },
   {
     name: 'fake government page with corporate author and no date',
+    // Non-.gov host stays webpage without source-type warning (no false report typing).
     url: 'https://agency.example.test/reports/water-safety',
     html: `<!doctype html><html><head>
       <title>Water Safety Field Guide</title>
@@ -336,12 +339,66 @@ const CASES: SmokeCase[] = [
     containerTitle: 'Public Health Notes',
     publisher: 'Office of Public Water Safety',
     expectedWarningCodes: ['date_not_found'],
-    absentWarningCodes: ['author_not_found', 'title_missing', 'url_missing'],
+    absentWarningCodes: ['author_not_found', 'title_missing', 'url_missing', 'source_type_ambiguous'],
     styleTokens: {
       'mla-9': ['Office of Public Water Safety.', '<i>Public Health Notes</i>'],
       'apa-7': ['Office of Public Water Safety. (n.d.).'],
       harvard: ['Office of Public Water Safety (no date)'],
       vancouver: ['Office of Public Water Safety. Public Health Notes [Internet].'],
+    },
+  },
+  {
+    name: 'real-domain government page suggests choose-source-type',
+    url: 'https://www.cdc.gov/diabetes/about/index.html',
+    html: `<!doctype html><html><head>
+      <title>Diabetes Basics | CDC</title>
+      <meta property="og:title" content="Diabetes Basics" />
+      <meta property="og:site_name" content="CDC" />
+      <script type="application/ld+json">${JSON.stringify({
+        '@type': 'WebPage',
+        name: 'Diabetes Basics',
+        author: { '@type': 'Organization', name: 'CDC' },
+        datePublished: '2026-01-26',
+      })}</script>
+    </head><body><h1>Diabetes Basics</h1></body></html>`,
+    type: 'webpage',
+    title: 'Diabetes Basics',
+    firstAuthor: { literal: 'CDC' },
+    authorCount: 1,
+    containerTitle: 'CDC',
+    issuedYear: 2026,
+    expectedWarningCodes: ['source_type_ambiguous'],
+    absentWarningCodes: ['author_not_found', 'date_not_found', 'title_missing', 'url_missing'],
+    styleTokens: {
+      'mla-9': ['CDC.', '<i>CDC</i>'],
+      'apa-7': ['CDC. (2026, January 26).'],
+    },
+  },
+  {
+    name: 'YouTube channel-as-author video',
+    url: 'https://www.youtube.com/watch?v=example',
+    html: `<!doctype html><html><head>
+      <meta property="og:title" content="How Memory Forms While You Sleep" />
+      <meta property="og:site_name" content="YouTube" />
+      <script type="application/ld+json">${JSON.stringify({
+        '@type': 'VideoObject',
+        name: 'How Memory Forms While You Sleep',
+        author: { '@type': 'Organization', name: 'Cognitive Lab' },
+        uploadDate: '2024-07-15',
+      })}</script>
+    </head><body></body></html>`,
+    type: 'webpage',
+    title: 'How Memory Forms While You Sleep',
+    firstAuthor: { literal: 'Cognitive Lab' },
+    authorCount: 1,
+    containerTitle: 'YouTube',
+    issuedYear: 2024,
+    expectedWarningCodes: [],
+    absentWarningCodes: ['author_not_found', 'date_not_found', 'title_missing', 'url_missing'],
+    styleTokens: {
+      'mla-9': ['Cognitive Lab.', '<i>YouTube</i>', '15 July 2024'],
+      'apa-7': ['Cognitive Lab. (2024, July 15).', '[Video].', 'YouTube.'],
+      'chicago-18': ['Cognitive Lab.', 'YouTube'],
     },
   },
 ];
@@ -351,7 +408,10 @@ describe('end-to-end citation smoke matrix', () => {
     it(`${item.name}: extracts fields, quality warnings, and all supported formats`, () => {
       const { html, url } = loadCaseInput(item);
       const result = runExtractionPipeline(html, url, { acquisition: 'fetch', acquiredAt: ACQUIRED_AT });
-      const quality = validateCitationQuality(result.csl, { provenance: result.provenance });
+      const quality = validateCitationQuality(result.csl, {
+        provenance: result.provenance,
+        typeWarnings: result.typeWarnings,
+      });
       const warningCodes = quality.warnings.map((warning) => warning.code);
 
       expect(result.csl.type).toBe(item.type);

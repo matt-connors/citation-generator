@@ -38,6 +38,9 @@ const ARTICLE_TYPES = new Set([
   'SocialMediaPosting', 'MedicalScholarlyArticle',
 ]);
 
+// VideoObject is intentionally non-article for title (name/headline can be wrong
+// or come from sibling ItemLists on TED-like pages). Author/date still extract.
+// YouTube titles come from OpenGraph / page title; genre is applied by type inference.
 const NON_ARTICLE_CONTAINER_RE = /^(WebSite|Organization|NewsMediaOrganization|Person|Corporation|BreadcrumbList|SiteNavigationElement|CollectionPage|ProfilePage|SearchResultsPage|ImageObject|VideoObject|ItemList|FAQPage)$/i;
 
 function isArticleish(type: string): boolean {
@@ -115,7 +118,7 @@ function walk(node: unknown, fields: Partial<CSLItem>, confidence: Partial<Recor
   }
 
   if (!fields.issued) {
-    const d = n.datePublished || n.dateCreated || n.dateModified;
+    const d = n.datePublished || n.uploadDate || n.dateCreated || n.dateModified;
     if (typeof d === 'string') {
       const dp = parseDate(d);
       if (dp) {

@@ -61,6 +61,10 @@ export interface CSLItem {
   issue?: string;
   page?: string;
   edition?: string;
+  /** CSL genre (e.g. "Video" for APA YouTube [Video] descriptors). */
+  genre?: string;
+  /** CSL medium of publication when a style uses medium instead of genre. */
+  medium?: string;
   abstract?: string;
   // CSL-JSON reserves `custom` for processor-ignored extension data; citeproc
   // passes it through untouched and it round-trips localStorage → /api/format.
@@ -96,6 +100,7 @@ export type EvidenceSource =
   | 'openlibrary'
   | 'google-books'
   | 'ai-extract'
+  | 'type-inference'
   | 'user-edit';
 
 export interface FieldEvidence {

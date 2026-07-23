@@ -29,7 +29,8 @@ export interface CiteWebsiteDeps {
 }
 
 type AcquisitionMode = 'auto' | 'fetch' | 'render';
-const WEBSITE_CACHE_VERSION = 'citation-website-v2';
+// Bump when extraction/type-inference changes alter CSL shape for the same URL.
+const WEBSITE_CACHE_VERSION = 'citation-website-v4';
 
 export async function handleCiteWebsite(
   requestUrl: URL,
@@ -297,9 +298,11 @@ export async function handleCiteWebsite(
   }
 
   merged = withAccessDate(merged, now);
+  const typeWarnings = results.flatMap((result) => result.typeWarnings ?? []);
   const quality = validateCitationQuality(merged.csl, {
     provenance: merged.provenance,
     acquisition: attempts,
+    typeWarnings,
   });
 
   const envelope: ExtractEnvelope = {
