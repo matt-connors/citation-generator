@@ -8,7 +8,7 @@ export interface NamedSignal {
 
 const MERGEABLE_FIELDS: Array<keyof CSLItem> = [
   'title', 'author', 'issued', 'publisher', 'container-title', 'URL', 'DOI',
-  'volume', 'issue', 'page', 'edition', 'abstract',
+  'volume', 'issue', 'page', 'edition', 'genre', 'medium', 'abstract',
 ];
 
 export const EXTRACT_MERGEABLE_FIELDS = MERGEABLE_FIELDS;

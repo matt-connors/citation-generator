@@ -3,9 +3,23 @@ const ARTICLE_TYPES = new Set([
   'Report', 'TechArticle', 'AnalysisNewsArticle', 'OpinionNewsArticle',
   'ReviewArticle', 'BackgroundNewsArticle', 'LiveBlogPosting',
   'SocialMediaPosting', 'MedicalScholarlyArticle',
+  'VideoObject',
 ]);
 
-const NON_ARTICLE_CONTAINER_RE = /^(WebSite|Organization|NewsMediaOrganization|Person|Corporation|BreadcrumbList|SiteNavigationElement|CollectionPage|ProfilePage|SearchResultsPage|ImageObject|VideoObject)$/i;
+const NON_ARTICLE_CONTAINER_RE = /^(WebSite|Organization|NewsMediaOrganization|Person|Corporation|BreadcrumbList|SiteNavigationElement|CollectionPage|ProfilePage|SearchResultsPage|ImageObject)$/i;
+
+const NEWS_SCHEMA_TYPES = new Set([
+  'NewsArticle', 'AnalysisNewsArticle', 'OpinionNewsArticle',
+  'BackgroundNewsArticle', 'ReportageNewsArticle',
+]);
+
+const NEWS_HOST_SUFFIXES = [
+  'nytimes.com', 'theguardian.com', 'theguardian.co.uk', 'apnews.com', 'reuters.com',
+  'bbc.com', 'bbc.co.uk', 'washingtonpost.com', 'wsj.com', 'latimes.com', 'cnn.com',
+  'npr.org', 'nbcnews.com', 'cbsnews.com', 'abcnews.go.com', 'usatoday.com',
+  'politico.com', 'bloomberg.com', 'ft.com', 'economist.com', 'aljazeera.com',
+  'axios.com', 'thehill.com', 'foxnews.com', 'news.yahoo.com', 'cbc.ca', 'globalnews.ca',
+];
 const TITLE_SEP = /\s+[-|:]\s+/;
 const ORG_SUFFIXES = /\b(Inc\.?|LLC|Ltd\.?|Corp\.?|Corporation|Foundation|Press|University|Institute|Society|Group|Company|Co\.?|Department|Office|Agency|Bureau|Commission|Administration|Authority|Association|Council|Center|Centre|Laboratory|Lab|Labs|Ministry|Service|Services|News|Editorial Board|Editorial Team|Staff)[.\s]*$/i;
 const PARTICLES = new Set([
@@ -100,12 +114,16 @@ export function citationFromSnapshot(snapshot, now = new Date()) {
     baseUrl,
   );
 
+  const schemaTypes = collectSchemaTypes(snapshot?.jsonld || []);
+  const ogType = firstMeta(meta, ['og:type']);
+  const inference = inferType(fields, url, schemaTypes, ogType);
   const csl = {
     id: url,
-    type: inferType(fields),
     URL: url,
     accessed: dateFrom(now),
     ...fields,
+    ...inference.fieldPatches,
+    type: inference.type,
   };
   if (!csl.title) csl.title = cleanTitle(snapshot?.title, csl['container-title']) || url;
   if (!csl['container-title']) csl['container-title'] = siteFromUrl(url);
@@ -192,7 +210,7 @@ function walkJsonLd(node, fields) {
   }
 
   if (!fields.date) {
-    const date = firstString(node.datePublished, node.dateCreated, node.dateModified);
+    const date = firstString(node.datePublished, node.uploadDate, node.dateCreated, node.dateModified);
     if (date) fields.date = date;
   }
 
@@ -395,11 +413,71 @@ function parseNumericDate(value) {
   return null;
 }
 
-function inferType(fields) {
+function inferType(fields, url = '', schemaTypes = [], ogType = '') {
+  const host = hostnameOf(url);
   if (fields['container-title'] && (fields.volume || fields.issue || fields.page || fields.DOI)) {
-    return 'article-journal';
+    return { type: 'article-journal', fieldPatches: {} };
   }
-  return 'webpage';
+  if (isYouTubeHost(host)) {
+    return {
+      type: 'webpage',
+      fieldPatches: {
+        genre: fields.genre || 'Video',
+        'container-title': 'YouTube',
+      },
+    };
+  }
+  if (schemaTypes.some((t) => NEWS_SCHEMA_TYPES.has(t))
+    || (isNewsHost(host) && (fields.title || /article/i.test(ogType || '')))) {
+    return { type: 'article-newspaper', fieldPatches: {} };
+  }
+  return { type: 'webpage', fieldPatches: {} };
+}
+
+function isYouTubeHost(host) {
+  const h = String(host || '').toLowerCase();
+  return h === 'youtu.be' || h === 'youtube.com' || h.endsWith('.youtube.com');
+}
+
+function isNewsHost(host) {
+  const h = String(host || '').toLowerCase();
+  return NEWS_HOST_SUFFIXES.some((suffix) => h === suffix || h.endsWith(`.${suffix}`));
+}
+
+function hostnameOf(url) {
+  try { return new URL(url).hostname.toLowerCase(); } catch { return ''; }
+}
+
+function collectSchemaTypes(blobs) {
+  const out = new Set();
+  const visit = (node) => {
+    if (Array.isArray(node)) {
+      for (const item of node) visit(item);
+      return;
+    }
+    if (!node || typeof node !== 'object') return;
+    const raw = node['@type'];
+    if (typeof raw === 'string') {
+      for (const part of raw.split(/[\s,]+/)) {
+        const t = part.trim();
+        if (t) out.add(t.includes('/') ? t.split('/').pop() : t);
+      }
+    } else if (Array.isArray(raw)) {
+      for (const item of raw) {
+        if (typeof item === 'string') out.add(item.includes('/') ? item.split('/').pop() : item);
+      }
+    }
+    if (node['@graph']) visit(node['@graph']);
+    if (node.mainEntity) visit(node.mainEntity);
+  };
+  for (const blob of blobs) {
+    try {
+      visit(typeof blob === 'string' ? JSON.parse(blob) : blob);
+    } catch {
+      // ignore invalid json-ld blobs from the page
+    }
+  }
+  return [...out];
 }
 
 function normalizeDoi(value) {

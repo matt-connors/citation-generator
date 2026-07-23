@@ -16,6 +16,7 @@ import {
     Publisher,
     JournalName,
     DOI,
+    Medium,
     type FieldWarning,
 } from './EditCitationFormComponents';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -26,13 +27,59 @@ import {
     warningDismissalKey,
 } from '../../lib/references/warnings';
 
-interface CitationOption { label: string; value: CSLItem['type']; }
+/** UI option id — maps to CSL type (and optional YouTube field patches). */
+type SourceTypeOptionId =
+    | CSLItem['type']
+    | 'youtube-video';
+
+interface CitationOption { label: string; value: SourceTypeOptionId; }
 
 const TYPE_OPTIONS: CitationOption[] = [
     { label: 'Website', value: 'webpage' },
     { label: 'Book', value: 'book' },
     { label: 'Journal Article', value: 'article-journal' },
+    { label: 'Newspaper Article', value: 'article-newspaper' },
+    { label: 'Magazine Article', value: 'article-magazine' },
+    { label: 'YouTube / Video', value: 'youtube-video' },
 ];
+
+function isYouTubeLike(csl: CSLItem): boolean {
+    if (csl.genre && /^video$/i.test(csl.genre.trim())) return true;
+    if (csl['container-title'] && /^youtube$/i.test(csl['container-title'].trim())) return true;
+    const url = csl.URL || csl.id || '';
+    try {
+        const host = new URL(url).hostname.toLowerCase();
+        return host === 'youtu.be' || host === 'youtube.com' || host.endsWith('.youtube.com');
+    } catch {
+        return false;
+    }
+}
+
+function selectedTypeOption(csl: CSLItem): CitationOption {
+    if (csl.type === 'webpage' && isYouTubeLike(csl)) {
+        return TYPE_OPTIONS.find((o) => o.value === 'youtube-video')!;
+    }
+    return TYPE_OPTIONS.find((o) => o.value === csl.type) ?? TYPE_OPTIONS[0];
+}
+
+function patchForTypeOption(option: SourceTypeOptionId, prev: CSLItem): Partial<CSLItem> {
+    if (option === 'youtube-video') {
+        return {
+            type: 'webpage',
+            genre: prev.genre?.trim() || 'Video',
+            'container-title': prev['container-title']?.trim() || 'YouTube',
+        };
+    }
+    if (option === 'webpage' && isYouTubeLike(prev)) {
+        // Leaving YouTube representation for a plain website — drop video genre.
+        const next: Partial<CSLItem> = { type: 'webpage', genre: undefined };
+        if (prev['container-title'] && /^youtube$/i.test(prev['container-title'])) {
+            next['container-title'] = undefined;
+        }
+        return next;
+    }
+    return { type: option };
+}
 
 interface Props {
     source: StoredSource;
@@ -55,6 +102,7 @@ export default function EditCitationForm({ source, setSources, currentRef }: Pro
         }));
     }, [setSources, source.uuid]);
     const fieldWarnings = warningMapFor(source.quality?.warnings ?? [], local, source.dismissedWarningKeys, dismissWarning);
+    const typeWarning = sourceTypeWarning(source.quality?.warnings ?? [], source.dismissedWarningKeys, dismissWarning);
 
     // Read the latest `local` via ref inside the debounced flush so the 500ms
     // timer always writes the most recent state, regardless of how many
@@ -71,11 +119,35 @@ export default function EditCitationForm({ source, setSources, currentRef }: Pro
     }, 500);
 
     const patch = useCallback((p: Partial<CSLItem>) => {
-        setLocal((prev) => ({ ...prev, ...p } as CSLItem));
+        setLocal((prev) => {
+            const next = { ...prev, ...p } as CSLItem;
+            // Explicit undefined clears optional fields (e.g. leaving YouTube mode).
+            for (const key of Object.keys(p) as Array<keyof CSLItem>) {
+                if (p[key] === undefined) delete (next as any)[key];
+            }
+            return next;
+        });
         debouncedSet();
     }, [debouncedSet]);
 
-    const handleTypeChange = (t: CSLItem['type']) => patch({ type: t });
+    const handleTypeChange = (option: SourceTypeOptionId) => {
+        setLocal((prev) => {
+            const typePatch = patchForTypeOption(option, prev);
+            const next = { ...prev, ...typePatch } as CSLItem;
+            for (const key of Object.keys(typePatch) as Array<keyof CSLItem>) {
+                if (typePatch[key] === undefined) delete (next as any)[key];
+            }
+            localRef.current = next;
+            if (currentRef) currentRef.current = next;
+            return next;
+        });
+        debouncedSet();
+    };
+
+    const youtubeMode = local.type === 'webpage' && isYouTubeLike(local);
+    const showWebsiteName = local.type === 'webpage' || local.type === 'article-newspaper' || local.type === 'article-magazine';
+    const showUrl = local.type === 'webpage' || local.type === 'book' || local.type === 'article-journal'
+        || local.type === 'article-newspaper' || local.type === 'article-magazine';
 
     return (
         // data-vaul-no-drag tells vaul to skip its drag-to-dismiss detection
@@ -90,18 +162,36 @@ export default function EditCitationForm({ source, setSources, currentRef }: Pro
                     Source Type
                     <span className="text-xs text-muted-foreground">Required</span>
                 </span>
-                <SimpleDropdown
-                    options={TYPE_OPTIONS}
-                    value={TYPE_OPTIONS.find((o) => o.value === local.type)}
-                    onChange={(o: CitationOption) => handleTypeChange(o.value)}
-                    placeholder="Source Type"
-                    className="min-w-0 sm:min-w-[7rem]"
-                />
+                <div className="flex min-w-0 flex-col gap-1.5">
+                    <SimpleDropdown
+                        options={TYPE_OPTIONS}
+                        value={selectedTypeOption(local)}
+                        onChange={(o: CitationOption) => handleTypeChange(o.value)}
+                        placeholder="Source Type"
+                        className="min-w-0 sm:min-w-[7rem]"
+                    />
+                    {typeWarning && (
+                        <p className="m-0 text-xs leading-5 text-muted-foreground" data-severity={typeWarning.severity || 'review'}>
+                            {typeWarning.message}
+                        </p>
+                    )}
+                </div>
             </div>
             <Line className="my-4" />
             <Title value={local.title || ''} onChange={(v) => patch({ title: v })} isRequired warning={fieldWarnings.title} />
-            {local.type === 'webpage' && (
-                <WebsiteName value={local['container-title'] || ''} onChange={(v) => patch({ 'container-title': v })} warning={fieldWarnings['container-title']} />
+            {showWebsiteName && (
+                <WebsiteName
+                    value={local['container-title'] || ''}
+                    onChange={(v) => patch({ 'container-title': v })}
+                    warning={fieldWarnings['container-title']}
+                />
+            )}
+            {youtubeMode && (
+                <Medium
+                    value={local.genre || ''}
+                    onChange={(v) => patch({ genre: v })}
+                    isRecommended
+                />
             )}
             <Line className="my-4" />
             <Contributors authors={local.author ?? []} onChange={(next) => patch({ author: next })} warning={fieldWarnings.author} />
@@ -109,7 +199,7 @@ export default function EditCitationForm({ source, setSources, currentRef }: Pro
             <PublicationDate value={local.issued} onChange={(d) => patch({ issued: d })} isRecommended warning={fieldWarnings.issued} />
             <AccessDate value={local.accessed} onChange={(d) => patch({ accessed: d })} />
             <Line className="my-4" />
-            {(local.type === 'webpage' || local.type === 'book' || local.type === 'article-journal') && (
+            {showUrl && (
                 <UrlField value={local.URL || ''} onChange={(v) => patch({ URL: v })} isRecommended warning={fieldWarnings.URL} />
             )}
             {local.type === 'book' && (
@@ -129,8 +219,31 @@ export default function EditCitationForm({ source, setSources, currentRef }: Pro
                     <DOI value={local.DOI || ''} onChange={(v) => patch({ DOI: v })} isRecommended warning={fieldWarnings.DOI} />
                 </>
             )}
+            {(local.type === 'article-newspaper' || local.type === 'article-magazine') && (
+                <Publisher value={local.publisher || ''} onChange={(v) => patch({ publisher: v })} warning={fieldWarnings.publisher} />
+            )}
         </div>
     );
+}
+
+function sourceTypeWarning(
+    warnings: CitationQualityWarning[],
+    dismissedWarningKeys: readonly string[] | undefined,
+    onDismissWarning: (warningKey: string) => void,
+): FieldWarning | undefined {
+    for (const warning of warnings) {
+        if (warning.action !== 'choose-source-type' && warning.code !== 'source_type_ambiguous') continue;
+        if (isCitationWarningDismissed(warning, dismissedWarningKeys)) continue;
+        const warningKey = warningDismissalKey(warning);
+        const dismissible = isDismissibleCitationWarning(warning);
+        return {
+            message: warning.message,
+            severity: warning.severity,
+            dismissible,
+            onDismiss: dismissible ? () => onDismissWarning(warningKey) : undefined,
+        };
+    }
+    return undefined;
 }
 
 function warningMapFor(

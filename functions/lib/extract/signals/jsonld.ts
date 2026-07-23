@@ -36,9 +36,12 @@ const ARTICLE_TYPES = new Set([
   'Report', 'TechArticle', 'AnalysisNewsArticle', 'OpinionNewsArticle',
   'ReviewArticle', 'BackgroundNewsArticle', 'LiveBlogPosting',
   'SocialMediaPosting', 'MedicalScholarlyArticle',
+  // VideoObject is extractable for title/author/date (YouTube etc.); still
+  // excluded from NON_ARTICLE so name/headline fields are accepted.
+  'VideoObject',
 ]);
 
-const NON_ARTICLE_CONTAINER_RE = /^(WebSite|Organization|NewsMediaOrganization|Person|Corporation|BreadcrumbList|SiteNavigationElement|CollectionPage|ProfilePage|SearchResultsPage|ImageObject|VideoObject)$/i;
+const NON_ARTICLE_CONTAINER_RE = /^(WebSite|Organization|NewsMediaOrganization|Person|Corporation|BreadcrumbList|SiteNavigationElement|CollectionPage|ProfilePage|SearchResultsPage|ImageObject)$/i;
 
 function isArticleish(type: string): boolean {
   const types = typeNames(type);
@@ -115,7 +118,7 @@ function walk(node: unknown, fields: Partial<CSLItem>, confidence: Partial<Recor
   }
 
   if (!fields.issued) {
-    const d = n.datePublished || n.dateCreated || n.dateModified;
+    const d = n.datePublished || n.uploadDate || n.dateCreated || n.dateModified;
     if (typeof d === 'string') {
       const dp = parseDate(d);
       if (dp) {

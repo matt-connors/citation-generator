@@ -18,7 +18,8 @@ describe('runExtractionPipeline', () => {
     const url = 'https://example.com/article';
     const result = runExtractionPipeline(html, url);
     expect(result.csl.id).toBe(url);
-    expect(result.csl.type).toBe('webpage');
+    // NewsArticle schema is high-confidence → newspaper, not generic webpage.
+    expect(result.csl.type).toBe('article-newspaper');
     expect(result.csl.title).toBe('JSON-LD Title');
     expect(result.csl.author).toEqual([{ family: 'Doe', given: 'Jane' }]);
     expect(result.csl.issued).toEqual({ 'date-parts': [[2026, 5, 26]] });
@@ -91,6 +92,53 @@ describe('runExtractionPipeline', () => {
     </head></html>`;
     const result = runExtractionPipeline(html, 'https://example.com/news');
     expect(result.csl.type).toBe('webpage');
+  });
+
+  it('classifies known news hosts as article-newspaper', () => {
+    const html = `<!DOCTYPE html><html><head>
+      <meta property="og:title" content="Breaking Story" />
+      <meta property="og:site_name" content="AP News" />
+      <meta property="og:type" content="article" />
+    </head></html>`;
+    const result = runExtractionPipeline(html, 'https://apnews.com/article/xyz');
+    expect(result.csl.type).toBe('article-newspaper');
+  });
+
+  it('applies YouTube video field patches for youtube.com URLs', () => {
+    const html = `<!DOCTYPE html><html><head>
+      <meta property="og:title" content="How Memory Forms" />
+      <meta property="og:site_name" content="YouTube" />
+      <script type="application/ld+json">${JSON.stringify({
+        '@type': 'VideoObject',
+        name: 'How Memory Forms',
+        author: { '@type': 'Person', name: 'Cognitive Lab' },
+        uploadDate: '2024-07-15',
+      })}</script>
+    </head></html>`;
+    const result = runExtractionPipeline(html, 'https://www.youtube.com/watch?v=example');
+    expect(result.csl.type).toBe('webpage');
+    expect(result.csl.genre).toBe('Video');
+    expect(result.csl['container-title']).toBe('YouTube');
+    expect(result.csl.title).toBe('How Memory Forms');
+    // Channel-style names with org-ish suffixes (Lab) stay as literal authors.
+    expect(result.csl.author).toEqual([{ literal: 'Cognitive Lab' }]);
+    expect(result.csl.issued).toEqual({ 'date-parts': [[2024, 7, 15]] });
+  });
+
+  it('emits typeWarnings for ambiguous government pages', () => {
+    const html = `<!DOCTYPE html><html><head>
+      <title>Diabetes Basics | CDC</title>
+      <meta property="og:title" content="Diabetes Basics" />
+      <meta property="og:site_name" content="CDC" />
+    </head></html>`;
+    const result = runExtractionPipeline(html, 'https://www.cdc.gov/diabetes/about/index.html');
+    expect(result.csl.type).toBe('webpage');
+    expect(result.typeWarnings).toEqual([
+      expect.objectContaining({
+        code: 'source_type_ambiguous',
+        action: 'choose-source-type',
+      }),
+    ]);
   });
 
   describe('wikipedia title override', () => {

@@ -1,5 +1,11 @@
 import * as cheerio from 'cheerio';
-import type { AcquisitionSource, CSLItem, FieldEvidence, FieldProvenance } from '../csl-types';
+import type {
+  AcquisitionSource,
+  CitationQualityWarning,
+  CSLItem,
+  FieldEvidence,
+  FieldProvenance,
+} from '../csl-types';
 import { jsonldSignal } from './signals/jsonld';
 import { microdataSignal } from './signals/microdata';
 import { openGraphSignal } from './signals/opengraph';
@@ -7,6 +13,7 @@ import { twitterSignal } from './signals/twitter';
 import { metaSignal } from './signals/meta';
 import { heuristicSignal } from './signals/heuristic';
 import { mergeSignals } from './merge';
+import { collectPageTypeHints, inferSourceType } from './infer-type';
 
 const SIGNALS = [
   { name: 'jsonld', fn: jsonldSignal },
@@ -21,6 +28,8 @@ export interface PipelineResult {
   csl: CSLItem;
   signals: Record<string, string>;
   provenance: Partial<Record<keyof CSLItem, FieldProvenance>>;
+  /** Type-inference review warnings (e.g. ambiguous government pages). */
+  typeWarnings?: CitationQualityWarning[];
 }
 
 export interface PipelineOptions {
@@ -32,14 +41,19 @@ export function runExtractionPipeline(html: string, url: string, options: Pipeli
   const $ = cheerio.load(html);
   const named = SIGNALS.map((s) => ({ name: s.name, ...s.fn($) }));
   const { csl: merged, signals, provenance } = mergeSignals(named, options);
+  const hints = collectPageTypeHints($);
+  const inference = inferSourceType(merged, url, hints);
   const final: CSLItem = {
     id: url,
-    type: inferType(merged),
     URL: url,
     ...merged,
+    ...inference.fieldPatches,
+    type: inference.type,
   };
   final.URL = resolveUrl(final.URL, url);
   ensureInputUrlProvenance(provenance, final.URL, options);
+  // YouTube container patches are intentional style fields; keep them even when
+  // publisher matched the pre-patch container.
   dedupePublisherContainer(final);
   if (!final.publisher) delete provenance.publisher;
 
@@ -63,19 +77,12 @@ export function runExtractionPipeline(html: string, url: string, options: Pipeli
     }
   }
 
-  return { csl: final, signals, provenance };
-}
-
-function inferType(item: Partial<CSLItem>): CSLItem['type'] {
-  // A pasted URL can point at a journal article landing page. When the page
-  // exposes journal-style container metadata plus a scholarly locator, format
-  // it as an article-journal so CSL can render those details. DOI-only landing
-  // pages are common for early-online articles and should not fall back to a
-  // generic webpage.
-  if (item['container-title'] && (item.volume || item.issue || item.page || item.DOI)) {
-    return 'article-journal';
-  }
-  return 'webpage';
+  return {
+    csl: final,
+    signals,
+    provenance,
+    typeWarnings: inference.warnings.length ? inference.warnings : undefined,
+  };
 }
 
 function resolveUrl(value: string | undefined, base: string): string {

@@ -39,7 +39,8 @@ describe('handleCiteWebsite', () => {
     expect(res.status).toBe(200);
     const body = await res.json() as any;
     expect(body.uuid).toBeTruthy();
-    expect(body.type).toBe('webpage');
+    // NewsArticle schema is high-confidence → article-newspaper.
+    expect(body.type).toBe('article-newspaper');
     expect(body.csl.title).toBe('Test Article');
     expect(body.csl.author).toEqual([{ family: 'Doe', given: 'Jane' }]);
     expect(body.csl.accessed).toEqual({ 'date-parts': [[2026, 6, 26]] });
