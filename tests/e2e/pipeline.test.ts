@@ -101,9 +101,9 @@ const CASES: SmokeCase[] = [
     absentWarningCodes: ['author_not_found', 'date_not_found', 'url_missing'],
     styleTokens: {
       'mla-9': ['Rush, Claire, and Rebecca Boone.', '<i>AP News</i>', '26 May 2026'],
-      // Newspaper type italicizes the paper name, not the article title.
+      // Newspaper type italicizes the paper name in APA; Chicago author-date keeps year after author.
       'apa-7': ['Rush, C., & Boone, R. (2026, May 26).', '<i>AP News</i>.'],
-      'chicago-18': ['<i>AP News</i>, May 26, 2026.'],
+      'chicago-18': ['Rush, Claire, and Rebecca Boone. 2026.', '<i>AP News</i>', 'May 26.'],
       ieee: ['[1] C. Rush and R. Boone', '[Online]. Available:'],
       vancouver: ['Rush C, Boone R.', 'Available from:'],
     },
@@ -311,7 +311,7 @@ const CASES: SmokeCase[] = [
     styleTokens: {
       'mla-9': ['Lee, Jordan.', '<i>Example Daily</i>', '4 Feb. 2026'],
       'apa-7': ['Lee, J. (2026, February 4).', '<i>Example Daily</i>.'],
-      'chicago-18': ['<i>Example Daily</i>, February 4, 2026.'],
+      'chicago-18': ['Lee, Jordan. 2026.', '<i>Example Daily</i>', 'February 4.'],
       ieee: ['[1] J. Lee'],
       vancouver: ['Lee J.', 'Example Daily', '2026'],
     },
