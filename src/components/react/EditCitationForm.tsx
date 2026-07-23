@@ -70,15 +70,14 @@ function patchForTypeOption(option: SourceTypeOptionId, prev: CSLItem): Partial<
             'container-title': prev['container-title']?.trim() || 'YouTube',
         };
     }
-    if (option === 'webpage' && isYouTubeLike(prev)) {
-        // Leaving YouTube representation for a plain website — drop video genre.
-        const next: Partial<CSLItem> = { type: 'webpage', genre: undefined };
-        if (prev['container-title'] && /^youtube$/i.test(prev['container-title'])) {
-            next['container-title'] = undefined;
-        }
-        return next;
+    // Leaving YouTube representation for any other type — drop video genre and
+    // a pure "YouTube" container so newspaper/journal styles do not keep [Video].
+    const next: Partial<CSLItem> = { type: option };
+    if (prev.genre && /^video$/i.test(prev.genre.trim())) next.genre = undefined;
+    if (prev['container-title'] && /^youtube$/i.test(prev['container-title'].trim())) {
+        next['container-title'] = undefined;
     }
-    return { type: option };
+    return next;
 }
 
 interface Props {

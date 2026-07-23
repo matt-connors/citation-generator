@@ -52,6 +52,9 @@ export function runExtractionPipeline(html: string, url: string, options: Pipeli
   };
   final.URL = resolveUrl(final.URL, url);
   ensureInputUrlProvenance(provenance, final.URL, options);
+  // Record inference patches in provenance so multi-pass merge (cite-website)
+  // keeps genre/container-title that no HTML signal extracted (e.g. YouTube Video).
+  applyFieldPatchesToProvenance(provenance, inference.fieldPatches, options);
   // YouTube container patches are intentional style fields; keep them even when
   // publisher matched the pre-patch container.
   dedupePublisherContainer(final);
@@ -81,7 +84,9 @@ export function runExtractionPipeline(html: string, url: string, options: Pipeli
     csl: final,
     signals,
     provenance,
-    typeWarnings: inference.warnings.length ? inference.warnings : undefined,
+    // Always pass an array (possibly empty) so quality validation does not
+    // re-run host heuristics that the pipeline already resolved.
+    typeWarnings: inference.warnings,
   };
 }
 
@@ -141,4 +146,47 @@ function ensureInputUrlProvenance(
     candidates: [evidence],
     conflicts: [],
   };
+}
+
+function applyFieldPatchesToProvenance(
+  provenance: Partial<Record<keyof CSLItem, FieldProvenance>>,
+  patches: Partial<CSLItem>,
+  options: PipelineOptions,
+): void {
+  for (const [key, value] of Object.entries(patches) as Array<[keyof CSLItem, unknown]>) {
+    if (value === undefined || value === null) continue;
+    if (key === 'id' || key === 'type') continue;
+    const evidence: FieldEvidence = {
+      field: key,
+      normalizedValue: value,
+      rawValue: typeof value === 'string' ? value : undefined,
+      source: 'type-inference',
+      acquisition: options.acquisition ?? 'input',
+      confidence: 0.98,
+      acquiredAt: options.acquiredAt,
+      locator: 'source-type-inference',
+    };
+    const existing = provenance[key];
+    if (!existing) {
+      provenance[key] = { winner: evidence, candidates: [evidence], conflicts: [] };
+      continue;
+    }
+    // Prefer inference for style-critical patches when confidence is higher or
+    // equal and the field was only weakly sourced (e.g. og site_name).
+    const candidates = [...existing.candidates, evidence];
+    const winner = evidence.confidence >= (existing.winner?.confidence ?? 0)
+      ? evidence
+      : existing.winner ?? evidence;
+    provenance[key] = {
+      winner,
+      candidates,
+      conflicts: candidates.filter((c) => {
+        try {
+          return JSON.stringify(c.normalizedValue) !== JSON.stringify(winner.normalizedValue);
+        } catch {
+          return c.normalizedValue !== winner.normalizedValue;
+        }
+      }),
+    };
+  }
 }

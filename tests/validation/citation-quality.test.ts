@@ -64,6 +64,20 @@ describe('validateCitationQuality', () => {
     expect(quality.warnings.filter((w) => w.code === 'source_type_ambiguous')).toHaveLength(1);
   });
 
+  it('does not re-flag gov pages when pipeline supplied an empty typeWarnings list', () => {
+    const quality = validateCitationQuality({
+      id: 'https://www.cdc.gov/research/paper',
+      type: 'webpage',
+      title: 'Scholarly Note',
+      URL: 'https://www.cdc.gov/research/paper',
+      author: [{ literal: 'CDC' }],
+      issued: { 'date-parts': [[2026, 1, 1]] },
+    }, {
+      typeWarnings: [],
+    });
+    expect(quality.warnings.map((w) => w.code)).not.toContain('source_type_ambiguous');
+  });
+
   it('flags conflicting evidence without overwriting the winner', () => {
     const winner: FieldEvidence = {
       field: 'issued',

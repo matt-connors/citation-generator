@@ -64,8 +64,9 @@ export function validateCitationQuality(csl: CSLItem, options: ValidateCitationO
   }
 
   // Ambiguous government pages: suggest choosing source type rather than silently
-  // promoting to report. Prefer pipeline-provided typeWarnings when present.
-  if (options.typeWarnings?.length) {
+  // promoting to report. When the pipeline supplied typeWarnings (even empty),
+  // trust that decision so scholarly .gov pages are not re-flagged.
+  if (options.typeWarnings !== undefined) {
     warnings.push(...options.typeWarnings);
   } else if (csl.type === 'webpage' && isAmbiguousGovernmentCitation(csl)) {
     warnings.push({
@@ -73,7 +74,7 @@ export function validateCitationQuality(csl: CSLItem, options: ValidateCitationO
       field: 'type',
       severity: 'review',
       message:
-        'This looks like a government or agency page. Confirm whether it should be cited as a webpage, report, or another source type.',
+        'This looks like a government or agency page. Confirm whether it should be cited as a webpage, newspaper, journal, or another source type.',
       action: 'choose-source-type',
     });
   }

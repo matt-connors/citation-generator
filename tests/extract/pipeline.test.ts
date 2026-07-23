@@ -123,6 +123,10 @@ describe('runExtractionPipeline', () => {
     // Channel-style names with org-ish suffixes (Lab) stay as literal authors.
     expect(result.csl.author).toEqual([{ literal: 'Cognitive Lab' }]);
     expect(result.csl.issued).toEqual({ 'date-parts': [[2024, 7, 15]] });
+    // Provenance must carry genre so multi-pass merge keeps APA [Video].
+    expect(result.provenance.genre?.winner?.normalizedValue).toBe('Video');
+    expect(result.provenance.genre?.winner?.source).toBe('type-inference');
+    expect(result.typeWarnings).toEqual([]);
   });
 
   it('emits typeWarnings for ambiguous government pages', () => {

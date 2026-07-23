@@ -80,6 +80,7 @@ export type EvidenceSource =
   | 'openlibrary'
   | 'google-books'
   | 'ai-extract'
+  | 'type-inference'
   | 'user-edit';
 
 export interface FieldEvidence {

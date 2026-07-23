@@ -28,7 +28,7 @@ export interface CiteWebsiteDeps {
 
 type AcquisitionMode = 'auto' | 'fetch' | 'render';
 // Bump when extraction/type-inference changes alter CSL shape for the same URL.
-const WEBSITE_CACHE_VERSION = 'citation-website-v3';
+const WEBSITE_CACHE_VERSION = 'citation-website-v4';
 
 export async function handleCiteWebsite(
   requestUrl: URL,

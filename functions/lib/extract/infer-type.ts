@@ -101,7 +101,7 @@ export function inferSourceType(
       field: 'type',
       severity: 'review',
       message:
-        'This looks like a government or agency page. Confirm whether it should be cited as a webpage, report, or another source type.',
+        'This looks like a government or agency page. Confirm whether it should be cited as a webpage, newspaper, journal, or another source type.',
       action: 'choose-source-type',
     });
   }
