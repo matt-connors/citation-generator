@@ -19,6 +19,8 @@ export function isDismissibleCitationWarning(warning: CitationQualityWarning): b
   if (NON_DISMISSIBLE_CODES.has(warning.code)) return false;
   if (warning.code.endsWith('_conflict')) return true;
   if (warning.code.endsWith('_ai_suggested')) return true; // "I verified this"
+  // User can confirm or change source type; do not trap them on a permanent banner.
+  if (warning.code === 'source_type_ambiguous' || warning.action === 'choose-source-type') return true;
   return false;
 }
 

@@ -1,0 +1,30 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "Diabetes Basics",
+  "author": [
+    {
+      "literal": "CDC"
+    }
+  ],
+  "issued": {
+    "date-parts": [
+      [
+        2026,
+        1,
+        26
+      ]
+    ]
+  },
+  "accessed": {
+    "date-parts": [
+      [
+        2026,
+        5,
+        31
+      ]
+    ]
+  },
+  "container-title": "Centers for Disease Control and Prevention",
+  "URL": "https://www.cdc.gov/diabetes/about/index.html"
+}

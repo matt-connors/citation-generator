@@ -96,6 +96,7 @@ function sourceRank(evidence: FieldEvidence): number {
     case 'microdata':
     case 'meta': return 70;
     case 'opengraph': return 60;
+    case 'type-inference': return 55;
     case 'heuristic': return 50;
     case 'ai-extract': return 40;
     case 'twitter': return 30;

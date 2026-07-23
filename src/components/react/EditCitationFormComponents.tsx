@@ -467,13 +467,13 @@ export const Medium = ({ value, onChange, isRequired, isRecommended, warning }: 
     return (
         <label className="flex flex-col gap-1 sm:grid sm:grid-cols-[130px_1fr] sm:items-center sm:gap-4">
             <span className="flex flex-col leading-4 text-sm">
-                Medium
+                Genre / Medium
                 {isRequired && <span className="text-xs text-muted-foreground">Required</span>}
                 {isRecommended && <span className="text-xs text-muted-foreground">Recommended</span>}
             </span>
             <FieldInputStack warning={warning}>
                 <Input
-                    placeholder="Medium"
+                    placeholder="e.g., Video"
                     type="text"
                     value={value}
                     onChange={(e) => onChange(e.target.value)}

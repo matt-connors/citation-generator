@@ -1,0 +1,31 @@
+{
+  "id": "fixture",
+  "type": "webpage",
+  "title": "How Memory Forms While You Sleep",
+  "author": [
+    {
+      "literal": "Cognitive Lab"
+    }
+  ],
+  "issued": {
+    "date-parts": [
+      [
+        2024,
+        7,
+        15
+      ]
+    ]
+  },
+  "accessed": {
+    "date-parts": [
+      [
+        2026,
+        5,
+        20
+      ]
+    ]
+  },
+  "container-title": "YouTube",
+  "genre": "Video",
+  "URL": "https://www.youtube.com/watch?v=example"
+}

@@ -39,7 +39,8 @@ describe('handleCiteWebsite', () => {
     expect(res.status).toBe(200);
     const body = await res.json() as any;
     expect(body.uuid).toBeTruthy();
-    expect(body.type).toBe('webpage');
+    // NewsArticle schema is high-confidence → article-newspaper.
+    expect(body.type).toBe('article-newspaper');
     expect(body.csl.title).toBe('Test Article');
     expect(body.csl.author).toEqual([{ family: 'Doe', given: 'Jane' }]);
     expect(body.csl.accessed).toEqual({ 'date-parts': [[2026, 6, 26]] });
@@ -152,6 +153,32 @@ describe('handleCiteWebsite', () => {
     expect(body.csl.publisher).toBeUndefined();
     expect(body._provenance.author.winner.source).toBe('ai-extract');
     expect(body._quality.acquisition.ai.fieldsFound).toEqual(['author', 'issued']);
+  });
+
+  it('keeps YouTube genre through merge so APA can render [Video]', async () => {
+    const html = `<!DOCTYPE html><html><head>
+      <meta property="og:title" content="How Memory Forms While You Sleep" />
+      <meta property="og:site_name" content="YouTube" />
+      <script type="application/ld+json">${JSON.stringify({
+        '@type': 'VideoObject',
+        name: 'How Memory Forms While You Sleep',
+        author: { '@type': 'Organization', name: 'Cognitive Lab' },
+        uploadDate: '2024-07-15',
+      })}</script>
+    </head></html>`;
+    mockHtml(html);
+    const res = await handleCiteWebsite(
+      new URL('https://m.com/api/cite-website?url=https://www.youtube.com/watch?v=example'),
+      null,
+      undefined,
+      new Date(Date.UTC(2026, 5, 20)),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json() as any;
+    expect(body.type).toBe('webpage');
+    expect(body.csl.genre).toBe('Video');
+    expect(body.csl['container-title']).toBe('YouTube');
+    expect(body._provenance.genre.winner.source).toBe('type-inference');
   });
 
   it('rescues an X post via the syndication API when the page is an empty JS shell', async () => {
